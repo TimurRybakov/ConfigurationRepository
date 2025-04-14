@@ -1,0 +1,22 @@
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace ConfigurationRepository;
+
+public static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddConfigurationRepositoryReloader(
+        this IServiceCollection services, TimeSpan? period = null, TimeSpan? dueTime = null)
+    {
+        services.AddSingleton(serviceProvider =>
+        {
+            var providers = serviceProvider
+                .GetRequiredService<IConfiguration>()
+                .GetConfigurationRepositoryProviders()?
+                .ToArray() ?? throw new InvalidOperationException($"No services of type {nameof(ConfigurationRepositoryProvider)} found");
+            return new ConfigurationReloader(providers, period, dueTime);
+        });
+        return services;
+    }
+}
