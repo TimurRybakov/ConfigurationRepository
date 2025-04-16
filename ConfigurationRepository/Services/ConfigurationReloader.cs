@@ -15,6 +15,8 @@ public sealed class ConfigurationReloader : BackgroundService
         _timer = new PeriodicTimer(period ?? TimeSpan.FromSeconds(30));
     }
 
+    public event Action<ConfigurationReloader>? OnProvidersReloaded;
+
     public override void Dispose()
     {
         _timer.Dispose();
@@ -34,5 +36,6 @@ public sealed class ConfigurationReloader : BackgroundService
         {
             provider.Reload();
         }
+        OnProvidersReloaded?.Invoke(this);
     }
 }

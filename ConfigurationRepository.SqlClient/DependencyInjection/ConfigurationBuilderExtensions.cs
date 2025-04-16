@@ -7,7 +7,7 @@ public static class ConfigurationBuilderExtensions
     public static IConfigurationBuilder AddSqlClientRepository(
         this IConfigurationBuilder builder,
         Action<SqlClientConfigurationRepository> configure,
-        Action<ConfigurationRepositorySource>? configureSource = null)
+        Action<SqlClientConfigurationSource>? configureSource = null)
     {
         var source = new SqlClientConfigurationSource();
         var repository = new SqlClientConfigurationRepository();
