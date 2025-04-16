@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
-using Microsoft.Identity.Client.Extensions.Msal;
 
 namespace ConfigurationRepository.Tests;
 
@@ -54,21 +53,25 @@ public class EfCoreConfigurationRepositoryTests
             })
             .Build();
 
+        Assert.That(configuration["Host"], Is.EqualTo("127.0.0.1"));
+
         ChangeToken.OnChange(
             () => configuration.GetReloadToken(),
             () => Console.WriteLine("Configuration reloaded."));
 
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
-        services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(50));
+        services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(15));
         var serviceProvider = services.BuildServiceProvider();
-        _  = serviceProvider.GetRequiredService<ConfigurationReloader>();
+        var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
 
         savedEntry.Value = "localhost";
         context.SaveChanges();
         Console.WriteLine("Configuration changed.");
 
-        Thread.Sleep(75); // wait for reload
+        await reloader.StartAsync(CancellationToken.None);
+        await Task.Delay(15);
+        await reloader.StopAsync(CancellationToken.None);
 
         // Assert
         Assert.That(configuration["Host"], Is.EqualTo(savedEntry?.Value));

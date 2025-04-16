@@ -1,25 +1,34 @@
+using Microsoft.Extensions.Hosting;
+
 namespace ConfigurationRepository;
 
-public sealed class ConfigurationReloader : IDisposable
+public sealed class ConfigurationReloader : BackgroundService
 {
     private readonly ICollection<ConfigurationRepositoryProvider> _providers;
-    private readonly Timer _timer;
+    private readonly PeriodicTimer _timer;
 
     public ConfigurationReloader(
         ICollection<ConfigurationRepositoryProvider> providers,
-        TimeSpan? period = null,
-        TimeSpan? dueTime = null)
+        TimeSpan? period = null)
     {
         _providers = providers;
-        _timer = new Timer(ReloadProviders, null, dueTime ?? TimeSpan.Zero, period ?? TimeSpan.FromSeconds(30));
+        _timer = new PeriodicTimer(period ?? TimeSpan.FromSeconds(30));
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         _timer.Dispose();
     }
 
-    private void ReloadProviders(object? state)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (await _timer.WaitForNextTickAsync(stoppingToken))
+        {
+            ReloadProviders();
+        }
+    }
+
+    private void ReloadProviders()
     {
         foreach (var provider in _providers)
         {

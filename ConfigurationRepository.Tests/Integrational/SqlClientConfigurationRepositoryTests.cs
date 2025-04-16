@@ -31,7 +31,7 @@ internal class SqlClientConfigurationRepositoryTests
     }
 
     [Test]
-    public void RepositoryWithReloader_Should_PeriodicallyReload()
+    public async Task RepositoryWithReloader_Should_PeriodicallyReload()
     {
         // Act
         var value = UpsertConfiguration();
@@ -54,18 +54,22 @@ internal class SqlClientConfigurationRepositoryTests
 
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
-        services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(50));
+        services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(15));
         var serviceProvider = services.BuildServiceProvider();
-        _ = serviceProvider.GetRequiredService<ConfigurationReloader>(); // Create ConfigurationReloader instance
+        var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
 
         UpdateConfigurationWithNoChanges();
         Console.WriteLine("Configuration not changed.");
+
+        await reloader.StartAsync(CancellationToken.None);
+        await Task.Delay(15); // wait for reload
+
         Assert.That(configuration["CurrentDateTime"], Is.EqualTo(value));
-        Thread.Sleep(75); // wait for reload
 
         value = UpsertConfiguration();
         Console.WriteLine("Configuration changed.");
-        Thread.Sleep(75); // wait for reload
+        await Task.Delay(15); // wait for reload
+        await reloader.StopAsync(CancellationToken.None);
 
         Assert.That(configuration["CurrentDateTime"], Is.EqualTo(value));
     }
