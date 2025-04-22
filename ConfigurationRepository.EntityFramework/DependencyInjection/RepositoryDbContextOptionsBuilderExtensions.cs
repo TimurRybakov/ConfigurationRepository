@@ -6,14 +6,15 @@ namespace ConfigurationRepository.EntityFramework;
 
 public static class RepositoryDbContextOptionsBuilderExtensions
 {
-    public static DbContextOptionsBuilder UseTable(
-        this DbContextOptionsBuilder optionsBuilder,
+    public static DbContextOptionsBuilder<TContext> UseTable<TContext>(
+        this DbContextOptionsBuilder<TContext> optionsBuilder,
         string tableName,
         string? schemaName = null,
-        Action<RepositoryDbContextOptions>? configurator = null)
+        Action<DictionaryRepositoryDbContextOptions>? configurator = null)
+        where TContext : DictionaryRepositoryDbContext
     {
-        var extension = (optionsBuilder.Options.FindExtension<RepositoryDbContextOptions>()
-                ?? new RepositoryDbContextOptions());
+        var extension = (optionsBuilder.Options.FindExtension<DictionaryRepositoryDbContextOptions>()
+                ?? new DictionaryRepositoryDbContextOptions());
 
         extension.TableName = tableName;
 

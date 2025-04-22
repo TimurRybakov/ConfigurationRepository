@@ -1,6 +1,4 @@
 
-using ConfigurationRepository.Services;
-
 namespace ConfigurationRepository;
 
 public static class ConfigurationRepositorySourceExtensions

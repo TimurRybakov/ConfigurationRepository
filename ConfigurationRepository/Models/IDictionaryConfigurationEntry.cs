@@ -6,7 +6,7 @@ namespace ConfigurationRepository;
 /// <summary>
 /// A single configuration entry stored in an <see cref="IRepository"/>.
 /// </summary>
-public interface IEntry
+public interface IDictionaryConfigurationEntry
 {
     /// <summary>
     /// Configuration Key delimited by <see cref="ConfigurationPath.KeyDelimiter"/>.

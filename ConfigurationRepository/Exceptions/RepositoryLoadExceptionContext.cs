@@ -1,4 +1,4 @@
-﻿namespace ConfigurationRepository;
+namespace ConfigurationRepository;
 
 /// <summary>
 /// Contains information about a database load exception.

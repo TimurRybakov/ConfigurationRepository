@@ -10,7 +10,7 @@ public static class ConfigurationBuilderExtensions
         Action<DbContextOptionsBuilder> configureOptions,
         Action<ConfigurationRepositorySource>? configureSource = null)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<RepositoryDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<DictionaryRepositoryDbContext>();
 
         configureOptions.Invoke(optionsBuilder);
 
@@ -19,14 +19,14 @@ public static class ConfigurationBuilderExtensions
 
     public static IConfigurationBuilder AddEfCoreRepository(
         this IConfigurationBuilder builder,
-        DbContextOptions<RepositoryDbContext> options,
+        DbContextOptions<DictionaryRepositoryDbContext> options,
         Action<ConfigurationRepositorySource>? configureSource = null)
     {
         var source = new ConfigurationRepositorySource();
 
         var repository =
-            new EfConfigurationRepository<RepositoryDbContext, ConfigurationEntry>(
-                new RepositoryDbContext(options));
+            new EfDictionaryConfigurationRepository<DictionaryRepositoryDbContext, DictionaryConfigurationEntry>(
+                new DictionaryRepositoryDbContext(options));
 
         source.Repository = repository;
 

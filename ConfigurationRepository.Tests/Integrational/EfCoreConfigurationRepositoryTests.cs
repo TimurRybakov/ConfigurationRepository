@@ -18,9 +18,9 @@ public class EfCoreConfigurationRepositoryTests
     {
         // Arrange
         var options = GetDbContextOptions(nameof(Configuration_Should_ReturnSameValueAsSavedByRepository));
-        await using var context = new RepositoryDbContext(options);
+        await using var context = new DictionaryRepositoryDbContext(options);
         var repository = new EntryRepository(context);
-        var entry = new ConfigurationEntry { Key = "Host", Value = "127.0.0.1" };
+        var entry = new DictionaryConfigurationEntry { Key = "Host", Value = "127.0.0.1" };
 
         // Act
         await repository.AddAsync(entry);
@@ -37,9 +37,9 @@ public class EfCoreConfigurationRepositoryTests
     {
         // Arrange
         var options = GetDbContextOptions(nameof(RepositoryWithReloader_Should_PeriodicallyReload));
-        await using var context = new RepositoryDbContext(options);
+        await using var context = new DictionaryRepositoryDbContext(options);
         var repository = new EntryRepository(context);
-        var entry = new ConfigurationEntry { Key = "Host", Value = "127.0.0.1" };
+        var entry = new DictionaryConfigurationEntry { Key = "Host", Value = "127.0.0.1" };
 
         // Act
         await repository.AddAsync(entry);
@@ -77,9 +77,9 @@ public class EfCoreConfigurationRepositoryTests
         Assert.That(configuration["Host"], Is.EqualTo(savedEntry?.Value));
     }
 
-    private static DbContextOptions<RepositoryDbContext> GetDbContextOptions(string databaseName)
+    private static DbContextOptions<DictionaryRepositoryDbContext> GetDbContextOptions(string databaseName)
     {
-        var options = new DbContextOptionsBuilder<RepositoryDbContext>();
+        var options = new DbContextOptionsBuilder<DictionaryRepositoryDbContext>();
         options
             .UseInMemoryDatabase(databaseName)
             .UseTable(tableName: "testConfiguration");

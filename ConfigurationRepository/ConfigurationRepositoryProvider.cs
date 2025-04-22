@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +9,7 @@ namespace ConfigurationRepository;
 /// <summary>
 /// A stored <see cref="ConfigurationProvider"/> in a <see cref="IConfiguration"/>.
 /// </summary>
-public class ConfigurationRepositoryProvider : ConfigurationProvider, IDisposable
+public class ConfigurationRepositoryProvider : ConfigurationProvider, IConfigurationRepositoryProvider
 {
     private readonly IDisposable? _changeTokenRegistration;
     private readonly object _lock = new();
@@ -77,10 +78,14 @@ public class ConfigurationRepositoryProvider : ConfigurationProvider, IDisposabl
         {
             if (Monitor.TryEnter(_lock))
             {
-                if (reload && !Source.Repository!.IsReloadNeeded())
+                var repository = Source.Repository!;
+
+                if (reload
+                    && repository is IVersionedRepository versionedRepository
+                    && !versionedRepository.VersionChanged())
                     return;
 
-                var configuration = Source.Repository!.GetConfiguration();
+                var configuration = repository.RetrievalStrategy.RetrieveConfiguration(repository);
 
                 if (configuration.Count == 0)
                 {

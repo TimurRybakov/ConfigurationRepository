@@ -4,11 +4,11 @@ namespace ConfigurationRepository;
 
 public sealed class ConfigurationReloader : BackgroundService
 {
-    private readonly ICollection<ConfigurationRepositoryProvider> _providers;
+    private readonly ICollection<IConfigurationRepositoryProvider> _providers;
     private readonly PeriodicTimer _timer;
 
     public ConfigurationReloader(
-        ICollection<ConfigurationRepositoryProvider> providers,
+        ICollection<IConfigurationRepositoryProvider> providers,
         TimeSpan? period = null)
     {
         _providers = providers;

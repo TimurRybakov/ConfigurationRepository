@@ -28,7 +28,7 @@ public class CustomConfigurationRepositoryTests
             })
             .Build();
 
-        Assert.DoesNotThrow(() => _ = Repository.GetConfiguration()["key1"], "Repository keys should be read ignoring case!");
+        Assert.DoesNotThrow(() => _ = Repository.GetConfiguration<IDictionary<string, string?>>()["key1"], "Repository keys should be read ignoring case!");
         Repository.SetConfiguration("key1", "changed value1");
 
         Assert.That(configuration["Key1"], Is.EqualTo("changed value1"));
@@ -36,12 +36,17 @@ public class CustomConfigurationRepositoryTests
 
     private sealed class InMemoryRepository(IDictionary<string, string?> configuration) : IRepository
     {
+        public IRetrievalStrategy RetrievalStrategy { get; } = DictionaryRetrievalStrategy.Instance;
+
         public void SetConfiguration(string key, string? value)
         {
             configuration[key] = value;
         }
 
-        public IDictionary<string, string?> GetConfiguration()
+        public TData GetConfiguration<TData>() =>
+            (TData)GetConfiguration();
+
+        private IDictionary<string, string?> GetConfiguration()
         {
             return configuration;
         }

@@ -1,7 +1,7 @@
 
 using Microsoft.Extensions.Primitives;
 
-namespace ConfigurationRepository.Services;
+namespace ConfigurationRepository;
 
 public class RepositoryChangesNotifier : IRepositoryChangesNotifier
 {

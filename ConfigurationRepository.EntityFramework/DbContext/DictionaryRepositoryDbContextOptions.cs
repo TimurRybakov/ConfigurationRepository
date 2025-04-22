@@ -5,13 +5,14 @@ using System.Text;
 
 namespace ConfigurationRepository.EntityFramework;
 
-public class RepositoryDbContextOptions : IDbContextOptionsExtension
+public class DictionaryRepositoryDbContextOptions : IDbContextOptionsExtension
 {
     public string TableName { get; set; } = null!;
 
     public string? SchemaName { get; set; }
 
     public string KeyColumnName { get; set; } = "Key";
+
     public string ValueColumnName { get; set; } = "Value";
 
     public void ApplyServices(IServiceCollection services)
@@ -28,9 +29,9 @@ public class RepositoryDbContextOptions : IDbContextOptionsExtension
 
     public DbContextOptionsExtensionInfo Info => new ExtensionInfo(this);
 
-    public RepositoryDbContextOptions() { }
+    public DictionaryRepositoryDbContextOptions() { }
 
-    protected RepositoryDbContextOptions(RepositoryDbContextOptions copyFrom)
+    protected DictionaryRepositoryDbContextOptions(DictionaryRepositoryDbContextOptions copyFrom)
     {
         SchemaName = copyFrom.SchemaName;
         TableName = copyFrom.TableName;
@@ -45,8 +46,8 @@ public class RepositoryDbContextOptions : IDbContextOptionsExtension
 
         public ExtensionInfo(IDbContextOptionsExtension extension) : base(extension) { }
 
-        private new RepositoryDbContextOptions Extension
-            => (RepositoryDbContextOptions)base.Extension;
+        private new DictionaryRepositoryDbContextOptions Extension
+            => (DictionaryRepositoryDbContextOptions)base.Extension;
 
         public override bool IsDatabaseProvider => false;
 
