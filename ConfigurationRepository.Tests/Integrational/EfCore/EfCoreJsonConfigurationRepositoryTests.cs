@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 
-namespace ConfigurationRepository.Tests;
+namespace ConfigurationRepository.Tests.Integrational;
 
 public class EfCoreJsonConfigurationRepositoryTests
 {

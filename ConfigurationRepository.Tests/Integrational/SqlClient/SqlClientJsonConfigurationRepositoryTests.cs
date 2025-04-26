@@ -3,7 +3,7 @@ using ConfigurationRepository.SqlClient;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
-namespace ConfigurationRepository.Tests;
+namespace ConfigurationRepository.Tests.Integrational;
 
 internal class SqlClientJsonConfigurationRepositoryTests : SqlClientConfigurationRepositoryTestsBase
 {

@@ -1,7 +1,7 @@
 
 using Microsoft.Extensions.Configuration;
 
-namespace ConfigurationRepository.Tests;
+namespace ConfigurationRepository.Tests.Integrational;
 
 public class CustomConfigurationRepositoryTests
 {
