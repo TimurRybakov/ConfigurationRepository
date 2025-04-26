@@ -4,47 +4,21 @@ using Microsoft.Data.SqlClient;
 
 namespace ConfigurationRepository.SqlClient;
 
-public sealed class SqlClientDictionaryConfigurationRepository : SqlClientConfigurationRepository, IVersionedRepository
+public sealed class SqlClientDictionaryConfigurationRepository : SqlClientConfigurationRepository
 {
-    private byte[]? _version;
-
     /// <summary>
     /// A table containing current configuration version. If set, repository will check version change before reloading.
     /// </summary>
     public string? VersionTableName { get; set; }
 
     /// <summary>
-    /// Table name with configuration.
+    /// Version field name.
     /// </summary>
-    [DisallowNull]
-    public string? ConfigurationTableName { get; set; }
+    public string? VersionFieldName { get; set; } = "[CurrentVersion]";
 
-    public IRetrievalStrategy RetrievalStrategy { get; }
-
-    public SqlClientDictionaryConfigurationRepository()
-    {
-        RetrievalStrategy = DictionaryRetrievalStrategy.Instance;
-    }
-
-    public TData GetConfiguration<TData>()
+    public override TData GetConfiguration<TData>()
     {
         return (TData)GetConfiguration();
-    }
-
-    public bool VersionChanged()
-    {
-        if (VersionTableName is null)
-            return true;
-
-        var newVersion = GetCurrentVersion();
-
-        if (StructuralComparisons.StructuralComparer.Compare(newVersion, _version) == 0)
-        {
-            return false;
-        }
-
-        _version = newVersion;
-        return true;
     }
 
     private IDictionary<string, string?> GetConfiguration()
@@ -52,7 +26,7 @@ public sealed class SqlClientDictionaryConfigurationRepository : SqlClientConfig
         ThrowIfPropertiesNotSet();
         CheckVersionInitialized();
 
-        string selectConfigurationQuery = $"select [Key], [Value] from {ConfigurationTableName}";
+        string selectConfigurationQuery = $"select {KeyFieldName}, {ValueFieldName} from {ConfigurationTableName}";
 
         using var connection = new SqlConnection(ConnectionString);
         using var command = new SqlCommand(selectConfigurationQuery, connection);
@@ -73,17 +47,9 @@ public sealed class SqlClientDictionaryConfigurationRepository : SqlClientConfig
         return configuration;
     }
 
-    private void CheckVersionInitialized()
+    protected override byte[] GetCurrentVersion()
     {
-        if (_version is null && VersionTableName is not null)
-        {
-            _version = GetCurrentVersion();
-        }
-    }
-
-    private byte[] GetCurrentVersion()
-    {
-        string selectCurrentVersionQuery = $"select top (1) [CurrentVersion] from {VersionTableName}";
+        string selectCurrentVersionQuery = $"select top (1) {VersionFieldName} from {VersionTableName}";
 
         using var connection = new SqlConnection(ConnectionString);
         using var command = new SqlCommand(selectCurrentVersionQuery, connection);
@@ -93,9 +59,5 @@ public sealed class SqlClientDictionaryConfigurationRepository : SqlClientConfig
         return (byte[])command.ExecuteScalar();
     }
 
-    private void ThrowIfPropertiesNotSet()
-    {
-        _ = ConnectionString ?? throw new ArgumentNullException(nameof(ConnectionString));
-        _ = ConfigurationTableName ?? throw new ArgumentNullException(nameof(ConfigurationTableName));
-    }
+    protected override bool IsVersioned() => VersionTableName is not null;
 }

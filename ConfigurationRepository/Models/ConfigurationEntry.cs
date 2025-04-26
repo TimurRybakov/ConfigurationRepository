@@ -1,6 +1,6 @@
 namespace ConfigurationRepository;
 
-public class DictionaryConfigurationEntry : IDictionaryConfigurationEntry
+public class ConfigurationEntry : IConfigurationEntry
 {
     public required string Key { get; set; }
 

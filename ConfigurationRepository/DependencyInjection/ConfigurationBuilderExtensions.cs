@@ -8,71 +8,27 @@ namespace ConfigurationRepository;
 public static class ConfigurationBuilderExtensions
 {
     /// <summary>
-    /// Adds the JSON configuration provider at <paramref name="path"/> to <paramref name="builder"/>.
+    /// Adds a ConfigurationRepositorySource to <paramref name="builder"/>.
     /// </summary>
     /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
-    /// <param name="optional">Whether the configuration is optional.</param>
+    /// <param name="configureSource">Configures the source.</param>
     /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-    //public static IConfigurationBuilder AddStorage(
-    //    this IConfigurationBuilder builder,
-    //    bool optional = false)
-    //{
-    //    return AddStorage(
-    //        builder,
-    //        provider: null,
-    //        optional: optional,
-    //        reloadOnChange: false);
-    //}
+    public static IConfigurationBuilder AddRepository<TSource>(
+        this IConfigurationBuilder builder,
+        IRepository repository,
+        Action<TSource>? configureSource = null)
+        where TSource : ConfigurationRepositorySource, new()
+    {
+        var source = new TSource();
+        source.Repository = repository;
+        configureSource?.Invoke(source);
+
+        builder.Add(source);
+        return builder;
+    }
 
     /// <summary>
-    /// Adds the JSON configuration provider at <paramref name="path"/> to <paramref name="builder"/>.
-    /// </summary>
-    /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
-    /// <param name="optional">Whether the Configuration is optional.</param>
-    /// <param name="reloadOnChange">Whether the configuration should be reloaded if the file changes.</param>
-    /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-    //public static IConfigurationBuilder AddStorage(
-    //    this IConfigurationBuilder builder,
-    //    bool optional,
-    //    bool reloadOnChange)
-    //{
-    //    return AddStorage(
-    //        builder,
-    //        provider: null,
-    //        optional,
-    //        reloadOnChange);
-    //}
-
-    /// <summary>
-    /// Adds a JSON configuration source to <paramref name="builder"/>.
-    /// </summary>
-    /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
-    /// <param name="provider">The <see cref="IRepositoryChangeWatcher"/> to use to access the database.</param>
-    /// <param name="configurationParser">Configuration parser to be used parsing data being loaded from database.</param>
-    /// <param name="storedConfiguration">Configuration storage.</param>
-    /// <param name="optional">Whether the Configuration is optional.</param>
-    /// <param name="reloadOnChange">Whether the configuration should be reloaded if the database changes.</param>
-    /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-    //public static IConfigurationBuilder AddStorage(
-    //    this IConfigurationBuilder builder,
-    //    IDatabaseProvider? provider,
-    //    IRepository? storedConfiguration,
-    //    bool optional,
-    //    bool reloadOnChange)
-    //{
-    //    _ = builder ?? throw new ArgumentNullException(nameof(builder));
-
-    //    return builder.AddStorage(source =>
-    //    {
-    //        source.DatabaseProvider = provider;
-    //        source.Repository = storedConfiguration;
-    //        source.Optional = optional;
-    //        source.ReloadOnChange = reloadOnChange;
-    //    });
-    //}
-
-    /// <summary>
-    /// Adds a JSON configuration source to <paramref name="builder"/>.
+    /// Adds the ConfigurationRepositorySource to <paramref name="builder"/>.
     /// </summary>
     /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
     /// <param name="configureSource">Configures the source.</param>
@@ -82,12 +38,7 @@ public static class ConfigurationBuilderExtensions
         IRepository repository,
         Action<ConfigurationRepositorySource>? configureSource = null)
     {
-        var source = new ConfigurationRepositorySource();
-        source.Repository = repository;
-        configureSource?.Invoke(source);
-
-        builder.Add(source);
-        return builder;
+        return builder.AddRepository<ConfigurationRepositorySource>(repository, configureSource);
     }
 
     /// <summary>
@@ -127,14 +78,14 @@ public static class ConfigurationBuilderExtensions
     /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
     /// <param name="parser">The configuration parser to be used parsing load data from database.</param>
     /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-    //public static IConfigurationBuilder SetDatabaseConfigurationParser(this IConfigurationBuilder builder,
-    //    IConfigurationParser parser)
-    //{
-    //    _ = builder ?? throw new ArgumentNullException(nameof(builder));
+    public static IConfigurationBuilder SetParsableConfigurationParser(this IConfigurationBuilder builder,
+        IConfigurationParser parser)
+    {
+        _ = builder ?? throw new ArgumentNullException(nameof(builder));
 
-    //    builder.Properties[StorageConfigurationParserKey] = parser;
-    //    return builder;
-    //}
+        builder.Properties[ParsableConfigurationParserKey] = parser;
+        return builder;
+    }
 
     /// <summary>
     /// Gets a configuration parser to be used when parsing configuration data being loaded from database.
@@ -142,13 +93,13 @@ public static class ConfigurationBuilderExtensions
     /// </summary>
     /// <param name="builder">The <see cref="IConfigurationBuilder"/>.</param>
     /// <returns>The configuration parser to be used parsing load data from database.</returns>
-    //public static IConfigurationParser GetDatabaseConfigurationParser(this IConfigurationBuilder builder)
-    //{
-    //    _ = builder ?? throw new ArgumentNullException(nameof(builder));
+    public static IConfigurationParser GetParsableConfigurationParser(this IConfigurationBuilder builder)
+    {
+        _ = builder ?? throw new ArgumentNullException(nameof(builder));
 
-    //    return ((builder.Properties.TryGetValue(StorageConfigurationParserKey, out object? parser))
-    //        ? (IConfigurationParser)parser : null) ?? new JsonConfigurationParser();
-    //}
+        return (builder.Properties.TryGetValue(ParsableConfigurationParserKey, out object? parser)
+            ? (IConfigurationParser)parser : null) ?? new JsonConfigurationParser();
+    }
 
     /// <summary>
     /// Sets connection string that will be used to connect to the database.
@@ -156,14 +107,27 @@ public static class ConfigurationBuilderExtensions
     /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
     /// <param name="connectionString">The connection string to connect to the database.</param>
     /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-    //public static IConfigurationBuilder SetDatabaseConnectionString(this IConfigurationBuilder builder,
-    //    string connectionString)
-    //{
-    //    _ = builder ?? throw new ArgumentNullException(nameof(builder));
+    public static IConfigurationBuilder SetDatabaseConnectionString(this IConfigurationBuilder builder,
+        string connectionString)
+    {
+        _ = builder ?? throw new ArgumentNullException(nameof(builder));
 
-    //    builder.Properties[StorageKey] = connectionString;
-    //    return builder;
-    //}
+        builder.Properties[RepositoryDatabaseConnectionStringKey] = connectionString;
+        return builder;
+    }
+
+    /// <summary>
+    /// Gets connection string that will be used to connect to the database.
+    /// </summary>
+    /// <param name="builder">The <see cref="IConfigurationBuilder"/>.</param>
+    /// <returns>The connection string to connect to the database.</returns>
+    public static string? GetDatabaseConnectionString(this IConfigurationBuilder builder)
+    {
+        _ = builder ?? throw new ArgumentNullException(nameof(builder));
+
+        return builder.Properties.TryGetValue(RepositoryDatabaseConnectionStringKey, out object? connectionString)
+            ? (string)connectionString : null;
+    }
 
     /// <summary>
     /// Gets the <see cref="IRepository"/> that will be used to store configurations.
@@ -178,7 +142,8 @@ public static class ConfigurationBuilderExtensions
             ? (IRepository)repository : null;
     }
 
-    private const string RepositoryLoadExceptionHandlerKey = "StoredConfiguration:Repository:LoadExceptionHandler";
-    //private const string StorageConfigurationParserKey = "StoredConfiguration:ConfigurationParser";
-    private const string RepositoryKey = "StoredConfiguration:Repository";
+    private const string RepositoryKey = "ConfigurationRepository:Repository";
+    private const string RepositoryLoadExceptionHandlerKey = "ConfigurationRepository:Repository:LoadExceptionHandler";
+    private const string ParsableConfigurationParserKey = "ConfigurationRepository:ParsableConfiguration:Parser";
+    private const string RepositoryDatabaseConnectionStringKey = "ConfigurationRepository:Repository:DatabaseConnectionString";
 }

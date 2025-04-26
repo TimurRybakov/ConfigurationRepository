@@ -12,6 +12,12 @@ public class ConfigurationRepositorySource : IConfigurationSource
     public IRepository? Repository { get; set; }
 
     /// <summary>
+    /// Strategy that will be used to retrieve configuration from repository.
+    /// </summary>
+    [DisallowNull]
+    public IRetrievalStrategy? RetrievalStrategy { get; set; }
+
+    /// <summary>
     /// Determines if loading the configuration is optional.
     /// </summary>
     public bool Optional { get; set; } = false;
@@ -38,8 +44,8 @@ public class ConfigurationRepositorySource : IConfigurationSource
     /// <returns>A <see cref="IConfigurationProvider"/></returns>
     public virtual IConfigurationProvider Build(IConfigurationBuilder builder)
     {
-        Repository ??= builder.GetConfigurationRepository() ??
-            throw new NullReferenceException("Repository is not set.");
+        Repository ??= builder.GetConfigurationRepository() ?? throw new NullReferenceException($"{nameof(Repository)} is not set.");
+        _ = RetrievalStrategy ?? throw new NullReferenceException($"{nameof(RetrievalStrategy)} is not set.");
 
         return new ConfigurationRepositoryProvider(this);
     }

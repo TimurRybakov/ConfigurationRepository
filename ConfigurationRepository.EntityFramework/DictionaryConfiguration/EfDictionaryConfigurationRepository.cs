@@ -3,17 +3,14 @@ using Microsoft.EntityFrameworkCore;
 namespace ConfigurationRepository.EntityFramework;
 
 internal sealed class EfDictionaryConfigurationRepository<TDbContext, TEntry> : IRepository
-    where TDbContext : DbContext, IDictionaryRepositoryDbContext<TEntry>
-    where TEntry : class, IDictionaryConfigurationEntry
+    where TDbContext : DbContext, IRepositoryDbContext<TEntry>
+    where TEntry : class, IConfigurationEntry
 {
     private TDbContext DbContext { get; }
-
-    public IRetrievalStrategy RetrievalStrategy { get; }
 
     public EfDictionaryConfigurationRepository(TDbContext dbContext)
     {
         DbContext = dbContext;
-        RetrievalStrategy = DictionaryRetrievalStrategy.Instance;
     }
 
     public TData GetConfiguration<TData>()

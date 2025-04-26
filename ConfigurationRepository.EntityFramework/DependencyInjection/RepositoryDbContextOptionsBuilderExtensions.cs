@@ -10,11 +10,11 @@ public static class RepositoryDbContextOptionsBuilderExtensions
         this DbContextOptionsBuilder<TContext> optionsBuilder,
         string tableName,
         string? schemaName = null,
-        Action<DictionaryRepositoryDbContextOptions>? configurator = null)
-        where TContext : DictionaryRepositoryDbContext
+        Action<RepositoryDbContextOptions>? configurator = null)
+        where TContext : RepositoryDbContext
     {
-        var extension = (optionsBuilder.Options.FindExtension<DictionaryRepositoryDbContextOptions>()
-                ?? new DictionaryRepositoryDbContextOptions());
+        var extension = (optionsBuilder.Options.FindExtension<RepositoryDbContextOptions>()
+                ?? new RepositoryDbContextOptions());
 
         extension.TableName = tableName;
 

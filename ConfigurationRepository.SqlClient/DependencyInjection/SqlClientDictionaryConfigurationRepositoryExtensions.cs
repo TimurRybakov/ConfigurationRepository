@@ -3,17 +3,19 @@ namespace ConfigurationRepository.SqlClient;
 
 public static class SqlClientDictionaryConfigurationRepositoryExtensions
 {
-    public static SqlClientDictionaryConfigurationRepository UseConnectionString(
-        this SqlClientDictionaryConfigurationRepository repository,
+    public static TRepository UseConnectionString<TRepository>(
+        this TRepository repository,
         string connectionString)
+        where TRepository : SqlClientConfigurationRepository
     {
         repository.ConnectionString = connectionString;
         return repository;
     }
 
-    public static SqlClientDictionaryConfigurationRepository WithConfigurationTableName(
-        this SqlClientDictionaryConfigurationRepository repository,
+    public static TRepository WithConfigurationTableName<TRepository>(
+        this TRepository repository,
         string configurationTableName)
+        where TRepository : SqlClientConfigurationRepository
     {
         repository.ConfigurationTableName = configurationTableName;
         return repository;

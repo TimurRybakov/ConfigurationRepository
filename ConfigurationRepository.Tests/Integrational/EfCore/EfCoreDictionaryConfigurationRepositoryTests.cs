@@ -6,7 +6,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace ConfigurationRepository.Tests;
 
-public class EfCoreConfigurationRepositoryTests
+public class EfCoreDictionaryConfigurationRepositoryTests
 {
     [OneTimeSetUp]
     public void Setup()
@@ -14,13 +14,13 @@ public class EfCoreConfigurationRepositoryTests
     }
 
     [Test]
-    public async Task Configuration_Should_ReturnSameValueAsSavedByRepository()
+    public async Task Configuration_Should_ReturnSameValueAsSavedByEfCoreRepository()
     {
         // Arrange
-        var options = GetDbContextOptions(nameof(Configuration_Should_ReturnSameValueAsSavedByRepository));
-        await using var context = new DictionaryRepositoryDbContext(options);
+        var options = GetDbContextOptions(nameof(Configuration_Should_ReturnSameValueAsSavedByEfCoreRepository));
+        await using var context = new RepositoryDbContext(options);
         var repository = new EntryRepository(context);
-        var entry = new DictionaryConfigurationEntry { Key = "Host", Value = "127.0.0.1" };
+        var entry = new ConfigurationEntry { Key = "Host", Value = "127.0.0.1" };
 
         // Act
         await repository.AddAsync(entry);
@@ -33,13 +33,13 @@ public class EfCoreConfigurationRepositoryTests
     }
 
     [Test]
-    public async Task RepositoryWithReloader_Should_PeriodicallyReload()
+    public async Task EfCoreRepositoryWithReloader_Should_PeriodicallyReload()
     {
         // Arrange
-        var options = GetDbContextOptions(nameof(RepositoryWithReloader_Should_PeriodicallyReload));
-        await using var context = new DictionaryRepositoryDbContext(options);
+        var options = GetDbContextOptions(nameof(EfCoreRepositoryWithReloader_Should_PeriodicallyReload));
+        await using var context = new RepositoryDbContext(options);
         var repository = new EntryRepository(context);
-        var entry = new DictionaryConfigurationEntry { Key = "Host", Value = "127.0.0.1" };
+        var entry = new ConfigurationEntry { Key = "Host", Value = "127.0.0.1" };
 
         // Act
         await repository.AddAsync(entry);
@@ -63,23 +63,25 @@ public class EfCoreConfigurationRepositoryTests
         services.AddSingleton<IConfiguration>(configuration);
         services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(15));
         var serviceProvider = services.BuildServiceProvider();
+        var tcs = new TaskCompletionSource();
         var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
+        reloader.OnProvidersReloaded += _ => tcs.SetResult();
 
         savedEntry.Value = "localhost";
         context.SaveChanges();
         Console.WriteLine("Configuration changed.");
 
         await reloader.StartAsync(CancellationToken.None);
-        await Task.Delay(15);
+        await tcs.Task; // wait for next reload
         await reloader.StopAsync(CancellationToken.None);
 
         // Assert
         Assert.That(configuration["Host"], Is.EqualTo(savedEntry?.Value));
     }
 
-    private static DbContextOptions<DictionaryRepositoryDbContext> GetDbContextOptions(string databaseName)
+    private static DbContextOptions<RepositoryDbContext> GetDbContextOptions(string databaseName)
     {
-        var options = new DbContextOptionsBuilder<DictionaryRepositoryDbContext>();
+        var options = new DbContextOptionsBuilder<RepositoryDbContext>();
         options
             .UseInMemoryDatabase(databaseName)
             .UseTable(tableName: "testConfiguration");

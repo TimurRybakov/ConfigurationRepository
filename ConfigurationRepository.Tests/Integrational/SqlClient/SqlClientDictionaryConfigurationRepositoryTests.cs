@@ -5,18 +5,18 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository.Tests;
 
-internal class SqlClientDictionaryConfigurationRepositoryTests : SqlClientConfigurationRepositoryTests
+internal class SqlClientDictionaryConfigurationRepositoryTests : SqlClientConfigurationRepositoryTestsBase
 {
     private const string ConfigurationTableName = "appcfg.Configuration";
     private const string VersionTableName = "appcfg.Version";
 
     [Test]
-    public void Repository_Should_ReturnSameValueAsSaved()
+    public void SqlClientRepository_Should_ReturnSameValueAsSaved()
     {
         // Act
         var value = UpsertConfiguration();
         var configuration = new ConfigurationBuilder()
-            .AddSqlClientDictionaryRepository(repository =>
+            .AddSqlClientRepository(repository =>
             {
                 repository
                     .UseConnectionString(ConnectionString)
@@ -28,14 +28,14 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : SqlClientConfig
     }
 
     [TestCase(2)]
-    public Task RepositoryWithReloader_Should_PeriodicallyReload(int reloadCountShouldBe)
+    public Task SqlClientRepositoryWithReloader_Should_PeriodicallyReload(int reloadCountShouldBe)
     {
-        return RepositoryWithReloaderTest(configureBuilder =>
+        return RepositoryWithReloaderTest(builder =>
         {
-            configureBuilder.AddSqlClientDictionaryRepository(
-                configureRepository =>
+            builder.AddSqlClientRepository(
+                repository =>
                 {
-                    configureRepository
+                    repository
                         .UseConnectionString(ConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName);
                 },
@@ -44,14 +44,14 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : SqlClientConfig
     }
 
     [TestCase(1)]
-    public Task RepositoryWithReloaderAndVersionChecker_Should_PeriodicallyReload(int reloadCountShouldBe)
+    public Task SqlClientRepositoryWithReloaderAndVersionChecker_Should_PeriodicallyReload(int reloadCountShouldBe)
     {
-        return RepositoryWithReloaderTest(configureBuilder =>
+        return RepositoryWithReloaderTest(builder =>
         {
-            configureBuilder.AddSqlClientDictionaryRepository(
-                configureRepository =>
+            builder.AddSqlClientRepository(
+                repository =>
                 {
-                    configureRepository
+                    repository
                         .UseConnectionString(ConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName)
                         .WithVersionTableName(VersionTableName);

@@ -2,8 +2,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ConfigurationRepository.EntityFramework;
 
-public interface IDictionaryRepositoryDbContext<TEntry>
-    where TEntry : class, IDictionaryConfigurationEntry
+public interface IRepositoryDbContext<TEntry>
+    where TEntry : class, IConfigurationEntry
 {
     DbSet<TEntry> ConfigurationEntryDbSet { get; }
 }

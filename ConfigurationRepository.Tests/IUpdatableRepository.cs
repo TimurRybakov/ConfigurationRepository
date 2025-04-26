@@ -4,5 +4,5 @@ namespace ConfigurationRepository.Tests;
 
 internal interface IUpdatableRepository : IRepository
 {
-    Task AddAsync(DictionaryConfigurationEntry entry);
+    Task AddAsync(ConfigurationEntry entry);
 }

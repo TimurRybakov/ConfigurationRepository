@@ -4,7 +4,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace ConfigurationRepository.Tests;
 
-internal abstract class SqlClientConfigurationRepositoryTests
+internal abstract class SqlClientConfigurationRepositoryTestsBase
 {
     protected const string ConnectionString = "Server=DESKTOP-S5G1QVL\\SQL2019;Database=test;Integrated Security=True;Trust Server Certificate=True;";
 

@@ -11,6 +11,9 @@ public sealed class JsonConfigurationParser : IConfigurationParser
 
     public IDictionary<string, string?> Parse(Stream input)
     {
+        _data.Clear();
+        _paths.Clear();
+
         try
         {
             var jsonDocumentOptions = new JsonDocumentOptions

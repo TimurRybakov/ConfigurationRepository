@@ -13,9 +13,4 @@ public interface IRepository
     /// <typeparam name="TData">Type of data to be returned by this method.</typeparam>
     /// <returns></returns>
     TData GetConfiguration<TData>();
-
-    /// <summary>
-    /// Strategy that will be used to retrieve configuration from repository.
-    /// </summary>
-    IRetrievalStrategy RetrievalStrategy { get; }
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ConfigurationRepository.EntityFramework;
 
-public class DictionaryRepositoryDbContextOptions : IDbContextOptionsExtension
+public class RepositoryDbContextOptions : IDbContextOptionsExtension
 {
     public string TableName { get; set; } = null!;
 
@@ -29,9 +29,9 @@ public class DictionaryRepositoryDbContextOptions : IDbContextOptionsExtension
 
     public DbContextOptionsExtensionInfo Info => new ExtensionInfo(this);
 
-    public DictionaryRepositoryDbContextOptions() { }
+    public RepositoryDbContextOptions() { }
 
-    protected DictionaryRepositoryDbContextOptions(DictionaryRepositoryDbContextOptions copyFrom)
+    protected RepositoryDbContextOptions(RepositoryDbContextOptions copyFrom)
     {
         SchemaName = copyFrom.SchemaName;
         TableName = copyFrom.TableName;
@@ -46,8 +46,8 @@ public class DictionaryRepositoryDbContextOptions : IDbContextOptionsExtension
 
         public ExtensionInfo(IDbContextOptionsExtension extension) : base(extension) { }
 
-        private new DictionaryRepositoryDbContextOptions Extension
-            => (DictionaryRepositoryDbContextOptions)base.Extension;
+        private new RepositoryDbContextOptions Extension
+            => (RepositoryDbContextOptions)base.Extension;
 
         public override bool IsDatabaseProvider => false;
 

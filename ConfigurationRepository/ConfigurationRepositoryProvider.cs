@@ -21,7 +21,8 @@ public class ConfigurationRepositoryProvider : ConfigurationProvider, IConfigura
     public ConfigurationRepositoryProvider(ConfigurationRepositorySource source)
     {
         Source = source ?? throw new ArgumentNullException(nameof(source));
-        Debug.Assert(Source.Repository is not null);
+        _ = Source.Repository ?? throw new NullReferenceException(nameof(Source.Repository));
+        _ = Source.RetrievalStrategy ?? throw new NullReferenceException(nameof(Source.RetrievalStrategy));
 
         if (Source.RepositoryChangesNotifier is not null)
         {
@@ -85,7 +86,7 @@ public class ConfigurationRepositoryProvider : ConfigurationProvider, IConfigura
                     && !versionedRepository.VersionChanged())
                     return;
 
-                var configuration = repository.RetrievalStrategy.RetrieveConfiguration(repository);
+                var configuration = Source.RetrievalStrategy!.RetrieveConfiguration(repository);
 
                 if (configuration.Count == 0)
                 {

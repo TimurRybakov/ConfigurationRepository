@@ -3,28 +3,32 @@ namespace ConfigurationRepository;
 
 public static class ConfigurationRepositorySourceExtensions
 {
-    public static ConfigurationRepositorySource UseOptional(this ConfigurationRepositorySource source)
+    public static TSource UseOptional<TSource>(this TSource source)
+        where TSource : ConfigurationRepositorySource
     {
         source.Optional = true;
         return source;
     }
 
-    public static ConfigurationRepositorySource WithPeriodicalReload(this ConfigurationRepositorySource source)
+    public static TSource WithPeriodicalReload<TSource>(this TSource source)
+        where TSource : ConfigurationRepositorySource
     {
         source.PeriodicalReload = true;
         return source;
     }
 
-    public static T UseRepositoryChangesNotifier<T>(this T source, IRepositoryChangesNotifier repositoryChangesNotifier)
-        where T : ConfigurationRepositorySource
+    public static TSource UseRepositoryChangesNotifier<TSource>(
+        this TSource source, IRepositoryChangesNotifier repositoryChangesNotifier)
+        where TSource : ConfigurationRepositorySource
     {
         source.RepositoryChangesNotifier = repositoryChangesNotifier;
 
         return source;
     }
 
-    public static T UseRepositoryChangesNotifier<T>(this T source, TimeSpan? reloadPeriod = null)
-        where T : ConfigurationRepositorySource
+    public static TSource UseRepositoryChangesNotifier<TSource>(
+        this TSource source, TimeSpan? reloadPeriod = null)
+        where TSource : ConfigurationRepositorySource
     {
         var repositoryChangesNotifier = reloadPeriod is null
             ? new RepositoryChangesNotifier()
@@ -32,6 +36,13 @@ public static class ConfigurationRepositorySourceExtensions
 
         source.UseRepositoryChangesNotifier(repositoryChangesNotifier);
 
+        return source;
+    }
+
+    public static TSource UseJsonParser<TSource>(this TSource source)
+        where TSource : ParsableConfigurationRepositorySource
+    {
+        source.ConfigurationParser = new JsonConfigurationParser();
         return source;
     }
 }

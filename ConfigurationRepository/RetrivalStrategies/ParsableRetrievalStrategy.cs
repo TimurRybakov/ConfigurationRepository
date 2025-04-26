@@ -8,11 +8,11 @@ namespace ConfigurationRepository;
 /// </summary>
 public class ParsableRetrievalStrategy : IRetrievalStrategy
 {
-    private readonly Func<IConfigurationParser> _parserFactory;
+    private readonly IConfigurationParser _parser;
 
-    public ParsableRetrievalStrategy(Func<IConfigurationParser> parserFactory)
+    public ParsableRetrievalStrategy(IConfigurationParser parser)
     {
-        _parserFactory = parserFactory;
+        _parser = parser;
     }
 
     public IDictionary<string, string?> RetrieveConfiguration(IRepository repository)
@@ -21,9 +21,7 @@ public class ParsableRetrievalStrategy : IRetrievalStrategy
 
         using Stream stream = CreateStream(data);
 
-        var parser = _parserFactory();
-
-        return parser.Parse(stream);
+        return _parser.Parse(stream);
     }
 
     private static Stream CreateStream(string input)

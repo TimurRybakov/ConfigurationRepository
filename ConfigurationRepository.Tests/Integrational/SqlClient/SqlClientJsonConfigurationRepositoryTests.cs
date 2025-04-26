@@ -5,14 +5,15 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository.Tests;
 
-internal class SqlClientJsonConfigurationRepositoryTests : SqlClientConfigurationRepositoryTests
+internal class SqlClientJsonConfigurationRepositoryTests : SqlClientConfigurationRepositoryTestsBase
 {
     private const string ConfigurationTableName = "appcfg.JsonConfiguration";
     private const string ConfigurationKey = "AKey";
     private const string ConfigurationVersionFieldName = "[Version]";
+    private const string ConfigurationValueFieldName = "[JsonValue]";
 
     [Test]
-    public void Repository_Should_ReturnSameValueAsSaved()
+    public void SqlClientJsonRepository_Should_ReturnSameValueAsSaved()
     {
         // Act
         var value = UpsertConfiguration();
@@ -22,6 +23,7 @@ internal class SqlClientJsonConfigurationRepositoryTests : SqlClientConfiguratio
                 repository
                     .UseConnectionString(ConnectionString)
                     .WithConfigurationTableName(ConfigurationTableName)
+                    .WithValueFieldName(ConfigurationValueFieldName)
                     .WithKey(ConfigurationKey);
             })
             .Build();
@@ -30,33 +32,35 @@ internal class SqlClientJsonConfigurationRepositoryTests : SqlClientConfiguratio
     }
 
     [TestCase(2)]
-    public Task RepositoryWithReloader_Should_PeriodicallyReload(int reloadCountShouldBe)
+    public Task SqlClientJsonRepositoryWithReloader_Should_PeriodicallyReload(int reloadCountShouldBe)
     {
-        return RepositoryWithReloaderTest(configureBuilder =>
+        return RepositoryWithReloaderTest(builder =>
         {
-            configureBuilder.AddSqlClientJsonRepository(
-                configureRepository =>
+            builder.AddSqlClientJsonRepository(
+                repository =>
                 {
-                    configureRepository
+                    repository
                         .UseConnectionString(ConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName)
+                        .WithValueFieldName(ConfigurationValueFieldName)
                         .WithKey(ConfigurationKey);
                 },
                 source => source.WithPeriodicalReload());
         }, reloadCountShouldBe);
     }
-
+        
     [TestCase(1)]
-    public Task RepositoryWithReloaderAndVersionChecker_Should_PeriodicallyReload(int reloadCountShouldBe)
+    public Task SqlClientJsonRepositoryWithReloaderAndVersionChecker_Should_PeriodicallyReload(int reloadCountShouldBe)
     {
-        return RepositoryWithReloaderTest(configureBuilder =>
+        return RepositoryWithReloaderTest(builder =>
         {
-            configureBuilder.AddSqlClientJsonRepository(
-                configureRepository =>
+            builder.AddSqlClientJsonRepository(
+                repository =>
                 {
-                    configureRepository
+                    repository
                         .UseConnectionString(ConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName)
+                        .WithValueFieldName(ConfigurationValueFieldName)
                         .WithVersionFieldName(ConfigurationVersionFieldName)
                         .WithKey(ConfigurationKey);
                 },

@@ -3,49 +3,49 @@ namespace ConfigurationRepository.SqlClient;
 
 public static class SqlClientJsonConfigurationRepositoryExtensions
 {
-    public static SqlClientJsonConfigurationRepository UseConnectionString(
-        this SqlClientJsonConfigurationRepository repository,
+    public static SqlClientParsableConfigurationRepository UseConnectionString(
+        this SqlClientParsableConfigurationRepository repository,
         string connectionString)
     {
         repository.ConnectionString = connectionString;
         return repository;
     }
 
-    public static SqlClientJsonConfigurationRepository WithConfigurationTableName(
-        this SqlClientJsonConfigurationRepository repository,
+    public static SqlClientParsableConfigurationRepository WithConfigurationTableName(
+        this SqlClientParsableConfigurationRepository repository,
         string configurationTableName)
     {
         repository.ConfigurationTableName = configurationTableName;
         return repository;
     }
 
-    public static SqlClientJsonConfigurationRepository WithVersionFieldName(
-        this SqlClientJsonConfigurationRepository repository,
+    public static SqlClientParsableConfigurationRepository WithVersionFieldName(
+        this SqlClientParsableConfigurationRepository repository,
         string? versionFieldName)
     {
         repository.VersionFieldName = versionFieldName;
         return repository;
     }
 
-    public static SqlClientJsonConfigurationRepository WithKeyFieldName(
-    this SqlClientJsonConfigurationRepository repository,
+    public static SqlClientParsableConfigurationRepository WithKeyFieldName(
+        this SqlClientParsableConfigurationRepository repository,
     string keyFieldName)
     {
         repository.KeyFieldName = keyFieldName;
         return repository;
     }
 
-    public static SqlClientJsonConfigurationRepository WithValueFieldName(
-    this SqlClientJsonConfigurationRepository repository,
+    public static SqlClientParsableConfigurationRepository WithValueFieldName(
+        this SqlClientParsableConfigurationRepository repository,
     string valueFieldName)
     {
         repository.ValueFieldName = valueFieldName;
         return repository;
     }
 
-    public static SqlClientJsonConfigurationRepository WithKey(
-    this SqlClientJsonConfigurationRepository repository,
-    string? key)
+    public static SqlClientParsableConfigurationRepository WithKey(
+        this SqlClientParsableConfigurationRepository repository,
+    string key)
     {
         repository.Key = key;
         return repository;

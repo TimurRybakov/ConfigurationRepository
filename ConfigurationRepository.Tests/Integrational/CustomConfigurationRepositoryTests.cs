@@ -24,6 +24,7 @@ public class CustomConfigurationRepositoryTests
         var configuration = new ConfigurationBuilder()
             .AddRepository(Repository, source =>
             {
+                source.RetrievalStrategy = DictionaryRetrievalStrategy.Instance;
                 //source.UseRepositoryChangesNotifier();
             })
             .Build();
@@ -36,8 +37,6 @@ public class CustomConfigurationRepositoryTests
 
     private sealed class InMemoryRepository(IDictionary<string, string?> configuration) : IRepository
     {
-        public IRetrievalStrategy RetrievalStrategy { get; } = DictionaryRetrievalStrategy.Instance;
-
         public void SetConfiguration(string key, string? value)
         {
             configuration[key] = value;
