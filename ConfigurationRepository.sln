@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationRepository.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationRepository.SqlClient", "ConfigurationRepository.SqlClient\ConfigurationRepository.SqlClient.csproj", "{FDF124B1-435B-46F8-8425-05658BB02B33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationRepository.Dapper", "ConfigurationRepository.Dapper\ConfigurationRepository.Dapper.csproj", "{950B2FB8-CC85-431B-97F2-0AEA783E5491}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{FDF124B1-435B-46F8-8425-05658BB02B33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDF124B1-435B-46F8-8425-05658BB02B33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDF124B1-435B-46F8-8425-05658BB02B33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{950B2FB8-CC85-431B-97F2-0AEA783E5491}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{950B2FB8-CC85-431B-97F2-0AEA783E5491}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{950B2FB8-CC85-431B-97F2-0AEA783E5491}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{950B2FB8-CC85-431B-97F2-0AEA783E5491}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

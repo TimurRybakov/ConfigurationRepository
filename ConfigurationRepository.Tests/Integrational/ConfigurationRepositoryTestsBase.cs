@@ -1,18 +1,22 @@
+using Microsoft.Data.SqlClient;
+using System.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
-internal abstract class SqlClientConfigurationRepositoryTestsBase
+internal abstract class ConfigurationRepositoryTestsBase
 {
-    protected const string ConnectionString = "Server=DESKTOP-S5G1QVL\\SQL2019;Database=test;Integrated Security=True;Trust Server Certificate=True;";
+    protected const string MsSqlConnectionString = "Server=DESKTOP-S5G1QVL\\SQL2019;Database=test;Integrated Security=True;Trust Server Certificate=True;";
+
+    protected readonly Func<IDbConnection> _connectionFactory = () => new SqlConnection(MsSqlConnectionString);
 
     protected async Task RepositoryWithReloaderTest(
         Action<IConfigurationBuilder> configureBuilder, int reloadCountShouldBe)
     {
         // Act
-        var value = UpsertConfiguration();
+        var value = await UpsertConfiguration();
         Console.WriteLine("Configuration saved to repository.");
         var configurationBuilder = new ConfigurationBuilder();
         configureBuilder(configurationBuilder);
@@ -35,7 +39,7 @@ internal abstract class SqlClientConfigurationRepositoryTestsBase
         var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
         reloader.OnProvidersReloaded += _ => tcs.SetResult();
 
-        UpdateConfigurationWithNoChanges();
+        await UpdateConfigurationWithNoChanges();
         Console.WriteLine("Configuration not changed.");
 
         await reloader.StartAsync(CancellationToken.None);
@@ -43,7 +47,7 @@ internal abstract class SqlClientConfigurationRepositoryTestsBase
 
         Assert.That(configuration["CurrentDateTime"], Is.EqualTo(value));
 
-        value = UpsertConfiguration();
+        value = await UpsertConfiguration();
         Console.WriteLine("Configuration changed.");
         tcs = new TaskCompletionSource();
         await tcs.Task; // wait for next reload
@@ -54,8 +58,8 @@ internal abstract class SqlClientConfigurationRepositoryTestsBase
         Assert.That(reloadCount, Is.EqualTo(reloadCountShouldBe), "Number of reloads does not match.");
     }
 
-    protected abstract string? UpsertConfiguration();
+    protected abstract Task<string?> UpsertConfiguration();
 
-    protected abstract string? UpdateConfigurationWithNoChanges();
+    protected abstract Task<int> UpdateConfigurationWithNoChanges();
 }
 

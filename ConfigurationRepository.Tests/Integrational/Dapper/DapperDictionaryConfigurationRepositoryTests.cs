@@ -1,14 +1,14 @@
 
-using ConfigurationRepository.SqlClient;
-using Microsoft.Data.SqlClient;
+using ConfigurationRepository.Dapper;
+using Dapper;
 using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
-internal class SqlClientDictionaryConfigurationRepositoryTests : ConfigurationRepositoryTestsBase
+internal class DapperDictionaryConfigurationRepositoryTests : ConfigurationRepositoryTestsBase
 {
-    private const string ConfigurationTableName = "appcfg.Configuration";
-    private const string VersionTableName = "appcfg.Version";
+    private const string SelectConfigurationQuery = "select \"Key\", \"Value\" from appcfg.Configuration";
+    private const string SelectCurrentVersionQuery = "select top (1) CurrentVersion from appcfg.Version";
 
     [Test]
     public async Task SqlClientRepository_Should_ReturnSameValueAsSaved()
@@ -16,11 +16,11 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : ConfigurationRe
         // Act
         var value = await UpsertConfiguration();
         var configuration = new ConfigurationBuilder()
-            .AddSqlClientRepository(repository =>
+            .AddDapperRepository(repository =>
             {
                 repository
-                    .UseConnectionString(MsSqlConnectionString)
-                    .WithConfigurationTableName(ConfigurationTableName);
+                    .UseDbConnectionFactory(_connectionFactory)
+                    .WithSelectConfigurationQuery(SelectConfigurationQuery);
             })
             .Build();
 
@@ -32,12 +32,12 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : ConfigurationRe
     {
         return RepositoryWithReloaderTest(builder =>
         {
-            builder.AddSqlClientRepository(
+            builder.AddDapperRepository(
                 repository =>
                 {
                     repository
-                        .UseConnectionString(MsSqlConnectionString)
-                        .WithConfigurationTableName(ConfigurationTableName);
+                        .UseDbConnectionFactory(_connectionFactory)
+                        .WithSelectConfigurationQuery(SelectConfigurationQuery);
                 },
                 source => source.WithPeriodicalReload());
         }, reloadCountShouldBe);
@@ -48,13 +48,13 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : ConfigurationRe
     {
         return RepositoryWithReloaderTest(builder =>
         {
-            builder.AddSqlClientRepository(
+            builder.AddDapperRepository(
                 repository =>
                 {
                     repository
-                        .UseConnectionString(MsSqlConnectionString)
-                        .WithConfigurationTableName(ConfigurationTableName)
-                        .WithVersionTableName(VersionTableName);
+                        .UseDbConnectionFactory(_connectionFactory)
+                        .WithSelectConfigurationQuery(SelectConfigurationQuery)
+                        .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery);
                 },
                 source => source.WithPeriodicalReload());
         }, reloadCountShouldBe);
@@ -62,24 +62,21 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : ConfigurationRe
 
     protected override async Task<int> UpdateConfigurationWithNoChanges()
     {
-        string updateQuery = $"""
-            update {ConfigurationTableName} set [Value] = [Value]
+        const string updateQuery = $"""
+            update appcfg.Configuration set [Value] = [Value]
             where [Key] = 'CurrentDateTime';
             """;
 
-        using var connection = new SqlConnection(MsSqlConnectionString);
-        var query = new SqlCommand(updateQuery, connection);
+        using var connection = _connectionFactory();
 
-        await query.Connection.OpenAsync();
-
-        return await query.ExecuteNonQueryAsync();
+        return await connection.ExecuteAsync(updateQuery);
     }
 
     protected override async Task<string?> UpsertConfiguration()
     {
-        string upsertQuery = $"""
+        const string upsertQuery = $"""
             declare @value varchar(255) = convert(varchar(255), getdate(), 121);
-            merge {ConfigurationTableName} t
+            merge appcfg.Configuration t
             using
             (
                 select
@@ -94,11 +91,8 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : ConfigurationRe
             select [Value] = @value
             """;
 
-        using var connection = new SqlConnection(MsSqlConnectionString);
-        var query = new SqlCommand(upsertQuery, connection);
+        using var connection = _connectionFactory();
 
-        await query.Connection.OpenAsync();
-
-        return (string?) await query.ExecuteScalarAsync();
+        return await connection.ExecuteScalarAsync<string?>(upsertQuery);
     }
 }

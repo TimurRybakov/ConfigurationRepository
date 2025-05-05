@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ConfigurationRepository.Dapper\ConfigurationRepository.Dapper.csproj" />
     <ProjectReference Include="..\ConfigurationRepository.EntityFramework\ConfigurationRepository.EntityFramework.csproj" />
     <ProjectReference Include="..\ConfigurationRepository.SqlClient\ConfigurationRepository.SqlClient.csproj" />
     <ProjectReference Include="..\ConfigurationRepository\ConfigurationRepository.csproj" />

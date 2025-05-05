@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
-internal class SqlClientJsonConfigurationRepositoryTests : SqlClientConfigurationRepositoryTestsBase
+internal class SqlClientJsonConfigurationRepositoryTests : ConfigurationRepositoryTestsBase
 {
     private const string ConfigurationTableName = "appcfg.JsonConfiguration";
     private const string ConfigurationKey = "AKey";
@@ -13,15 +13,15 @@ internal class SqlClientJsonConfigurationRepositoryTests : SqlClientConfiguratio
     private const string ConfigurationValueFieldName = "[JsonValue]";
 
     [Test]
-    public void SqlClientJsonRepository_Should_ReturnSameValueAsSaved()
+    public async Task SqlClientJsonRepository_Should_ReturnSameValueAsSaved()
     {
         // Act
-        var value = UpsertConfiguration();
+        var value = await UpsertConfiguration();
         var configuration = new ConfigurationBuilder()
             .AddSqlClientJsonRepository(repository =>
             {
                 repository
-                    .UseConnectionString(ConnectionString)
+                    .UseConnectionString(MsSqlConnectionString)
                     .WithConfigurationTableName(ConfigurationTableName)
                     .WithValueFieldName(ConfigurationValueFieldName)
                     .WithKey(ConfigurationKey);
@@ -40,7 +40,7 @@ internal class SqlClientJsonConfigurationRepositoryTests : SqlClientConfiguratio
                 repository =>
                 {
                     repository
-                        .UseConnectionString(ConnectionString)
+                        .UseConnectionString(MsSqlConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName)
                         .WithValueFieldName(ConfigurationValueFieldName)
                         .WithKey(ConfigurationKey);
@@ -58,7 +58,7 @@ internal class SqlClientJsonConfigurationRepositoryTests : SqlClientConfiguratio
                 repository =>
                 {
                     repository
-                        .UseConnectionString(ConnectionString)
+                        .UseConnectionString(MsSqlConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName)
                         .WithValueFieldName(ConfigurationValueFieldName)
                         .WithVersionFieldName(ConfigurationVersionFieldName)
@@ -68,26 +68,26 @@ internal class SqlClientJsonConfigurationRepositoryTests : SqlClientConfiguratio
         }, reloadCountShouldBe);
     }
 
-    protected override string? UpdateConfigurationWithNoChanges()
+    protected override async Task<int> UpdateConfigurationWithNoChanges()
     {
         string updateQuery = $"""
-            -- Emulate update that does not happened as value was not changed
+            -- Emulate update that will not happen as value was not changed
             declare @Value nvarchar(max) = (select [JsonValue] from {ConfigurationTableName} where [Key] = @Key)
             update {ConfigurationTableName} set [JsonValue] = @Value
             where [Key] = @Key
               and hashbytes('SHA2_256', [JsonValue]) != hashbytes('SHA2_256', @Value);
             """;
 
-        using var connection = new SqlConnection(ConnectionString);
+        using var connection = new SqlConnection(MsSqlConnectionString);
         using var command = new SqlCommand(updateQuery, connection);
         command.Parameters.AddWithValue("@Key", ConfigurationKey);
 
-        command.Connection.Open();
+        await command.Connection.OpenAsync();
 
-        return (string?)command.ExecuteScalar();
+        return await command.ExecuteNonQueryAsync();
     }
 
-    protected override string? UpsertConfiguration()
+    protected override async Task<string?> UpsertConfiguration()
     {
         string upsertQuery = $"""
             declare @value varchar(255) = convert(varchar(255), getdate(), 121);
@@ -111,11 +111,11 @@ internal class SqlClientJsonConfigurationRepositoryTests : SqlClientConfiguratio
             select [Value] = @value
             """;
 
-        using var connection = new SqlConnection(ConnectionString);
+        using var connection = new SqlConnection(MsSqlConnectionString);
         using var command = new SqlCommand(upsertQuery, connection);
 
-        command.Connection.Open();
+        await command.Connection.OpenAsync();
 
-        return (string?)command.ExecuteScalar();
+        return (string?) await command.ExecuteScalarAsync();
     }
 }

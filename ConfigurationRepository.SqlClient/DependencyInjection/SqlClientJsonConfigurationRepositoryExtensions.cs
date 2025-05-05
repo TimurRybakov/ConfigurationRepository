@@ -29,7 +29,7 @@ public static class SqlClientJsonConfigurationRepositoryExtensions
 
     public static SqlClientParsableConfigurationRepository WithKeyFieldName(
         this SqlClientParsableConfigurationRepository repository,
-    string keyFieldName)
+        string keyFieldName)
     {
         repository.KeyFieldName = keyFieldName;
         return repository;
@@ -37,7 +37,7 @@ public static class SqlClientJsonConfigurationRepositoryExtensions
 
     public static SqlClientParsableConfigurationRepository WithValueFieldName(
         this SqlClientParsableConfigurationRepository repository,
-    string valueFieldName)
+        string valueFieldName)
     {
         repository.ValueFieldName = valueFieldName;
         return repository;
@@ -45,7 +45,7 @@ public static class SqlClientJsonConfigurationRepositoryExtensions
 
     public static SqlClientParsableConfigurationRepository WithKey(
         this SqlClientParsableConfigurationRepository repository,
-    string key)
+        string key)
     {
         repository.Key = key;
         return repository;
