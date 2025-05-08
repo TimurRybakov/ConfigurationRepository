@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
+[Parallelizable]
+[TestFixture]
 public class CustomConfigurationRepositoryTests
 {
     private InMemoryRepository Repository { get; set; }

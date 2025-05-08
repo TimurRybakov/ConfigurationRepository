@@ -6,14 +6,10 @@ using Microsoft.Extensions.Primitives;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
+[TestFixture]
 public class EfCoreJsonConfigurationRepositoryTests
 {
     private const string Key = "AKey";
-
-    [OneTimeSetUp]
-    public void Setup()
-    {
-    }
 
     [Test]
     public async Task Configuration_Should_ReturnSameValueAsSavedByEfCoreJsonRepository()
@@ -70,7 +66,7 @@ public class EfCoreJsonConfigurationRepositoryTests
         var serviceProvider = services.BuildServiceProvider();
         var tcs = new TaskCompletionSource();
         var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
-        reloader.OnProvidersReloaded += _ => tcs.SetResult();
+        reloader.OnProvidersReloaded += _ => tcs.TrySetResult();
 
         savedEntry.Value = """{"Host":"localhost"}""";
         context.SaveChanges();

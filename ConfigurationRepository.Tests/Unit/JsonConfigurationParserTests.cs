@@ -3,9 +3,14 @@ using System.Text;
 
 namespace ConfigurationRepository.Tests.Unit;
 
+[Parallelizable]
+[TestFixture]
 internal class JsonConfigurationParserTests
 {
-    [TestCase("""
+    [Test]
+    public void Json_ShouldBe_ParsedAsExpected()
+    {
+        const string input = """
         {
           "Logging": {
             "LogLevel": {
@@ -16,9 +21,7 @@ internal class JsonConfigurationParserTests
           },
           "AllowedHosts": "*"
         }
-        """)]
-    public void Json_ShouldBe_ParsedAsExpected(string input)
-    {
+        """;
         // Arrange
         JsonConfigurationParser parser = new JsonConfigurationParser();
         byte[] byteArray = Encoding.UTF8.GetBytes(input);

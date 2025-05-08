@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
-internal class SqlClientDictionaryConfigurationRepositoryTests : ConfigurationRepositoryTestsBase
+internal class SqlClientDictionaryConfigurationRepositoryTests : MsSqlConfigurationRepositoryTests
 {
     private const string ConfigurationTableName = "appcfg.Configuration";
     private const string VersionTableName = "appcfg.Version";
@@ -19,7 +19,7 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : ConfigurationRe
             .AddSqlClientRepository(repository =>
             {
                 repository
-                    .UseConnectionString(MsSqlConnectionString)
+                    .UseConnectionString(ConnectionString)
                     .WithConfigurationTableName(ConfigurationTableName);
             })
             .Build();
@@ -36,7 +36,7 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : ConfigurationRe
                 repository =>
                 {
                     repository
-                        .UseConnectionString(MsSqlConnectionString)
+                        .UseConnectionString(ConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName);
                 },
                 source => source.WithPeriodicalReload());
@@ -52,7 +52,7 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : ConfigurationRe
                 repository =>
                 {
                     repository
-                        .UseConnectionString(MsSqlConnectionString)
+                        .UseConnectionString(ConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName)
                         .WithVersionTableName(VersionTableName);
                 },
@@ -67,7 +67,7 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : ConfigurationRe
             where [Key] = 'CurrentDateTime';
             """;
 
-        using var connection = new SqlConnection(MsSqlConnectionString);
+        using var connection = new SqlConnection(ConnectionString);
         var query = new SqlCommand(updateQuery, connection);
 
         await query.Connection.OpenAsync();
@@ -94,7 +94,7 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : ConfigurationRe
             select [Value] = @value
             """;
 
-        using var connection = new SqlConnection(MsSqlConnectionString);
+        using var connection = new SqlConnection(ConnectionString);
         var query = new SqlCommand(upsertQuery, connection);
 
         await query.Connection.OpenAsync();

@@ -1,16 +1,21 @@
-using Microsoft.Data.SqlClient;
-using System.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
-internal abstract class ConfigurationRepositoryTestsBase
+[TestFixture]
+internal abstract class MsSqlConfigurationRepositoryTests
 {
-    protected const string MsSqlConnectionString = "Server=DESKTOP-S5G1QVL\\SQL2019;Database=test;Integrated Security=True;Trust Server Certificate=True;";
+    private readonly MsSqlContainerSingleton _msSqlContainerSingleton = MsSqlContainerSingleton.Instance.Value;
 
-    protected readonly Func<IDbConnection> _connectionFactory = () => new SqlConnection(MsSqlConnectionString);
+    protected string ConnectionString { get; private set; }
+
+    [OneTimeSetUp]
+    protected void InitOnce()
+    {
+        ConnectionString = _msSqlContainerSingleton.ConnectionString;
+    }
 
     protected async Task RepositoryWithReloaderTest(
         Action<IConfigurationBuilder> configureBuilder, int reloadCountShouldBe)
@@ -33,11 +38,11 @@ internal abstract class ConfigurationRepositoryTestsBase
 
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
-        services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(10));
+        services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(20));
         var serviceProvider = services.BuildServiceProvider();
         var tcs = new TaskCompletionSource();
         var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
-        reloader.OnProvidersReloaded += _ => tcs.SetResult();
+        reloader.OnProvidersReloaded += _ => tcs.TrySetResult();
 
         await UpdateConfigurationWithNoChanges();
         Console.WriteLine("Configuration not changed.");

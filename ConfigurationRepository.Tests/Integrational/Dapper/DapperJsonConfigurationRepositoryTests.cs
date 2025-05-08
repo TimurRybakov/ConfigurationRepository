@@ -1,11 +1,13 @@
 
 using ConfigurationRepository.Dapper;
 using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
-internal class DapperJsonConfigurationRepositoryTests : ConfigurationRepositoryTestsBase
+[TestFixture]
+internal class DapperJsonConfigurationRepositoryTests : MsSqlConfigurationRepositoryTests
 {
     private const string SelectConfigurationQuery = "select JsonValue as \"Value\" from appcfg.JsonConfiguration where \"Key\" = @Key";
     private const string SelectCurrentVersionQuery = "select Version from appcfg.JsonConfiguration where \"Key\" = @Key";
@@ -20,7 +22,7 @@ internal class DapperJsonConfigurationRepositoryTests : ConfigurationRepositoryT
             .AddDapperJsonRepository(repository =>
             {
                 repository
-                    .UseDbConnectionFactory(_connectionFactory)
+                    .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
                     .WithSelectConfigurationQuery(SelectConfigurationQuery)
                     .WithKey(ConfigurationKey);
             })
@@ -38,7 +40,7 @@ internal class DapperJsonConfigurationRepositoryTests : ConfigurationRepositoryT
                 repository =>
                 {
                     repository
-                        .UseDbConnectionFactory(_connectionFactory)
+                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
                         .WithSelectConfigurationQuery(SelectConfigurationQuery)
                         .WithKey(ConfigurationKey);
                 },
@@ -55,7 +57,7 @@ internal class DapperJsonConfigurationRepositoryTests : ConfigurationRepositoryT
                 repository =>
                 {
                     repository
-                        .UseDbConnectionFactory(_connectionFactory)
+                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
                         .WithSelectConfigurationQuery(SelectConfigurationQuery)
                         .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery)
                         .WithKey(ConfigurationKey);
@@ -74,7 +76,7 @@ internal class DapperJsonConfigurationRepositoryTests : ConfigurationRepositoryT
               and hashbytes('SHA2_256', [JsonValue]) != hashbytes('SHA2_256', @Value);
             """;
 
-        using var connection = _connectionFactory();
+        using var connection = new SqlConnection(ConnectionString);
 
         return await connection.ExecuteAsync(updateQuery, new { Key = ConfigurationKey });
     }
@@ -103,7 +105,7 @@ internal class DapperJsonConfigurationRepositoryTests : ConfigurationRepositoryT
             select [Value] = @value
             """;
 
-        using var connection = _connectionFactory();
+        using var connection = new SqlConnection(ConnectionString);
 
         return (string?) await connection.ExecuteScalarAsync(upsertQuery);
     }

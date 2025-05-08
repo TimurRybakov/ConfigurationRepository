@@ -1,11 +1,13 @@
 
 using ConfigurationRepository.Dapper;
 using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
-internal class DapperDictionaryConfigurationRepositoryTests : ConfigurationRepositoryTestsBase
+[TestFixture]
+internal class DapperDictionaryConfigurationRepositoryTests : MsSqlConfigurationRepositoryTests
 {
     private const string SelectConfigurationQuery = "select \"Key\", \"Value\" from appcfg.Configuration";
     private const string SelectCurrentVersionQuery = "select top (1) CurrentVersion from appcfg.Version";
@@ -19,7 +21,7 @@ internal class DapperDictionaryConfigurationRepositoryTests : ConfigurationRepos
             .AddDapperRepository(repository =>
             {
                 repository
-                    .UseDbConnectionFactory(_connectionFactory)
+                    .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
                     .WithSelectConfigurationQuery(SelectConfigurationQuery);
             })
             .Build();
@@ -36,7 +38,7 @@ internal class DapperDictionaryConfigurationRepositoryTests : ConfigurationRepos
                 repository =>
                 {
                     repository
-                        .UseDbConnectionFactory(_connectionFactory)
+                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
                         .WithSelectConfigurationQuery(SelectConfigurationQuery);
                 },
                 source => source.WithPeriodicalReload());
@@ -52,7 +54,7 @@ internal class DapperDictionaryConfigurationRepositoryTests : ConfigurationRepos
                 repository =>
                 {
                     repository
-                        .UseDbConnectionFactory(_connectionFactory)
+                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
                         .WithSelectConfigurationQuery(SelectConfigurationQuery)
                         .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery);
                 },
@@ -67,7 +69,7 @@ internal class DapperDictionaryConfigurationRepositoryTests : ConfigurationRepos
             where [Key] = 'CurrentDateTime';
             """;
 
-        using var connection = _connectionFactory();
+        using var connection = new SqlConnection(ConnectionString);
 
         return await connection.ExecuteAsync(updateQuery);
     }
@@ -91,7 +93,7 @@ internal class DapperDictionaryConfigurationRepositoryTests : ConfigurationRepos
             select [Value] = @value
             """;
 
-        using var connection = _connectionFactory();
+        using var connection = new SqlConnection(ConnectionString);
 
         return await connection.ExecuteScalarAsync<string?>(upsertQuery);
     }

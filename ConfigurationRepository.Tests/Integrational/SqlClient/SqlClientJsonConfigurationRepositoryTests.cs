@@ -5,7 +5,8 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
-internal class SqlClientJsonConfigurationRepositoryTests : ConfigurationRepositoryTestsBase
+[TestFixture]
+internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRepositoryTests
 {
     private const string ConfigurationTableName = "appcfg.JsonConfiguration";
     private const string ConfigurationKey = "AKey";
@@ -21,7 +22,7 @@ internal class SqlClientJsonConfigurationRepositoryTests : ConfigurationReposito
             .AddSqlClientJsonRepository(repository =>
             {
                 repository
-                    .UseConnectionString(MsSqlConnectionString)
+                    .UseConnectionString(ConnectionString)
                     .WithConfigurationTableName(ConfigurationTableName)
                     .WithValueFieldName(ConfigurationValueFieldName)
                     .WithKey(ConfigurationKey);
@@ -40,7 +41,7 @@ internal class SqlClientJsonConfigurationRepositoryTests : ConfigurationReposito
                 repository =>
                 {
                     repository
-                        .UseConnectionString(MsSqlConnectionString)
+                        .UseConnectionString(ConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName)
                         .WithValueFieldName(ConfigurationValueFieldName)
                         .WithKey(ConfigurationKey);
@@ -58,7 +59,7 @@ internal class SqlClientJsonConfigurationRepositoryTests : ConfigurationReposito
                 repository =>
                 {
                     repository
-                        .UseConnectionString(MsSqlConnectionString)
+                        .UseConnectionString(ConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName)
                         .WithValueFieldName(ConfigurationValueFieldName)
                         .WithVersionFieldName(ConfigurationVersionFieldName)
@@ -78,7 +79,7 @@ internal class SqlClientJsonConfigurationRepositoryTests : ConfigurationReposito
               and hashbytes('SHA2_256', [JsonValue]) != hashbytes('SHA2_256', @Value);
             """;
 
-        using var connection = new SqlConnection(MsSqlConnectionString);
+        using var connection = new SqlConnection(ConnectionString);
         using var command = new SqlCommand(updateQuery, connection);
         command.Parameters.AddWithValue("@Key", ConfigurationKey);
 
@@ -111,7 +112,7 @@ internal class SqlClientJsonConfigurationRepositoryTests : ConfigurationReposito
             select [Value] = @value
             """;
 
-        using var connection = new SqlConnection(MsSqlConnectionString);
+        using var connection = new SqlConnection(ConnectionString);
         using var command = new SqlCommand(upsertQuery, connection);
 
         await command.Connection.OpenAsync();
