@@ -2,6 +2,7 @@
 using ConfigurationRepository.SqlClient;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using ParametrizedConfiguration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
@@ -10,6 +11,7 @@ internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRep
 {
     private const string ConfigurationTableName = "appcfg.JsonConfiguration";
     private const string ConfigurationKey = "AKey";
+    private const string ConfigurationParametrizedKey = "Date";
     private const string ConfigurationVersionFieldName = "[Version]";
     private const string ConfigurationValueFieldName = "[JsonValue]";
 
@@ -19,14 +21,12 @@ internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRep
         // Act
         var value = await UpsertConfiguration();
         var configuration = new ConfigurationBuilder()
-            .AddSqlClientJsonRepository(repository =>
-            {
-                repository
+            .AddSqlClientJsonRepository(
+                repository => repository
                     .UseConnectionString(ConnectionString)
                     .WithConfigurationTableName(ConfigurationTableName)
                     .WithValueFieldName(ConfigurationValueFieldName)
-                    .WithKey(ConfigurationKey);
-            })
+                    .WithKey(ConfigurationKey))
             .Build();
 
         Assert.That(configuration["CurrentDateTime"], Is.EqualTo(value));
@@ -35,38 +35,65 @@ internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRep
     [TestCase(2)]
     public Task SqlClientJsonRepositoryWithReloader_Should_PeriodicallyReload(int reloadCountShouldBe)
     {
-        return RepositoryWithReloaderTest(builder =>
-        {
-            builder.AddSqlClientJsonRepository(
-                repository =>
-                {
-                    repository
+        return RepositoryWithReloaderTest(
+            () => new ConfigurationBuilder()
+                .AddSqlClientJsonRepository(
+                    repository => repository
+                            .UseConnectionString(ConnectionString)
+                            .WithConfigurationTableName(ConfigurationTableName)
+                            .WithValueFieldName(ConfigurationValueFieldName)
+                            .WithKey(ConfigurationKey),
+                    source => source.WithPeriodicalReload()),
+            reloadCountShouldBe);
+    }
+
+    [TestCase(2)]
+    public Task SqlClientJsonRepositoryWithParametrizationWithReloader_Should_PeriodicallyReload(int reloadCountShouldBe)
+    {
+        return RepositoryWithReloaderTest(
+            () => new ParametrizedConfigurationBuilder()
+                .AddSqlClientJsonRepository(
+                    repository => repository
                         .UseConnectionString(ConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName)
                         .WithValueFieldName(ConfigurationValueFieldName)
-                        .WithKey(ConfigurationKey);
-                },
-                source => source.WithPeriodicalReload());
-        }, reloadCountShouldBe);
+                        .WithKey(ConfigurationKey),
+                    source => source.WithPeriodicalReload()),
+            reloadCountShouldBe, ConfigurationParametrizedKey);
     }
-        
+
     [TestCase(1)]
     public Task SqlClientJsonRepositoryWithReloaderAndVersionChecker_Should_PeriodicallyReload(int reloadCountShouldBe)
     {
-        return RepositoryWithReloaderTest(builder =>
-        {
-            builder.AddSqlClientJsonRepository(
-                repository =>
-                {
-                    repository
+        return RepositoryWithReloaderTest(
+            () => new ConfigurationBuilder()
+                .AddSqlClientJsonRepository(
+                    repository => repository
                         .UseConnectionString(ConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName)
                         .WithValueFieldName(ConfigurationValueFieldName)
                         .WithVersionFieldName(ConfigurationVersionFieldName)
-                        .WithKey(ConfigurationKey);
-                },
-                source => source.WithPeriodicalReload());
-        }, reloadCountShouldBe);
+                        .WithKey(ConfigurationKey),
+                    source => source.WithPeriodicalReload()),
+            reloadCountShouldBe);
+    }
+
+    [Test]
+    public async Task SqlClientJsonRepositoryWithParametrization_Should_ReturnSameValueAsSaved()
+    {
+        // Act
+        var value = await UpsertConfiguration();
+        var configuration = new ParametrizedConfigurationBuilder()
+            .AddSqlClientJsonRepository(
+                repository => repository
+                    .UseConnectionString(ConnectionString)
+                    .WithConfigurationTableName(ConfigurationTableName)
+                    .WithValueFieldName(ConfigurationValueFieldName)
+                    .WithKey(ConfigurationKey),
+                source => source.WithPeriodicalReload())
+            .Build();
+
+        Assert.That(configuration[ConfigurationParametrizedKey], Is.EqualTo(value));
     }
 
     protected override async Task<int> UpdateConfigurationWithNoChanges()
@@ -100,7 +127,8 @@ internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRep
                     [JsonValue] =
                         (
                             select
-                                [CurrentDateTime] = @value
+                                [CurrentDateTime] = @value,
+                                [Date] = '%CurrentDateTime%'
                             for json path, without_array_wrapper
                         )
             ) s on t.[Key] = s.[Key]

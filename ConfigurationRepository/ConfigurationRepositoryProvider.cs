@@ -73,6 +73,11 @@ public class ConfigurationRepositoryProvider : ConfigurationProvider, IConfigura
         _changeTokenRegistration?.Dispose();
     }
 
+    ~ConfigurationRepositoryProvider()
+    {
+        Dispose(false);
+    }
+
     private void Load(bool reload)
     {
         try

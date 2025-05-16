@@ -27,6 +27,7 @@
     <ProjectReference Include="..\ConfigurationRepository.EntityFramework\ConfigurationRepository.EntityFramework.csproj" />
     <ProjectReference Include="..\ConfigurationRepository.SqlClient\ConfigurationRepository.SqlClient.csproj" />
     <ProjectReference Include="..\ConfigurationRepository\ConfigurationRepository.csproj" />
+    <ProjectReference Include="..\ParametrizedConfiguration\ParametrizedConfiguration.csproj" />
   </ItemGroup>
 
   <ItemGroup>

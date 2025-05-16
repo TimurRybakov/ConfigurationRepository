@@ -18,12 +18,10 @@ internal class DapperDictionaryConfigurationRepositoryTests : MsSqlConfiguration
         // Act
         var value = await UpsertConfiguration();
         var configuration = new ConfigurationBuilder()
-            .AddDapperRepository(repository =>
-            {
-                repository
+            .AddDapperRepository(
+                repository => repository
                     .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
-                    .WithSelectConfigurationQuery(SelectConfigurationQuery);
-            })
+                    .WithSelectConfigurationQuery(SelectConfigurationQuery))
             .Build();
 
         Assert.That(configuration["CurrentDateTime"], Is.EqualTo(value));
@@ -32,34 +30,28 @@ internal class DapperDictionaryConfigurationRepositoryTests : MsSqlConfiguration
     [TestCase(2)]
     public Task SqlClientRepositoryWithReloader_Should_PeriodicallyReload(int reloadCountShouldBe)
     {
-        return RepositoryWithReloaderTest(builder =>
-        {
-            builder.AddDapperRepository(
-                repository =>
-                {
-                    repository
+        return RepositoryWithReloaderTest(
+            () => new ConfigurationBuilder()
+                .AddDapperRepository(
+                    repository => repository
                         .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
-                        .WithSelectConfigurationQuery(SelectConfigurationQuery);
-                },
-                source => source.WithPeriodicalReload());
-        }, reloadCountShouldBe);
+                        .WithSelectConfigurationQuery(SelectConfigurationQuery),
+                    source => source.WithPeriodicalReload()),
+            reloadCountShouldBe);
     }
 
     [TestCase(1)]
     public Task SqlClientRepositoryWithReloaderAndVersionChecker_Should_PeriodicallyReload(int reloadCountShouldBe)
     {
-        return RepositoryWithReloaderTest(builder =>
-        {
-            builder.AddDapperRepository(
-                repository =>
-                {
-                    repository
+        return RepositoryWithReloaderTest(
+            () => new ConfigurationBuilder()
+                .AddDapperRepository(
+                    repository => repository
                         .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
                         .WithSelectConfigurationQuery(SelectConfigurationQuery)
-                        .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery);
-                },
-                source => source.WithPeriodicalReload());
-        }, reloadCountShouldBe);
+                        .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery),
+                    source => source.WithPeriodicalReload()),
+            reloadCountShouldBe);
     }
 
     protected override async Task<int> UpdateConfigurationWithNoChanges()

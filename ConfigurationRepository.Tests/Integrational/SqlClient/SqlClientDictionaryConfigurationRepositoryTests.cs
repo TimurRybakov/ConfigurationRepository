@@ -16,12 +16,10 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : MsSqlConfigurat
         // Act
         var value = await UpsertConfiguration();
         var configuration = new ConfigurationBuilder()
-            .AddSqlClientRepository(repository =>
-            {
-                repository
+            .AddSqlClientRepository(
+                repository => repository
                     .UseConnectionString(ConnectionString)
-                    .WithConfigurationTableName(ConfigurationTableName);
-            })
+                    .WithConfigurationTableName(ConfigurationTableName))
             .Build();
 
         Assert.That(configuration["CurrentDateTime"], Is.EqualTo(value));
@@ -30,34 +28,28 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : MsSqlConfigurat
     [TestCase(2)]
     public Task SqlClientRepositoryWithReloader_Should_PeriodicallyReload(int reloadCountShouldBe)
     {
-        return RepositoryWithReloaderTest(builder =>
-        {
-            builder.AddSqlClientRepository(
-                repository =>
-                {
-                    repository
+        return RepositoryWithReloaderTest(
+            () => new ConfigurationBuilder()
+                .AddSqlClientRepository(
+                    repository => repository
                         .UseConnectionString(ConnectionString)
-                        .WithConfigurationTableName(ConfigurationTableName);
-                },
-                source => source.WithPeriodicalReload());
-        }, reloadCountShouldBe);
+                        .WithConfigurationTableName(ConfigurationTableName),
+                    source => source.WithPeriodicalReload()),
+            reloadCountShouldBe);
     }
 
     [TestCase(1)]
     public Task SqlClientRepositoryWithReloaderAndVersionChecker_Should_PeriodicallyReload(int reloadCountShouldBe)
     {
-        return RepositoryWithReloaderTest(builder =>
-        {
-            builder.AddSqlClientRepository(
-                repository =>
-                {
-                    repository
+        return RepositoryWithReloaderTest(
+            () => new ConfigurationBuilder()
+                .AddSqlClientRepository(
+                    repository => repository
                         .UseConnectionString(ConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName)
-                        .WithVersionTableName(VersionTableName);
-                },
-                source => source.WithPeriodicalReload());
-        }, reloadCountShouldBe);
+                        .WithVersionTableName(VersionTableName),
+                source => source.WithPeriodicalReload()),
+            reloadCountShouldBe);
     }
 
     protected override async Task<int> UpdateConfigurationWithNoChanges()

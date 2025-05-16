@@ -18,17 +18,18 @@ internal abstract class MsSqlConfigurationRepositoryTests
     }
 
     protected async Task RepositoryWithReloaderTest(
-        Action<IConfigurationBuilder> configureBuilder, int reloadCountShouldBe)
+        Func<IConfigurationBuilder> createConfigurationBuilder,
+        int reloadCountShouldBe,
+        string key = "CurrentDateTime")
     {
         // Act
         var value = await UpsertConfiguration();
         Console.WriteLine("Configuration saved to repository.");
-        var configurationBuilder = new ConfigurationBuilder();
-        configureBuilder(configurationBuilder);
+        var configurationBuilder = createConfigurationBuilder();
         var configuration = configurationBuilder.Build();
 
         var reloadCount = 0;
-        ChangeToken.OnChange(
+        using var _ = ChangeToken.OnChange(
             () => configuration.GetReloadToken(),
             () =>
             {
@@ -50,7 +51,7 @@ internal abstract class MsSqlConfigurationRepositoryTests
         await reloader.StartAsync(CancellationToken.None);
         await tcs.Task; // wait for next reload
 
-        Assert.That(configuration["CurrentDateTime"], Is.EqualTo(value));
+        Assert.That(configuration[key], Is.EqualTo(value));
 
         value = await UpsertConfiguration();
         Console.WriteLine("Configuration changed.");
@@ -59,7 +60,7 @@ internal abstract class MsSqlConfigurationRepositoryTests
 
         await reloader.StopAsync(CancellationToken.None);
 
-        Assert.That(configuration["CurrentDateTime"], Is.EqualTo(value));
+        Assert.That(configuration[key], Is.EqualTo(value));
         Assert.That(reloadCount, Is.EqualTo(reloadCountShouldBe), "Number of reloads does not match.");
     }
 
