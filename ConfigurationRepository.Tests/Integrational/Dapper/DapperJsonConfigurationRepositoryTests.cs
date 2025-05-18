@@ -3,6 +3,7 @@ using ConfigurationRepository.Dapper;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using ParametrizedConfiguration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
@@ -11,26 +12,42 @@ internal class DapperJsonConfigurationRepositoryTests : MsSqlConfigurationReposi
 {
     private const string SelectConfigurationQuery = "select JsonValue as \"Value\" from appcfg.JsonConfiguration where \"Key\" = @Key";
     private const string SelectCurrentVersionQuery = "select Version from appcfg.JsonConfiguration where \"Key\" = @Key";
-    private const string ConfigurationKey = "AKey";
+    private const string ConfigurationRepositoryKey = "AKey";
 
     [Test]
-    public async Task DapperJsonRepository_Should_ReturnSameValueAsSaved()
+    public async Task Dapper_Json_Repository_Should_Return_Same_Value_As_Saved()
     {
         // Act
-        var value = await UpsertConfiguration();
+        var value = await UpsertConfiguration(DateTime.Now);
         var configuration = new ConfigurationBuilder()
             .AddDapperJsonRepository(
                 repository => repository
                     .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
                     .WithSelectConfigurationQuery(SelectConfigurationQuery)
-                    .WithKey(ConfigurationKey))
+                    .WithKey(ConfigurationRepositoryKey))
             .Build();
 
-        Assert.That(configuration["CurrentDateTime"], Is.EqualTo(value));
+        Assert.That(configuration[ConfigurationKey], Is.EqualTo(value));
+    }
+
+    [Test]
+    public async Task Dapper_Parametrized_Json_Repository_Should_Return_Same_Value_As_Saved()
+    {
+        // Act
+        var value = await UpsertConfiguration(DateTime.Now);
+        var configuration = new ParametrizedConfigurationBuilder()
+            .AddDapperJsonRepository(
+                repository => repository
+                    .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                    .WithSelectConfigurationQuery(SelectConfigurationQuery)
+                    .WithKey(ConfigurationRepositoryKey))
+            .Build();
+
+        Assert.That(configuration[ConfigurationParametrizedKey], Is.EqualTo(value));
     }
 
     [TestCase(2)]
-    public Task DapperJsonRepositoryWithReloader_Should_PeriodicallyReload(int reloadCountShouldBe)
+    public Task Dapper_Json_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
             () => new ConfigurationBuilder()
@@ -38,13 +55,27 @@ internal class DapperJsonConfigurationRepositoryTests : MsSqlConfigurationReposi
                     repository => repository
                         .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
                         .WithSelectConfigurationQuery(SelectConfigurationQuery)
-                        .WithKey(ConfigurationKey),
+                        .WithKey(ConfigurationRepositoryKey),
                     source => source.WithPeriodicalReload()),
-            reloadCountShouldBe);
+            expectedReloadCount, key: ConfigurationKey);
     }
-        
+
+    [TestCase(2)]
+    public Task Dapper_Parametrized_Json_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
+    {
+        return RepositoryWithReloaderTest(
+            () => new ParametrizedConfigurationBuilder()
+                .AddDapperJsonRepository(
+                    repository => repository
+                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                        .WithSelectConfigurationQuery(SelectConfigurationQuery)
+                        .WithKey(ConfigurationRepositoryKey),
+                    source => source.WithPeriodicalReload()),
+            expectedReloadCount, key: ConfigurationParametrizedKey);
+    }
+
     [TestCase(1)]
-    public Task DapperJsonRepositoryWithReloaderAndVersionChecker_Should_PeriodicallyReload(int reloadCountShouldBe)
+    public Task Dapper_Versioned_Json_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
             () => new ConfigurationBuilder()
@@ -53,11 +84,25 @@ internal class DapperJsonConfigurationRepositoryTests : MsSqlConfigurationReposi
                         .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
                         .WithSelectConfigurationQuery(SelectConfigurationQuery)
                         .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery)
-                        .WithKey(ConfigurationKey),
+                        .WithKey(ConfigurationRepositoryKey),
                 source => source.WithPeriodicalReload()),
-            reloadCountShouldBe);
+            expectedReloadCount, key: ConfigurationKey);
     }
 
+    [TestCase(1)]
+    public Task Dapper_Parametrized_Versioned_Json_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
+    {
+        return RepositoryWithReloaderTest(
+            () => new ParametrizedConfigurationBuilder()
+                .AddDapperJsonRepository(
+                    repository => repository
+                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                        .WithSelectConfigurationQuery(SelectConfigurationQuery)
+                        .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery)
+                        .WithKey(ConfigurationRepositoryKey),
+                source => source.WithPeriodicalReload()),
+            expectedReloadCount, key: ConfigurationParametrizedKey);
+    }
     protected override async Task<int> UpdateConfigurationWithNoChanges()
     {
         const string updateQuery = $"""
@@ -68,15 +113,14 @@ internal class DapperJsonConfigurationRepositoryTests : MsSqlConfigurationReposi
               and hashbytes('SHA2_256', [JsonValue]) != hashbytes('SHA2_256', @Value);
             """;
 
-        using var connection = new SqlConnection(ConnectionString);
+        await using var connection = new SqlConnection(ConnectionString);
 
-        return await connection.ExecuteAsync(updateQuery, new { Key = ConfigurationKey });
+        return await connection.ExecuteAsync(updateQuery, new { Key = ConfigurationRepositoryKey });
     }
 
-    protected override async Task<string?> UpsertConfiguration()
+    protected override async Task<string?> UpsertConfiguration(DateTime value)
     {
         const string upsertQuery = $"""
-            declare @value varchar(255) = convert(varchar(255), getdate(), 121);
             merge appcfg.JsonConfiguration t
             using
             (
@@ -85,7 +129,8 @@ internal class DapperJsonConfigurationRepositoryTests : MsSqlConfigurationReposi
                     [JsonValue] =
                         (
                             select
-                                [CurrentDateTime] = @value
+                                [CurrentDateTime] = convert(varchar, @value, 121),
+                                [CurrentDateTimeParameter] = '%CurrentDateTime%'
                             for json path, without_array_wrapper
                         )
             ) s on t.[Key] = s.[Key]
@@ -94,11 +139,11 @@ internal class DapperJsonConfigurationRepositoryTests : MsSqlConfigurationReposi
             when not matched then
                 insert ([Key], [JsonValue])
                 values (s.[Key], s.[JsonValue]);
-            select [Value] = @value
+            select [Value] = convert(varchar, @value, 121)
             """;
 
-        using var connection = new SqlConnection(ConnectionString);
+        await using var connection = new SqlConnection(ConnectionString);
 
-        return (string?) await connection.ExecuteScalarAsync(upsertQuery);
+        return (string?) await connection.ExecuteScalarAsync(upsertQuery, new { value });
     }
 }

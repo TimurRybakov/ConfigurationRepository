@@ -3,6 +3,7 @@ using ConfigurationRepository.Dapper;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using ParametrizedConfiguration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
@@ -13,10 +14,10 @@ internal class DapperDictionaryConfigurationRepositoryTests : MsSqlConfiguration
     private const string SelectCurrentVersionQuery = "select top (1) CurrentVersion from appcfg.Version";
 
     [Test]
-    public async Task SqlClientRepository_Should_ReturnSameValueAsSaved()
+    public async Task Dapper_Repository_Should_Return_Same_Value_As_Saved()
     {
         // Act
-        var value = await UpsertConfiguration();
+        var value = await UpsertConfiguration(DateTime.Now);
         var configuration = new ConfigurationBuilder()
             .AddDapperRepository(
                 repository => repository
@@ -24,11 +25,26 @@ internal class DapperDictionaryConfigurationRepositoryTests : MsSqlConfiguration
                     .WithSelectConfigurationQuery(SelectConfigurationQuery))
             .Build();
 
-        Assert.That(configuration["CurrentDateTime"], Is.EqualTo(value));
+        Assert.That(configuration[ConfigurationKey], Is.EqualTo(value));
+    }
+
+    [Test]
+    public async Task Dapper_Parametrized_Repository_Should_Return_Same_Value_As_Saved()
+    {
+        // Act
+        var value = await UpsertConfiguration(DateTime.Now);
+        var configuration = new ParametrizedConfigurationBuilder()
+            .AddDapperRepository(
+                repository => repository
+                    .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                    .WithSelectConfigurationQuery(SelectConfigurationQuery))
+            .Build();
+
+        Assert.That(configuration[ConfigurationParametrizedKey], Is.EqualTo(value));
     }
 
     [TestCase(2)]
-    public Task SqlClientRepositoryWithReloader_Should_PeriodicallyReload(int reloadCountShouldBe)
+    public Task Dapper_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
             () => new ConfigurationBuilder()
@@ -37,11 +53,24 @@ internal class DapperDictionaryConfigurationRepositoryTests : MsSqlConfiguration
                         .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
                         .WithSelectConfigurationQuery(SelectConfigurationQuery),
                     source => source.WithPeriodicalReload()),
-            reloadCountShouldBe);
+            expectedReloadCount, key: ConfigurationKey);
+    }
+
+    [TestCase(2)]
+    public Task Dapper_Parametrized_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
+    {
+        return RepositoryWithReloaderTest(
+            () => new ParametrizedConfigurationBuilder()
+                .AddDapperRepository(
+                    repository => repository
+                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                        .WithSelectConfigurationQuery(SelectConfigurationQuery),
+                    source => source.WithPeriodicalReload()),
+            expectedReloadCount, key: ConfigurationParametrizedKey);
     }
 
     [TestCase(1)]
-    public Task SqlClientRepositoryWithReloaderAndVersionChecker_Should_PeriodicallyReload(int reloadCountShouldBe)
+    public Task Dapper_Versioned_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
             () => new ConfigurationBuilder()
@@ -51,7 +80,21 @@ internal class DapperDictionaryConfigurationRepositoryTests : MsSqlConfiguration
                         .WithSelectConfigurationQuery(SelectConfigurationQuery)
                         .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery),
                     source => source.WithPeriodicalReload()),
-            reloadCountShouldBe);
+            expectedReloadCount, key: ConfigurationKey);
+    }
+
+    [TestCase(1)]
+    public Task Dapper_Parametrized_Versioned_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
+    {
+        return RepositoryWithReloaderTest(
+            () => new ParametrizedConfigurationBuilder()
+                .AddDapperRepository(
+                    repository => repository
+                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                        .WithSelectConfigurationQuery(SelectConfigurationQuery)
+                        .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery),
+                    source => source.WithPeriodicalReload()),
+            expectedReloadCount, key: ConfigurationParametrizedKey);
     }
 
     protected override async Task<int> UpdateConfigurationWithNoChanges()
@@ -61,32 +104,35 @@ internal class DapperDictionaryConfigurationRepositoryTests : MsSqlConfiguration
             where [Key] = 'CurrentDateTime';
             """;
 
-        using var connection = new SqlConnection(ConnectionString);
+        await using var connection = new SqlConnection(ConnectionString);
 
         return await connection.ExecuteAsync(updateQuery);
     }
 
-    protected override async Task<string?> UpsertConfiguration()
+    protected override async Task<string?> UpsertConfiguration(DateTime value)
     {
         const string upsertQuery = $"""
-            declare @value varchar(255) = convert(varchar(255), getdate(), 121);
             merge appcfg.Configuration t
             using
             (
                 select
                     [Key] = 'CurrentDateTime',
-                    [Value] = @value
+                    [Value] = convert(varchar, @value, 121)
+                union all
+                select
+                    [Key] = 'CurrentDateTimeParameter',
+                    [Value] = '%CurrentDateTime%'
             ) s on t.[Key] = s.[Key]
             when matched then
                 update set [Value] = s.[Value]
             when not matched then
                 insert ([Key], [Value])
                 values (s.[Key], s.[Value]);
-            select [Value] = @value
+            select [Value] = convert(varchar, @value, 121)
             """;
 
-        using var connection = new SqlConnection(ConnectionString);
+        await using var connection = new SqlConnection(ConnectionString);
 
-        return await connection.ExecuteScalarAsync<string?>(upsertQuery);
+        return await connection.ExecuteScalarAsync<string?>(upsertQuery, new { value });
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
+using ParametrizedConfiguration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
@@ -12,10 +13,10 @@ public class EfCoreJsonConfigurationRepositoryTests
     private const string Key = "AKey";
 
     [Test]
-    public async Task Configuration_Should_ReturnSameValueAsSavedByEfCoreJsonRepository()
+    public async Task EfCore_Json_Repository_Should_Return_Same_Value_As_Saved()
     {
         // Arrange
-        var options = GetDbContextOptions(nameof(Configuration_Should_ReturnSameValueAsSavedByEfCoreJsonRepository));
+        var options = GetDbContextOptions(nameof(EfCore_Json_Repository_Should_Return_Same_Value_As_Saved));
         await using var context = new RepositoryDbContext(options);
         var repository = new EntryRepository(context);
         var entry = new ConfigurationEntry { Key = Key, Value = """{"Host":"127.0.0.1"}""" };
@@ -31,10 +32,33 @@ public class EfCoreJsonConfigurationRepositoryTests
     }
 
     [Test]
-    public async Task EfCoreJsonRepositoryWithReloader_Should_PeriodicallyReload()
+    public async Task EfCore_Parametrized_Json_Repository_Should_Return_Same_Value_As_Saved()
     {
         // Arrange
-        var options = GetDbContextOptions(nameof(EfCoreJsonRepositoryWithReloader_Should_PeriodicallyReload));
+        var options = GetDbContextOptions(nameof(EfCore_Parametrized_Json_Repository_Should_Return_Same_Value_As_Saved));
+        await using var context = new RepositoryDbContext(options);
+        var repository = new EntryRepository(context);
+        var entry = new ConfigurationEntry
+        {
+            Key = Key,
+            Value = """{ "localhost" : "127.0.0.1", "host" : "%localhost%" }"""
+        };
+
+        // Act
+        await repository.AddAsync(entry);
+        var savedEntry = context.ConfigurationEntryDbSet.FirstOrDefault();
+        var configuration = new ParametrizedConfigurationBuilder()
+            .AddEfCoreJsonRepository(Key, options)
+            .Build();
+
+        Assert.That(configuration["Host"], Is.EqualTo("127.0.0.1"));
+    }
+
+    [Test]
+    public async Task EfCore_Json_Repository_With_Reloader_Should_Periodically_Reload()
+    {
+        // Arrange
+        var options = GetDbContextOptions(nameof(EfCore_Json_Repository_With_Reloader_Should_Periodically_Reload));
         await using var context = new RepositoryDbContext(options);
         var repository = new EntryRepository(context);
         var entry = new ConfigurationEntry { Key = Key, Value = """{"Host":"127.0.0.1"}""" };
@@ -78,6 +102,60 @@ public class EfCoreJsonConfigurationRepositoryTests
 
         // Assert
         Assert.That(configuration["Host"], Is.EqualTo("localhost"));
+    }
+
+    [Test]
+    public async Task EfCore_Parametrized_Json_Repository_With_Reloader_Should_Periodically_Reload()
+    {
+        // Arrange
+        var options = GetDbContextOptions(nameof(EfCore_Parametrized_Json_Repository_With_Reloader_Should_Periodically_Reload));
+        await using var context = new RepositoryDbContext(options);
+        var repository = new EntryRepository(context);
+        var entry = new ConfigurationEntry
+        {
+            Key = Key,
+            Value = """{ "localhost" : "127.0.0.1", "host" : "%localhost%" }"""
+        };
+
+        // Act
+        await repository.AddAsync(entry);
+        Console.WriteLine("Configuration saved to repository.");
+        var savedEntry = context.ConfigurationEntryDbSet.First();
+        var configuration = new ParametrizedConfigurationBuilder()
+            .AddEfCoreJsonRepository(
+                Key,
+                options,
+                source =>
+                {
+                    //source.UseRepositoryChangesNotifier();
+                    source.WithPeriodicalReload();
+                })
+            .Build();
+
+        Assert.That(configuration["Host"], Is.EqualTo("127.0.0.1"));
+
+        ChangeToken.OnChange(
+            () => configuration.GetReloadToken(),
+            () => Console.WriteLine("Configuration reloaded."));
+
+        var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(configuration);
+        services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(15));
+        var serviceProvider = services.BuildServiceProvider();
+        var tcs = new TaskCompletionSource();
+        var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
+        reloader.OnProvidersReloaded += _ => tcs.TrySetResult();
+
+        savedEntry.Value = """{ "home" : "192.168.0.1", "host" : "%home%" }""";
+        context.SaveChanges();
+        Console.WriteLine("Configuration changed.");
+
+        await reloader.StartAsync(CancellationToken.None);
+        await tcs.Task; // wait for next reload
+        await reloader.StopAsync(CancellationToken.None);
+
+        // Assert
+        Assert.That(configuration["Host"], Is.EqualTo("192.168.0.1"));
     }
 
     private static DbContextOptions<RepositoryDbContext> GetDbContextOptions(string databaseName)

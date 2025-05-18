@@ -11,6 +11,7 @@ public partial class MsSqlContainerSingleton : IDisposable
 
     public readonly MsSqlContainer _mssql = new MsSqlBuilder()
         .WithImage("mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04")
+        .WithName("mssql_configuration_repository")
         .WithReuse(true)
         .WithBindMount($"{Environment.CurrentDirectory}\\mssql", "/var/opt/mssql/data")
         .Build();
@@ -121,8 +122,8 @@ public partial class MsSqlContainerSingleton : IDisposable
               set nocount on;
 
               declare
-                @inserted_cs int = isnull((select checksum(*) from inserted), 0),
-                @deleted_cs  int = isnull((select checksum(*) from deleted), 0);
+                @inserted_cs int = isnull((select checksum_agg([checksum]) from (select [checksum] = checksum(*) from inserted) q), 0),
+                @deleted_cs  int = isnull((select checksum_agg([checksum]) from (select [checksum] = checksum(*) from deleted) q), 0);
 
               if @inserted_cs != @deleted_cs
                 update appcfg.Version set [PreviousVersion] = [CurrentVersion]; 
@@ -134,7 +135,7 @@ public partial class MsSqlContainerSingleton : IDisposable
 
     private static async Task ExecuteCommand(string connectionString, string commandText)
     {
-        using var connection = new SqlConnection(connectionString);
+        await using var connection = new SqlConnection(connectionString);
         var query = new SqlCommand(commandText, connection);
 
         await query.Connection.OpenAsync();

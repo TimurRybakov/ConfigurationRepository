@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 
@@ -6,17 +7,13 @@ namespace ParametrizedConfiguration;
 public class ParametrizedConfigurationProvider : ConfigurationProvider, IDisposable
 {
     private readonly IList<IConfigurationProvider> _providers;
-    private readonly IDisposable _changeToken;
+    private IDisposable? _changeToken = null;
 
     private IDictionary<string, string?> ParametrizableData { get; set; } = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
 
     public ParametrizedConfigurationProvider(IList<IConfigurationProvider> providers)
     {
         _providers = providers;
-
-        _changeToken = ChangeToken.OnChange(
-            () => GetReloadToken(),
-            () => Load());
     }
 
     public override void Load()
@@ -37,13 +34,16 @@ public class ParametrizedConfigurationProvider : ConfigurationProvider, IDisposa
 
         Data = Parametrizer.Parametrize(data);
 
-        //OnReload();
+        // Set change token after first load
+        _changeToken ??= ChangeToken.OnChange(
+            () => GetReloadToken(),
+            () => Load());
     }
 
     public override void Set(string key, string? value)
     {
         ParametrizableData[key] = value;
-        Load();
+        Data = Parametrizer.Parametrize(ParametrizableData);
     }
 
     public void Dispose() => Dispose(true);

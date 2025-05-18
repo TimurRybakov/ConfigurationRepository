@@ -3,16 +3,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
+using ParametrizedConfiguration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
 public class EfCoreDictionaryConfigurationRepositoryTests
 {
     [Test]
-    public async Task Configuration_Should_ReturnSameValueAsSavedByEfCoreRepository()
+    public async Task EfCore_Repository_Should_Return_Same_Value_As_Saved()
     {
         // Arrange
-        var options = GetDbContextOptions(nameof(Configuration_Should_ReturnSameValueAsSavedByEfCoreRepository));
+        var options = GetDbContextOptions(nameof(EfCore_Repository_Should_Return_Same_Value_As_Saved));
         await using var context = new RepositoryDbContext(options);
         var repository = new EntryRepository(context);
         var entry = new ConfigurationEntry { Key = "Host", Value = "127.0.0.1" };
@@ -28,27 +29,54 @@ public class EfCoreDictionaryConfigurationRepositoryTests
     }
 
     [Test]
-    public async Task EfCoreRepositoryWithReloader_Should_PeriodicallyReload()
+    public async Task EfCore_Parametrized_Repository_Should_Return_Same_Value_As_Saved()
     {
         // Arrange
-        var options = GetDbContextOptions(nameof(EfCoreRepositoryWithReloader_Should_PeriodicallyReload));
+        var options = GetDbContextOptions(nameof(EfCore_Parametrized_Repository_Should_Return_Same_Value_As_Saved));
         await using var context = new RepositoryDbContext(options);
         var repository = new EntryRepository(context);
-        var entry = new ConfigurationEntry { Key = "Host", Value = "127.0.0.1" };
+
+        // Act
+        await repository.AddAsync(new ConfigurationEntry
+        {
+            Key = "localhost",
+            Value = "127.0.0.1"
+        });
+        await repository.AddAsync(new ConfigurationEntry
+        {
+            Key = "HostParameter",
+            Value = "%LOCALHOST%:8080"
+        });
+
+        var configuration = new ParametrizedConfigurationBuilder()
+            .AddEfCoreRepository(options)
+            .Build();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(configuration["localhost"], Is.EqualTo("127.0.0.1"));
+            Assert.That(configuration["HostParameter"], Is.EqualTo("127.0.0.1:8080"));
+        });
+    }
+
+    [Test]
+    public async Task EfCore_Repository_With_Reloader_Should_Periodically_Reload()
+    {
+        // Arrange
+        var options = GetDbContextOptions(nameof(EfCore_Repository_With_Reloader_Should_Periodically_Reload));
+        await using var context = new RepositoryDbContext(options);
+        var repository = new EntryRepository(context);
+        var entry = new ConfigurationEntry { Key = "Key", Value = "Value" };
 
         // Act
         await repository.AddAsync(entry);
         Console.WriteLine("Configuration saved to repository.");
         var savedEntry = context.ConfigurationEntryDbSet.First();
         var configuration = new ConfigurationBuilder()
-            .AddEfCoreRepository(options, source =>
-            {
-                //source.UseRepositoryChangesNotifier();
-                source.WithPeriodicalReload();
-            })
+            .AddEfCoreRepository(options, source => source.WithPeriodicalReload())
             .Build();
 
-        Assert.That(configuration["Host"], Is.EqualTo("127.0.0.1"));
+        Assert.That(configuration["Key"], Is.EqualTo("Value"));
 
         ChangeToken.OnChange(
             () => configuration.GetReloadToken(),
@@ -62,16 +90,83 @@ public class EfCoreDictionaryConfigurationRepositoryTests
         var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
         reloader.OnProvidersReloaded += _ => tcs.TrySetResult();
 
-        savedEntry.Value = "localhost";
+        savedEntry.Value = "New value";
         context.SaveChanges();
         Console.WriteLine("Configuration changed.");
 
         await reloader.StartAsync(CancellationToken.None);
-        await tcs.Task; // wait for next reload
-        await reloader.StopAsync(CancellationToken.None);
+        try
+        {
+            await tcs.Task; // wait for next reload
+        }
+        finally
+        {
+            await reloader.StopAsync(CancellationToken.None);
+        }
 
         // Assert
-        Assert.That(configuration["Host"], Is.EqualTo(savedEntry?.Value));
+        Assert.That(configuration["Key"], Is.EqualTo(savedEntry.Value));
+    }
+
+    [Test]
+    public async Task EfCore_Parametrized_Repository_With_Reloader_Should_Periodically_Reload()
+    {
+        // Arrange
+        var options = GetDbContextOptions(nameof(EfCore_Parametrized_Repository_With_Reloader_Should_Periodically_Reload));
+        await using var context = new RepositoryDbContext(options);
+        var repository = new EntryRepository(context);
+
+        // Act
+        await repository.AddAsync(new ConfigurationEntry
+        {
+            Key = "ConnectionString",
+            Value = "<some connection string>"
+        });
+        await repository.AddAsync(new ConfigurationEntry
+        {
+            Key = "ExtendedConnectionString",
+            Value = "%ConnectionString%(extended)"
+        });
+        Console.WriteLine("Configuration saved to repository.");
+        var savedEntry = context.ConfigurationEntryDbSet.First();
+        var configuration = new ParametrizedConfigurationBuilder()
+            .AddEfCoreRepository(options, source => source.WithPeriodicalReload())
+            .Build();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(configuration["ConnectionString"], Is.EqualTo("<some connection string>"));
+            Assert.That(configuration["ExtendedConnectionString"], Is.EqualTo("<some connection string>(extended)"));
+        });
+
+        ChangeToken.OnChange(
+            () => configuration.GetReloadToken(),
+            () => Console.WriteLine("Configuration reloaded."));
+
+        var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(configuration);
+        services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(15));
+        var serviceProvider = services.BuildServiceProvider();
+        var tcs = new TaskCompletionSource();
+        var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
+        reloader.OnProvidersReloaded += _ => tcs.TrySetResult();
+
+        savedEntry.Value = "new connection string";
+        context.SaveChanges();
+        Console.WriteLine("Configuration changed.");
+
+        await reloader.StartAsync(CancellationToken.None);
+        try
+        {
+            await tcs.Task; // wait for next reload
+        }
+        finally
+        {
+            await reloader.StopAsync(CancellationToken.None);
+        }
+
+        // Assert
+        Assert.That(configuration["ConnectionString"], Is.EqualTo(savedEntry.Value));
     }
 
     private static DbContextOptions<RepositoryDbContext> GetDbContextOptions(string databaseName)

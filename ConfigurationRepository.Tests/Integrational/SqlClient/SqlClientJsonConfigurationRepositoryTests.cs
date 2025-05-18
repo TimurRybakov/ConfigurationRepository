@@ -1,4 +1,5 @@
 
+using System.Data;
 using ConfigurationRepository.SqlClient;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -10,45 +11,61 @@ namespace ConfigurationRepository.Tests.Integrational;
 internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRepositoryTests
 {
     private const string ConfigurationTableName = "appcfg.JsonConfiguration";
-    private const string ConfigurationKey = "AKey";
-    private const string ConfigurationParametrizedKey = "Date";
+    private const string ConfigurationRepositoryKey = "AKey";
     private const string ConfigurationVersionFieldName = "[Version]";
     private const string ConfigurationValueFieldName = "[JsonValue]";
 
     [Test]
-    public async Task SqlClientJsonRepository_Should_ReturnSameValueAsSaved()
+    public async Task SqlClient_Json_Repository_Should_Return_Same_Value_As_Saved()
     {
         // Act
-        var value = await UpsertConfiguration();
+        var value = await UpsertConfiguration(DateTime.Now);
         var configuration = new ConfigurationBuilder()
             .AddSqlClientJsonRepository(
                 repository => repository
                     .UseConnectionString(ConnectionString)
                     .WithConfigurationTableName(ConfigurationTableName)
                     .WithValueFieldName(ConfigurationValueFieldName)
-                    .WithKey(ConfigurationKey))
+                    .WithKey(ConfigurationRepositoryKey))
             .Build();
 
-        Assert.That(configuration["CurrentDateTime"], Is.EqualTo(value));
+        Assert.That(configuration[ConfigurationKey], Is.EqualTo(value));
+    }
+
+    [Test]
+    public async Task SqlClient_Json_Parametrized_Repository_Should_Return_Same_Value_As_Saved()
+    {
+        // Act
+        var value = await UpsertConfiguration(DateTime.Now);
+        var configuration = new ParametrizedConfigurationBuilder()
+            .AddSqlClientJsonRepository(
+                repository => repository
+                    .UseConnectionString(ConnectionString)
+                    .WithConfigurationTableName(ConfigurationTableName)
+                    .WithValueFieldName(ConfigurationValueFieldName)
+                    .WithKey(ConfigurationRepositoryKey))
+            .Build();
+
+        Assert.That(configuration[ConfigurationKey], Is.EqualTo(value));
     }
 
     [TestCase(2)]
-    public Task SqlClientJsonRepositoryWithReloader_Should_PeriodicallyReload(int reloadCountShouldBe)
+    public Task SqlClient_Json_Repository_With_Reloader_Should_Periodically_Reload(int reloadCountShouldBe)
     {
         return RepositoryWithReloaderTest(
             () => new ConfigurationBuilder()
                 .AddSqlClientJsonRepository(
                     repository => repository
-                            .UseConnectionString(ConnectionString)
-                            .WithConfigurationTableName(ConfigurationTableName)
-                            .WithValueFieldName(ConfigurationValueFieldName)
-                            .WithKey(ConfigurationKey),
+                        .UseConnectionString(ConnectionString)
+                        .WithConfigurationTableName(ConfigurationTableName)
+                        .WithValueFieldName(ConfigurationValueFieldName)
+                        .WithKey(ConfigurationRepositoryKey),
                     source => source.WithPeriodicalReload()),
-            reloadCountShouldBe);
+            reloadCountShouldBe, key: ConfigurationKey);
     }
 
     [TestCase(2)]
-    public Task SqlClientJsonRepositoryWithParametrizationWithReloader_Should_PeriodicallyReload(int reloadCountShouldBe)
+    public Task SqlClient_Json_Parametrized_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
             () => new ParametrizedConfigurationBuilder()
@@ -57,13 +74,13 @@ internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRep
                         .UseConnectionString(ConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName)
                         .WithValueFieldName(ConfigurationValueFieldName)
-                        .WithKey(ConfigurationKey),
+                        .WithKey(ConfigurationRepositoryKey),
                     source => source.WithPeriodicalReload()),
-            reloadCountShouldBe, ConfigurationParametrizedKey);
+            expectedReloadCount, key: ConfigurationParametrizedKey);
     }
 
     [TestCase(1)]
-    public Task SqlClientJsonRepositoryWithReloaderAndVersionChecker_Should_PeriodicallyReload(int reloadCountShouldBe)
+    public Task SqlClient_Json_Versioned_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
             () => new ConfigurationBuilder()
@@ -73,27 +90,25 @@ internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRep
                         .WithConfigurationTableName(ConfigurationTableName)
                         .WithValueFieldName(ConfigurationValueFieldName)
                         .WithVersionFieldName(ConfigurationVersionFieldName)
-                        .WithKey(ConfigurationKey),
+                        .WithKey(ConfigurationRepositoryKey),
                     source => source.WithPeriodicalReload()),
-            reloadCountShouldBe);
+            expectedReloadCount, key: ConfigurationKey);
     }
 
-    [Test]
-    public async Task SqlClientJsonRepositoryWithParametrization_Should_ReturnSameValueAsSaved()
+    [TestCase(1)]
+    public Task SqlClient_Json_Parametrized_Versioned_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
-        // Act
-        var value = await UpsertConfiguration();
-        var configuration = new ParametrizedConfigurationBuilder()
-            .AddSqlClientJsonRepository(
-                repository => repository
-                    .UseConnectionString(ConnectionString)
-                    .WithConfigurationTableName(ConfigurationTableName)
-                    .WithValueFieldName(ConfigurationValueFieldName)
-                    .WithKey(ConfigurationKey),
-                source => source.WithPeriodicalReload())
-            .Build();
-
-        Assert.That(configuration[ConfigurationParametrizedKey], Is.EqualTo(value));
+        return RepositoryWithReloaderTest(
+            () => new ParametrizedConfigurationBuilder()
+                .AddSqlClientJsonRepository(
+                    repository => repository
+                        .UseConnectionString(ConnectionString)
+                        .WithConfigurationTableName(ConfigurationTableName)
+                        .WithValueFieldName(ConfigurationValueFieldName)
+                        .WithVersionFieldName(ConfigurationVersionFieldName)
+                        .WithKey(ConfigurationRepositoryKey),
+                    source => source.WithPeriodicalReload()),
+            expectedReloadCount, key: ConfigurationParametrizedKey);
     }
 
     protected override async Task<int> UpdateConfigurationWithNoChanges()
@@ -108,17 +123,16 @@ internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRep
 
         using var connection = new SqlConnection(ConnectionString);
         using var command = new SqlCommand(updateQuery, connection);
-        command.Parameters.AddWithValue("@Key", ConfigurationKey);
+        command.Parameters.AddWithValue("@Key", ConfigurationRepositoryKey);
 
         await command.Connection.OpenAsync();
 
         return await command.ExecuteNonQueryAsync();
     }
 
-    protected override async Task<string?> UpsertConfiguration()
+    protected override async Task<string?> UpsertConfiguration(DateTime value)
     {
         string upsertQuery = $"""
-            declare @value varchar(255) = convert(varchar(255), getdate(), 121);
             merge {ConfigurationTableName} t
             using
             (
@@ -127,8 +141,8 @@ internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRep
                     [JsonValue] =
                         (
                             select
-                                [CurrentDateTime] = @value,
-                                [Date] = '%CurrentDateTime%'
+                                [CurrentDateTime] = convert(varchar, @value, 121),
+                                [CurrentDateTimeParameter] = '%CurrentDateTime%'
                             for json path, without_array_wrapper
                         )
             ) s on t.[Key] = s.[Key]
@@ -137,11 +151,12 @@ internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRep
             when not matched then
                 insert ([Key], [JsonValue])
                 values (s.[Key], s.[JsonValue]);
-            select [Value] = @value
+            select [Value] = convert(varchar, @value, 121)
             """;
 
         using var connection = new SqlConnection(ConnectionString);
         using var command = new SqlCommand(upsertQuery, connection);
+        command.Parameters.Add("@value", SqlDbType.DateTime).Value = value;
 
         await command.Connection.OpenAsync();
 

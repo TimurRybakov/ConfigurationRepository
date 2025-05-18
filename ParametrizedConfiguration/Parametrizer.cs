@@ -1,3 +1,6 @@
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Xml.Linq;
 using Microsoft.Extensions.Configuration;
 
 namespace ParametrizedConfiguration;
@@ -84,9 +87,16 @@ public static class Parametrizer
             if (!visited.Add(node))
                 return;
 
-            for (var i = 0; i < (graph[node]?.Count ?? 0); i++)
+            ref var nodes = ref CollectionsMarshal.GetValueRefOrNullRef(graph, node);
+
+            if (Unsafe.IsNullRef(ref nodes))
             {
-                var neighbor = graph[node]![i];
+                throw new InvalidOperationException($"Undefined parameter value '{node}'.");
+            }
+
+            for (var i = 0; i < (nodes?.Count ?? 0); i++)
+            {
+                var neighbor = nodes![i];
                 DFS(neighbor);
             }
 
@@ -109,7 +119,7 @@ public static class Parametrizer
             var key = value.Substring(startIndex + 1, endIndex - startIndex - 1);
             if (!input.TryGetValue(key, out var replacement) || replacement is null)
             {
-                throw new InvalidOperationException($"Undefined parameter '{key}'.");
+                throw new InvalidOperationException($"Undefined parameter value '{key}'.");
             }
 
             value = value.Substring(0, startIndex) + replacement + value.Substring(endIndex + 1);

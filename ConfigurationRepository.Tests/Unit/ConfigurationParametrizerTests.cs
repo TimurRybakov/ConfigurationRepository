@@ -8,7 +8,7 @@ namespace ConfigurationRepository.Tests.Unit;
 internal class ConfigurationParametrizerTests
 {
     [Test]
-    public void ConfigurationParametrizer_Should_ReplaceParametersPlaceholders()
+    public void Configuration_Parametrizer_Should_Replace_Placeholders_With_Parameters_Values()
     {
         Dictionary<string, string?> configuration = new()
         {
@@ -24,7 +24,7 @@ internal class ConfigurationParametrizerTests
     }
 
     [Test]
-    public void ConfigurationParametrizer_Should_ReloadChanges()
+    public void Configuration_Parametrizer_Should_Reload_Changes()
     {
         Dictionary<string, string?> configuration = new()
         {
@@ -42,7 +42,7 @@ internal class ConfigurationParametrizerTests
     }
 
     [Test]
-    public void ConfigurationParametrizer_Should_FailOnParameterCyclicDeps()
+    public void Configuration_Parametrizer_Should_Fail_On_Parameter_Cyclic_Dependencies()
     {
         Dictionary<string, string?> configuration = new()
         {
@@ -54,5 +54,20 @@ internal class ConfigurationParametrizerTests
             .AddInMemoryCollection(configuration);
 
         Assert.Throws<CyclicDependencyException>(() => configBuilder.Build());
+    }
+
+
+    [Test]
+    public void Configuration_Parametrizer_Should_Fail_On_Undefined_Parameters()
+    {
+        Dictionary<string, string?> configuration = new()
+        {
+            { "Key", "%parameter not defined%" },
+        };
+
+        var configBuilder = new ParametrizedConfigurationBuilder()
+            .AddInMemoryCollection(configuration);
+
+        Assert.Throws<InvalidOperationException>(() => configBuilder.Build());
     }
 }

@@ -1,5 +1,6 @@
 
 using Microsoft.Extensions.Configuration;
+using ParametrizedConfiguration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
@@ -21,14 +22,10 @@ public class CustomConfigurationRepositoryTests
     }
 
     [Test]
-    public void InMemoryRepositoryChanges_Should_UpdateConfiguration()
+    public void InMemory_Repository_Changes_Should_Update_Configuration()
     {
         var configuration = new ConfigurationBuilder()
-            .AddRepository(Repository, source =>
-            {
-                source.RetrievalStrategy = DictionaryRetrievalStrategy.Instance;
-                //source.UseRepositoryChangesNotifier();
-            })
+            .AddRepository(Repository, source => source.RetrievalStrategy = DictionaryRetrievalStrategy.Instance)
             .Build();
 
         TestDelegate getValue = () => _ = Repository.GetConfiguration<IDictionary<string, string?>>()["key1"];

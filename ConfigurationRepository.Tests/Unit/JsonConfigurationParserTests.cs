@@ -8,7 +8,7 @@ namespace ConfigurationRepository.Tests.Unit;
 internal class JsonConfigurationParserTests
 {
     [Test]
-    public void Json_ShouldBe_ParsedAsExpected()
+    public void Json_Should_Be_Parsed_As_Expected()
     {
         const string input = """
         {

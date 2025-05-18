@@ -1,7 +1,10 @@
 
+using System.Data;
+using System.Diagnostics;
 using ConfigurationRepository.SqlClient;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using ParametrizedConfiguration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
@@ -11,10 +14,10 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : MsSqlConfigurat
     private const string VersionTableName = "appcfg.Version";
 
     [Test]
-    public async Task SqlClientRepository_Should_ReturnSameValueAsSaved()
+    public async Task SqlClient_Repository_Should_Return_Same_Value_As_Saved()
     {
         // Act
-        var value = await UpsertConfiguration();
+        var value = await UpsertConfiguration(DateTime.Now);
         var configuration = new ConfigurationBuilder()
             .AddSqlClientRepository(
                 repository => repository
@@ -22,11 +25,26 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : MsSqlConfigurat
                     .WithConfigurationTableName(ConfigurationTableName))
             .Build();
 
-        Assert.That(configuration["CurrentDateTime"], Is.EqualTo(value));
+        Assert.That(configuration[ConfigurationKey], Is.EqualTo(value));
+    }
+
+    [Test]
+    public async Task SqlClient_Parametrized_Repository_Should_Return_Same_Value_As_Saved()
+    {
+        // Act
+        var value = await UpsertConfiguration(DateTime.Now);
+        var configuration = new ParametrizedConfigurationBuilder()
+            .AddSqlClientRepository(
+                repository => repository
+                    .UseConnectionString(ConnectionString)
+                    .WithConfigurationTableName(ConfigurationTableName))
+            .Build();
+
+        Assert.That(configuration[ConfigurationParametrizedKey], Is.EqualTo(value));
     }
 
     [TestCase(2)]
-    public Task SqlClientRepositoryWithReloader_Should_PeriodicallyReload(int reloadCountShouldBe)
+    public Task SqlClient_Repository_With_Reloader_Should_Periodically_Reload(int reloadCountShouldBe)
     {
         return RepositoryWithReloaderTest(
             () => new ConfigurationBuilder()
@@ -35,11 +53,24 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : MsSqlConfigurat
                         .UseConnectionString(ConnectionString)
                         .WithConfigurationTableName(ConfigurationTableName),
                     source => source.WithPeriodicalReload()),
-            reloadCountShouldBe);
+            reloadCountShouldBe, key: ConfigurationKey);
+    }
+
+    [TestCase(2)]
+    public Task SqlClient_Parametrized_Repository_With_Reloader_Should_Periodically_Reload(int reloadCountShouldBe)
+    {
+        return RepositoryWithReloaderTest(
+            () => new ParametrizedConfigurationBuilder()
+                .AddSqlClientRepository(
+                    repository => repository
+                        .UseConnectionString(ConnectionString)
+                        .WithConfigurationTableName(ConfigurationTableName),
+                    source => source.WithPeriodicalReload()),
+            reloadCountShouldBe, key: ConfigurationParametrizedKey);
     }
 
     [TestCase(1)]
-    public Task SqlClientRepositoryWithReloaderAndVersionChecker_Should_PeriodicallyReload(int reloadCountShouldBe)
+    public Task SqlClient_Versioned_Repository_With_Reloader_Should_Periodically_Reload(int reloadCountShouldBe)
     {
         return RepositoryWithReloaderTest(
             () => new ConfigurationBuilder()
@@ -49,7 +80,21 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : MsSqlConfigurat
                         .WithConfigurationTableName(ConfigurationTableName)
                         .WithVersionTableName(VersionTableName),
                 source => source.WithPeriodicalReload()),
-            reloadCountShouldBe);
+            reloadCountShouldBe, key: ConfigurationKey);
+    }
+
+    [TestCase(1)]
+    public Task SqlClient_Parametrized_Versioned_Repository_With_Reloader_Should_Periodically_Reload(int reloadCountShouldBe)
+    {
+        return RepositoryWithReloaderTest(
+            () => new ParametrizedConfigurationBuilder()
+                .AddSqlClientRepository(
+                    repository => repository
+                        .UseConnectionString(ConnectionString)
+                        .WithConfigurationTableName(ConfigurationTableName)
+                        .WithVersionTableName(VersionTableName),
+                source => source.WithPeriodicalReload()),
+            reloadCountShouldBe, key: ConfigurationParametrizedKey);
     }
 
     protected override async Task<int> UpdateConfigurationWithNoChanges()
@@ -59,7 +104,7 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : MsSqlConfigurat
             where [Key] = 'CurrentDateTime';
             """;
 
-        using var connection = new SqlConnection(ConnectionString);
+        await using var connection = new SqlConnection(ConnectionString);
         var query = new SqlCommand(updateQuery, connection);
 
         await query.Connection.OpenAsync();
@@ -67,30 +112,39 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : MsSqlConfigurat
         return await query.ExecuteNonQueryAsync();
     }
 
-    protected override async Task<string?> UpsertConfiguration()
+    protected override async Task<string?> UpsertConfiguration(DateTime value)
     {
         string upsertQuery = $"""
-            declare @value varchar(255) = convert(varchar(255), getdate(), 121);
             merge {ConfigurationTableName} t
             using
             (
                 select
                     [Key] = 'CurrentDateTime',
-                    [Value] = @value
+                    [Value] = convert(varchar, @value, 121)
+                union all
+                select
+                    [Key] = 'CurrentDateTimeParameter',
+                    [Value] = '%CurrentDateTime%'
             ) s on t.[Key] = s.[Key]
             when matched then
                 update set [Value] = s.[Value]
             when not matched then
                 insert ([Key], [Value])
                 values (s.[Key], s.[Value]);
-            select [Value] = @value
+            select [Value] = convert(varchar, @value, 121)
             """;
 
         using var connection = new SqlConnection(ConnectionString);
-        var query = new SqlCommand(upsertQuery, connection);
+        connection.InfoMessage += (sender, args) =>
+        {
+            Debug.WriteLine(args.Message); // Log SQL queries
+        };
 
-        await query.Connection.OpenAsync();
+        using var command = new SqlCommand(upsertQuery, connection);
+        command.Parameters.Add("@value", SqlDbType.DateTime).Value = value;
 
-        return (string?) await query.ExecuteScalarAsync();
+        await command.Connection.OpenAsync();
+
+        return (string?) await command.ExecuteScalarAsync();
     }
 }
