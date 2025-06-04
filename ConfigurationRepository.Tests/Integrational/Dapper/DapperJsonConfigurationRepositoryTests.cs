@@ -35,12 +35,13 @@ internal class DapperJsonConfigurationRepositoryTests : MsSqlConfigurationReposi
     {
         // Act
         var value = await UpsertConfiguration(DateTime.Now);
-        var configuration = new ParametrizedConfigurationBuilder()
+        var configuration = new ConfigurationBuilder()
             .AddDapperJsonRepository(
                 repository => repository
                     .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
                     .WithSelectConfigurationQuery(SelectConfigurationQuery)
                     .WithKey(ConfigurationRepositoryKey))
+            .WithParametrization()
             .Build();
 
         Assert.That(configuration[ConfigurationParametrizedKey], Is.EqualTo(value));
@@ -50,58 +51,80 @@ internal class DapperJsonConfigurationRepositoryTests : MsSqlConfigurationReposi
     public Task Dapper_Json_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
-            () => new ConfigurationBuilder()
-                .AddDapperJsonRepository(
-                    repository => repository
-                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
-                        .WithSelectConfigurationQuery(SelectConfigurationQuery)
-                        .WithKey(ConfigurationRepositoryKey),
-                    source => source.WithPeriodicalReload()),
-            expectedReloadCount, key: ConfigurationKey);
+            builder =>
+            {
+                builder
+                    .AddDapperJsonRepository(
+                        repository => repository
+                            .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                            .WithSelectConfigurationQuery(SelectConfigurationQuery)
+                            .WithKey(ConfigurationRepositoryKey),
+                        source => source.WithPeriodicalReload());
+                return null;
+            },
+            expectedReloadCount,
+            key: ConfigurationKey);
     }
 
     [TestCase(2)]
     public Task Dapper_Parametrized_Json_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
-            () => new ParametrizedConfigurationBuilder()
-                .AddDapperJsonRepository(
-                    repository => repository
-                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
-                        .WithSelectConfigurationQuery(SelectConfigurationQuery)
-                        .WithKey(ConfigurationRepositoryKey),
-                    source => source.WithPeriodicalReload()),
-            expectedReloadCount, key: ConfigurationParametrizedKey);
+            builder =>
+            {
+                builder
+                    .AddDapperJsonRepository(
+                        repository => repository
+                            .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                            .WithSelectConfigurationQuery(SelectConfigurationQuery)
+                            .WithKey(ConfigurationRepositoryKey),
+                        source => source.WithPeriodicalReload())
+                    .WithParametrization(out var configuration);
+                return configuration;
+            },
+            expectedReloadCount,
+            key: ConfigurationParametrizedKey);
     }
 
     [TestCase(1)]
     public Task Dapper_Versioned_Json_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
-            () => new ConfigurationBuilder()
-                .AddDapperJsonRepository(
-                    repository => repository
-                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
-                        .WithSelectConfigurationQuery(SelectConfigurationQuery)
-                        .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery)
-                        .WithKey(ConfigurationRepositoryKey),
-                source => source.WithPeriodicalReload()),
-            expectedReloadCount, key: ConfigurationKey);
+            builder =>
+            {
+                builder
+                    .AddDapperJsonRepository(
+                        repository => repository
+                            .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                            .WithSelectConfigurationQuery(SelectConfigurationQuery)
+                            .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery)
+                            .WithKey(ConfigurationRepositoryKey),
+                        source => source.WithPeriodicalReload());
+                return null;
+            },
+            expectedReloadCount,
+            key: ConfigurationKey);
     }
 
     [TestCase(1)]
     public Task Dapper_Parametrized_Versioned_Json_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
-            () => new ParametrizedConfigurationBuilder()
-                .AddDapperJsonRepository(
-                    repository => repository
-                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
-                        .WithSelectConfigurationQuery(SelectConfigurationQuery)
-                        .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery)
-                        .WithKey(ConfigurationRepositoryKey),
-                source => source.WithPeriodicalReload()),
-            expectedReloadCount, key: ConfigurationParametrizedKey);
+            builder =>
+            {
+                builder
+                    .AddDapperJsonRepository(
+                        repository => repository
+                            .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                            .WithSelectConfigurationQuery(SelectConfigurationQuery)
+                            .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery)
+                            .WithKey(ConfigurationRepositoryKey),
+                        source => source.WithPeriodicalReload())
+                    .WithParametrization(out var configuration);
+                return configuration;
+            },
+            expectedReloadCount,
+            key: ConfigurationParametrizedKey);
     }
     protected override async Task<int> UpdateConfigurationWithNoChanges()
     {

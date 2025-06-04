@@ -33,11 +33,12 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : MsSqlConfigurat
     {
         // Act
         var value = await UpsertConfiguration(DateTime.Now);
-        var configuration = new ParametrizedConfigurationBuilder()
+        var configuration = new ConfigurationBuilder()
             .AddSqlClientRepository(
                 repository => repository
                     .UseConnectionString(ConnectionString)
                     .WithConfigurationTableName(ConfigurationTableName))
+            .WithParametrization()
             .Build();
 
         Assert.That(configuration[ConfigurationParametrizedKey], Is.EqualTo(value));
@@ -47,54 +48,76 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : MsSqlConfigurat
     public Task SqlClient_Repository_With_Reloader_Should_Periodically_Reload(int reloadCountShouldBe)
     {
         return RepositoryWithReloaderTest(
-            () => new ConfigurationBuilder()
-                .AddSqlClientRepository(
-                    repository => repository
-                        .UseConnectionString(ConnectionString)
-                        .WithConfigurationTableName(ConfigurationTableName),
-                    source => source.WithPeriodicalReload()),
-            reloadCountShouldBe, key: ConfigurationKey);
+            builder =>
+            {
+                builder
+                    .AddSqlClientRepository(
+                        repository => repository
+                            .UseConnectionString(ConnectionString)
+                            .WithConfigurationTableName(ConfigurationTableName),
+                        source => source.WithPeriodicalReload());
+                return null;
+            },
+            reloadCountShouldBe,
+            key: ConfigurationKey);
     }
 
     [TestCase(2)]
     public Task SqlClient_Parametrized_Repository_With_Reloader_Should_Periodically_Reload(int reloadCountShouldBe)
     {
         return RepositoryWithReloaderTest(
-            () => new ParametrizedConfigurationBuilder()
-                .AddSqlClientRepository(
-                    repository => repository
-                        .UseConnectionString(ConnectionString)
-                        .WithConfigurationTableName(ConfigurationTableName),
-                    source => source.WithPeriodicalReload()),
-            reloadCountShouldBe, key: ConfigurationParametrizedKey);
+            builder =>
+            {
+                builder
+                    .AddSqlClientRepository(
+                        repository => repository
+                            .UseConnectionString(ConnectionString)
+                            .WithConfigurationTableName(ConfigurationTableName),
+                        source => source.WithPeriodicalReload())
+                    .WithParametrization(out var configuration);
+                return configuration;
+            },
+            reloadCountShouldBe,
+            key: ConfigurationParametrizedKey);
     }
 
     [TestCase(1)]
     public Task SqlClient_Versioned_Repository_With_Reloader_Should_Periodically_Reload(int reloadCountShouldBe)
     {
         return RepositoryWithReloaderTest(
-            () => new ConfigurationBuilder()
-                .AddSqlClientRepository(
-                    repository => repository
-                        .UseConnectionString(ConnectionString)
-                        .WithConfigurationTableName(ConfigurationTableName)
-                        .WithVersionTableName(VersionTableName),
-                source => source.WithPeriodicalReload()),
-            reloadCountShouldBe, key: ConfigurationKey);
+            builder =>
+            {
+                builder
+                    .AddSqlClientRepository(
+                        repository => repository
+                            .UseConnectionString(ConnectionString)
+                            .WithConfigurationTableName(ConfigurationTableName)
+                            .WithVersionTableName(VersionTableName),
+                        source => source.WithPeriodicalReload());
+                return null;
+            },
+            reloadCountShouldBe,
+            key: ConfigurationKey);
     }
 
     [TestCase(1)]
     public Task SqlClient_Parametrized_Versioned_Repository_With_Reloader_Should_Periodically_Reload(int reloadCountShouldBe)
     {
         return RepositoryWithReloaderTest(
-            () => new ParametrizedConfigurationBuilder()
-                .AddSqlClientRepository(
-                    repository => repository
-                        .UseConnectionString(ConnectionString)
-                        .WithConfigurationTableName(ConfigurationTableName)
-                        .WithVersionTableName(VersionTableName),
-                source => source.WithPeriodicalReload()),
-            reloadCountShouldBe, key: ConfigurationParametrizedKey);
+            builder =>
+            {
+                builder
+                    .AddSqlClientRepository(
+                        repository => repository
+                            .UseConnectionString(ConnectionString)
+                            .WithConfigurationTableName(ConfigurationTableName)
+                            .WithVersionTableName(VersionTableName),
+                        source => source.WithPeriodicalReload())
+                    .WithParametrization(out var configuration);
+                return configuration;
+            },
+            reloadCountShouldBe,
+            key: ConfigurationParametrizedKey);
     }
 
     protected override async Task<int> UpdateConfigurationWithNoChanges()

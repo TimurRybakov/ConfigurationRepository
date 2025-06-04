@@ -33,11 +33,12 @@ internal class DapperDictionaryConfigurationRepositoryTests : MsSqlConfiguration
     {
         // Act
         var value = await UpsertConfiguration(DateTime.Now);
-        var configuration = new ParametrizedConfigurationBuilder()
+        var configuration = new ConfigurationBuilder()
             .AddDapperRepository(
                 repository => repository
                     .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
                     .WithSelectConfigurationQuery(SelectConfigurationQuery))
+            .WithParametrization()
             .Build();
 
         Assert.That(configuration[ConfigurationParametrizedKey], Is.EqualTo(value));
@@ -47,54 +48,76 @@ internal class DapperDictionaryConfigurationRepositoryTests : MsSqlConfiguration
     public Task Dapper_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
-            () => new ConfigurationBuilder()
-                .AddDapperRepository(
-                    repository => repository
-                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
-                        .WithSelectConfigurationQuery(SelectConfigurationQuery),
-                    source => source.WithPeriodicalReload()),
-            expectedReloadCount, key: ConfigurationKey);
+            builder =>
+            {
+                builder
+                    .AddDapperRepository(
+                        repository => repository
+                            .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                            .WithSelectConfigurationQuery(SelectConfigurationQuery),
+                        source => source.WithPeriodicalReload());
+                return null;
+            },
+            expectedReloadCount,
+            key: ConfigurationKey);
     }
 
     [TestCase(2)]
     public Task Dapper_Parametrized_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
-            () => new ParametrizedConfigurationBuilder()
-                .AddDapperRepository(
-                    repository => repository
-                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
-                        .WithSelectConfigurationQuery(SelectConfigurationQuery),
-                    source => source.WithPeriodicalReload()),
-            expectedReloadCount, key: ConfigurationParametrizedKey);
+            builder =>
+            {
+                builder
+                    .AddDapperRepository(
+                        repository => repository
+                            .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                            .WithSelectConfigurationQuery(SelectConfigurationQuery),
+                        source => source.WithPeriodicalReload())
+                    .WithParametrization(out var configuration);
+                return configuration;
+            },
+            expectedReloadCount,
+            key: ConfigurationParametrizedKey);
     }
 
     [TestCase(1)]
     public Task Dapper_Versioned_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
-            () => new ConfigurationBuilder()
-                .AddDapperRepository(
-                    repository => repository
-                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
-                        .WithSelectConfigurationQuery(SelectConfigurationQuery)
-                        .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery),
-                    source => source.WithPeriodicalReload()),
-            expectedReloadCount, key: ConfigurationKey);
+            builder =>
+            {
+                builder
+                    .AddDapperRepository(
+                            repository => repository
+                                .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                                .WithSelectConfigurationQuery(SelectConfigurationQuery)
+                                .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery),
+                            source => source.WithPeriodicalReload());
+                return null;
+            },
+            expectedReloadCount,
+            key: ConfigurationKey);
     }
 
     [TestCase(1)]
     public Task Dapper_Parametrized_Versioned_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
-            () => new ParametrizedConfigurationBuilder()
-                .AddDapperRepository(
-                    repository => repository
-                        .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
-                        .WithSelectConfigurationQuery(SelectConfigurationQuery)
-                        .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery),
-                    source => source.WithPeriodicalReload()),
-            expectedReloadCount, key: ConfigurationParametrizedKey);
+            builder =>
+            {
+                builder
+                    .AddDapperRepository(
+                        repository => repository
+                            .UseDbConnectionFactory(() => new SqlConnection(ConnectionString))
+                            .WithSelectConfigurationQuery(SelectConfigurationQuery)
+                            .WithSelectCurrentVersionQuery(SelectCurrentVersionQuery),
+                        source => source.WithPeriodicalReload())
+                    .WithParametrization(out var configuration);
+                return configuration;
+            },
+            expectedReloadCount,
+            key: ConfigurationParametrizedKey);
     }
 
     protected override async Task<int> UpdateConfigurationWithNoChanges()

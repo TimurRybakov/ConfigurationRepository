@@ -7,9 +7,14 @@ namespace ParametrizedConfiguration;
 
 public static class Parametrizer
 {
-    public static IDictionary<string, string?> Parametrize(IDictionary<string, string?> input)
+    public static IDictionary<string, string?> Parametrize(this IConfiguration config)
     {
-        var valueDictionary = new Dictionary<string, string?>(input, StringComparer.OrdinalIgnoreCase);
+        var valueDictionary = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var kvp in config.AsEnumerable())
+        {
+            valueDictionary.Add(kvp.Key, kvp.Value);
+        }
 
         var dependencyGraph = BuildDependencyGraph(valueDictionary);
 

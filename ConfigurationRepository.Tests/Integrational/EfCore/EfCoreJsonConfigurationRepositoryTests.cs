@@ -2,6 +2,7 @@ using ConfigurationRepository.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using ParametrizedConfiguration;
 
@@ -47,8 +48,9 @@ public class EfCoreJsonConfigurationRepositoryTests
         // Act
         await repository.AddAsync(entry);
         var savedEntry = context.ConfigurationEntryDbSet.FirstOrDefault();
-        var configuration = new ParametrizedConfigurationBuilder()
+        var configuration = new ConfigurationBuilder()
             .AddEfCoreJsonRepository(Key, options)
+            .WithParametrization()  
             .Build();
 
         Assert.That(configuration["Host"], Is.EqualTo("127.0.0.1"));
@@ -85,11 +87,11 @@ public class EfCoreJsonConfigurationRepositoryTests
             () => Console.WriteLine("Configuration reloaded."));
 
         var services = new ServiceCollection();
-        services.AddSingleton<IConfiguration>(configuration);
-        services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(15));
+        services.AddConfigurationReloader(configuration, TimeSpan.FromMilliseconds(15));
         var serviceProvider = services.BuildServiceProvider();
         var tcs = new TaskCompletionSource();
-        var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
+        var hostedServices = serviceProvider.GetServices<IHostedService>();
+        var reloader = hostedServices.OfType<ConfigurationReloader>().First();
         reloader.OnProvidersReloaded += _ => tcs.TrySetResult();
 
         savedEntry.Value = """{"Host":"localhost"}""";
@@ -121,7 +123,7 @@ public class EfCoreJsonConfigurationRepositoryTests
         await repository.AddAsync(entry);
         Console.WriteLine("Configuration saved to repository.");
         var savedEntry = context.ConfigurationEntryDbSet.First();
-        var configuration = new ParametrizedConfigurationBuilder()
+        var configuration = new ConfigurationBuilder()
             .AddEfCoreJsonRepository(
                 Key,
                 options,
@@ -130,6 +132,7 @@ public class EfCoreJsonConfigurationRepositoryTests
                     //source.UseRepositoryChangesNotifier();
                     source.WithPeriodicalReload();
                 })
+            .WithParametrization(out var parametrizableConfiguration)
             .Build();
 
         Assert.That(configuration["Host"], Is.EqualTo("127.0.0.1"));
@@ -139,11 +142,11 @@ public class EfCoreJsonConfigurationRepositoryTests
             () => Console.WriteLine("Configuration reloaded."));
 
         var services = new ServiceCollection();
-        services.AddSingleton<IConfiguration>(configuration);
-        services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(15));
+        services.AddConfigurationReloader(parametrizableConfiguration, TimeSpan.FromMilliseconds(15));
         var serviceProvider = services.BuildServiceProvider();
         var tcs = new TaskCompletionSource();
-        var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
+        var hostedServices = serviceProvider.GetServices<IHostedService>();
+        var reloader = hostedServices.OfType<ConfigurationReloader>().First();
         reloader.OnProvidersReloaded += _ => tcs.TrySetResult();
 
         savedEntry.Value = """{ "home" : "192.168.0.1", "host" : "%home%" }""";

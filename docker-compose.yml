@@ -1,0 +1,69 @@
+name: configuration_sample_web_api
+services:
+  configurationsamplewebapp:
+    container_name: app
+    image: ${DOCKER_REGISTRY-}configurationsamplewebapp
+    environment:
+      VAULT_ADDR: "http://vault-server:8200"
+    build:
+      context: .
+      dockerfile: ConfigurationSampleWebApp/Dockerfile
+    depends_on:
+      mssql:
+        condition: service_started
+      vault:
+        condition: service_started
+    networks:
+      net:
+        aliases:
+          - app
+
+  vault:
+    container_name: vault
+    ports:
+      - "8200:8200"
+      - "8201:8201"
+    image: hashicorp/vault:1.19
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200"
+      VAULT_DEV_ROOT_TOKEN_ID: "root"
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    cap_add:
+      - IPC_LOCK
+    restart: unless-stopped
+    networks:
+      net:
+        aliases:
+          - vault-server
+
+  mssql:
+    container_name: mssql
+    image: mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: ${MSSQL_PRODUCT_ID:-Developer}
+      SA_PASSWORD: "${MSSQL_SA_PASSWORD:-yourStrong(!)Password}"
+    volumes:
+      - mssqlsystem:/var/opt/mssql
+      - mssqluser:/var/opt/sqlserver
+      - ${MSSQL_CONFIG_DIR:-./.config/mssql}/entrypoint.sh:/usr/src/app/entrypoint.sh
+      - ${MSSQL_CONFIG_DIR:-./.config/mssql}/sql/:/usr/src/app/docker-entrypoint-initdb.d
+    working_dir: /usr/src/app
+    command: sh -c ' chmod +x ./entrypoint.sh; ./entrypoint.sh & /opt/mssql/bin/sqlservr;'
+    ports:
+      - "${MSSQL_PORT:-1433}:1433"
+    networks:
+      net:
+        aliases:
+          - mssql-server
+    restart: unless-stopped
+
+
+networks:
+  net:
+    name: configuration_sample_web_api
+    driver: bridge
+
+volumes:
+  mssqlsystem: # external: true
+  mssqluser: # external: true

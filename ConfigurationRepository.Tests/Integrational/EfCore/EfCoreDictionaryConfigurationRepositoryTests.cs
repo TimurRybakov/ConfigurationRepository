@@ -2,6 +2,7 @@ using ConfigurationRepository.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using ParametrizedConfiguration;
 
@@ -48,8 +49,9 @@ public class EfCoreDictionaryConfigurationRepositoryTests
             Value = "%LOCALHOST%:8080"
         });
 
-        var configuration = new ParametrizedConfigurationBuilder()
+        var configuration = new ConfigurationBuilder()
             .AddEfCoreRepository(options)
+            .WithParametrization()
             .Build();
 
         Assert.Multiple(() =>
@@ -83,11 +85,11 @@ public class EfCoreDictionaryConfigurationRepositoryTests
             () => Console.WriteLine("Configuration reloaded."));
 
         var services = new ServiceCollection();
-        services.AddSingleton<IConfiguration>(configuration);
-        services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(15));
+        services.AddConfigurationReloader(configuration, TimeSpan.FromMilliseconds(15));
         var serviceProvider = services.BuildServiceProvider();
         var tcs = new TaskCompletionSource();
-        var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
+        var hostedServices = serviceProvider.GetServices<IHostedService>();
+        var reloader = hostedServices.OfType<ConfigurationReloader>().First();
         reloader.OnProvidersReloaded += _ => tcs.TrySetResult();
 
         savedEntry.Value = "New value";
@@ -129,8 +131,9 @@ public class EfCoreDictionaryConfigurationRepositoryTests
         });
         Console.WriteLine("Configuration saved to repository.");
         var savedEntry = context.ConfigurationEntryDbSet.First();
-        var configuration = new ParametrizedConfigurationBuilder()
+        var configuration = new ConfigurationBuilder()
             .AddEfCoreRepository(options, source => source.WithPeriodicalReload())
+            .WithParametrization(out var parametrizableConfiguration)
             .Build();
 
         Assert.Multiple(() =>
@@ -144,11 +147,11 @@ public class EfCoreDictionaryConfigurationRepositoryTests
             () => Console.WriteLine("Configuration reloaded."));
 
         var services = new ServiceCollection();
-        services.AddSingleton<IConfiguration>(configuration);
-        services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(15));
+        services.AddConfigurationReloader(parametrizableConfiguration, TimeSpan.FromMilliseconds(15));
         var serviceProvider = services.BuildServiceProvider();
         var tcs = new TaskCompletionSource();
-        var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
+        var hostedServices = serviceProvider.GetServices<IHostedService>();
+        var reloader = hostedServices.OfType<ConfigurationReloader>().First();
         reloader.OnProvidersReloaded += _ => tcs.TrySetResult();
 
         savedEntry.Value = "new connection string";

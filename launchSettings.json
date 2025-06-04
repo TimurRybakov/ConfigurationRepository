@@ -1,0 +1,19 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "composeLaunchAction": "LaunchBrowser",
+      "composeLaunchServiceName": "configurationsamplewebapp",
+      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/swagger",
+      "serviceActions": {
+        "configurationsamplewebapp": "StartDebugging",
+        "mssql": "StartWithoutDebugging",
+        "vault": "StartWithoutDebugging"
+      },
+      "environmentVariables": {
+        "MSSQL_SA_PASSWORD": "111"
+      }
+    }
+  }
+}

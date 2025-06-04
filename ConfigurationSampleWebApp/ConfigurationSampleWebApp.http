@@ -1,0 +1,6 @@
+@ConfigurationSampleWebApp_HostAddress = http://localhost:5068
+
+GET {{ConfigurationSampleWebApp_HostAddress}}/configuration/
+Accept: application/json
+
+###

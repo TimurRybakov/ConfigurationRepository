@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
@@ -9,7 +7,7 @@ namespace ConfigurationRepository;
 /// <summary>
 /// A stored <see cref="ConfigurationProvider"/> in a <see cref="IConfiguration"/>.
 /// </summary>
-public class ConfigurationRepositoryProvider : ConfigurationProvider, IConfigurationRepositoryProvider
+public class ConfigurationRepositoryProvider : ConfigurationProvider, IReloadableConfigurationProvider
 {
     private readonly IDisposable? _changeTokenRegistration;
     private readonly object _lock = new();
@@ -27,14 +25,24 @@ public class ConfigurationRepositoryProvider : ConfigurationProvider, IConfigura
         if (Source.RepositoryChangesNotifier is not null)
         {
             _changeTokenRegistration = ChangeToken.OnChange(
-                () => Source.RepositoryChangesNotifier.CreateChangeToken(), Reload);
+                () => Source.RepositoryChangesNotifier.CreateChangeToken(),
+                Reload);
         }
     }
 
     /// <summary>
     /// The source settings for this provider.
     /// </summary>
-    public ConfigurationRepositorySource Source { get; }
+    protected ConfigurationRepositorySource Source { get; }
+
+    /// <summary>
+    /// True means that configuration provider will be reloaded periodically by <see cref="ConfigurationReloader"/> service
+    /// </summary>
+    public bool PeriodicalReload
+    {
+        get => Source.PeriodicalReload;
+        set => Source.PeriodicalReload = value;
+    }
 
     /// <summary>
     /// Generates a string representing this provider name and relevant details.

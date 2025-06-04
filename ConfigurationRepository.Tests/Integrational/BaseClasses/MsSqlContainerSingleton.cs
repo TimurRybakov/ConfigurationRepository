@@ -13,7 +13,7 @@ public partial class MsSqlContainerSingleton : IDisposable
         .WithImage("mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04")
         .WithName("mssql_configuration_repository")
         .WithReuse(true)
-        .WithBindMount($"{Environment.CurrentDirectory}\\mssql", "/var/opt/mssql/data")
+        .WithBindMount($"{Environment.CurrentDirectory}\\..\\..\\..\\..\\mssql_mount", "/var/opt/mssql/data")
         .Build();
 
     public string ConnectionString { get; private set; } = "";
@@ -41,12 +41,12 @@ public partial class MsSqlContainerSingleton : IDisposable
 
         await EnsureTestDatabaseCreated(connectionString);
 
-        string testCoonnectionString = DatabaseReplacementRegex().Replace(connectionString, $"Database=test");
+        string testConnectionString = DatabaseReplacementRegex().Replace(connectionString, $"Database=test");
 
-        await EnsureConfigurationSchemaCreated(testCoonnectionString);
-        await EnsureConfigurationTablesCreated(testCoonnectionString);
+        await EnsureConfigurationSchemaCreated(testConnectionString);
+        await EnsureConfigurationTablesCreated(testConnectionString);
 
-        ConnectionString = testCoonnectionString;
+        ConnectionString = testConnectionString;
     }
 
     public void Dispose()

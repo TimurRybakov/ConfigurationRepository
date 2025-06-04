@@ -10,13 +10,6 @@ public static class ConfigurationRepositorySourceExtensions
         return source;
     }
 
-    public static TSource WithPeriodicalReload<TSource>(this TSource source)
-        where TSource : ConfigurationRepositorySource
-    {
-        source.PeriodicalReload = true;
-        return source;
-    }
-
     public static TSource UseRepositoryChangesNotifier<TSource>(
         this TSource source, IRepositoryChangesNotifier repositoryChangesNotifier)
         where TSource : ConfigurationRepositorySource

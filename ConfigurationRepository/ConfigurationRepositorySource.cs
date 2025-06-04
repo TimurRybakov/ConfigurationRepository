@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository;
 
-public class ConfigurationRepositorySource : IConfigurationSource
+public class ConfigurationRepositorySource : IReloadableConfigurationSource
 {
     /// <summary>
     /// The configuration storage repository.

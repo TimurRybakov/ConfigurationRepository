@@ -37,13 +37,14 @@ internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRep
     {
         // Act
         var value = await UpsertConfiguration(DateTime.Now);
-        var configuration = new ParametrizedConfigurationBuilder()
+        var configuration = new ConfigurationBuilder()
             .AddSqlClientJsonRepository(
                 repository => repository
                     .UseConnectionString(ConnectionString)
                     .WithConfigurationTableName(ConfigurationTableName)
                     .WithValueFieldName(ConfigurationValueFieldName)
                     .WithKey(ConfigurationRepositoryKey))
+            .WithParametrization()
             .Build();
 
         Assert.That(configuration[ConfigurationKey], Is.EqualTo(value));
@@ -53,62 +54,84 @@ internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRep
     public Task SqlClient_Json_Repository_With_Reloader_Should_Periodically_Reload(int reloadCountShouldBe)
     {
         return RepositoryWithReloaderTest(
-            () => new ConfigurationBuilder()
-                .AddSqlClientJsonRepository(
-                    repository => repository
-                        .UseConnectionString(ConnectionString)
-                        .WithConfigurationTableName(ConfigurationTableName)
-                        .WithValueFieldName(ConfigurationValueFieldName)
-                        .WithKey(ConfigurationRepositoryKey),
-                    source => source.WithPeriodicalReload()),
-            reloadCountShouldBe, key: ConfigurationKey);
+            builder =>
+            {
+                builder
+                    .AddSqlClientJsonRepository(
+                        repository => repository
+                            .UseConnectionString(ConnectionString)
+                            .WithConfigurationTableName(ConfigurationTableName)
+                            .WithValueFieldName(ConfigurationValueFieldName)
+                            .WithKey(ConfigurationRepositoryKey),
+                        source => source.WithPeriodicalReload());
+                return null;
+            },
+            reloadCountShouldBe,
+            key: ConfigurationKey);
     }
 
     [TestCase(2)]
     public Task SqlClient_Json_Parametrized_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
-            () => new ParametrizedConfigurationBuilder()
-                .AddSqlClientJsonRepository(
-                    repository => repository
-                        .UseConnectionString(ConnectionString)
-                        .WithConfigurationTableName(ConfigurationTableName)
-                        .WithValueFieldName(ConfigurationValueFieldName)
-                        .WithKey(ConfigurationRepositoryKey),
-                    source => source.WithPeriodicalReload()),
-            expectedReloadCount, key: ConfigurationParametrizedKey);
+            builder =>
+            {
+                builder
+                    .AddSqlClientJsonRepository(
+                        repository => repository
+                            .UseConnectionString(ConnectionString)
+                            .WithConfigurationTableName(ConfigurationTableName)
+                            .WithValueFieldName(ConfigurationValueFieldName)
+                            .WithKey(ConfigurationRepositoryKey),
+                        source => source.WithPeriodicalReload())
+                    .WithParametrization(out var configuration);
+                return configuration;
+            },
+            expectedReloadCount,
+            key: ConfigurationParametrizedKey);
     }
 
     [TestCase(1)]
     public Task SqlClient_Json_Versioned_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
-            () => new ConfigurationBuilder()
-                .AddSqlClientJsonRepository(
-                    repository => repository
-                        .UseConnectionString(ConnectionString)
-                        .WithConfigurationTableName(ConfigurationTableName)
-                        .WithValueFieldName(ConfigurationValueFieldName)
-                        .WithVersionFieldName(ConfigurationVersionFieldName)
-                        .WithKey(ConfigurationRepositoryKey),
-                    source => source.WithPeriodicalReload()),
-            expectedReloadCount, key: ConfigurationKey);
+            builder =>
+            {
+                builder
+                    .AddSqlClientJsonRepository(
+                        repository => repository
+                            .UseConnectionString(ConnectionString)
+                            .WithConfigurationTableName(ConfigurationTableName)
+                            .WithValueFieldName(ConfigurationValueFieldName)
+                            .WithVersionFieldName(ConfigurationVersionFieldName)
+                            .WithKey(ConfigurationRepositoryKey),
+                        source => source.WithPeriodicalReload());
+                return null;
+            },
+            expectedReloadCount,
+            key: ConfigurationKey);
     }
 
     [TestCase(1)]
     public Task SqlClient_Json_Parametrized_Versioned_Repository_With_Reloader_Should_Periodically_Reload(int expectedReloadCount)
     {
         return RepositoryWithReloaderTest(
-            () => new ParametrizedConfigurationBuilder()
-                .AddSqlClientJsonRepository(
-                    repository => repository
-                        .UseConnectionString(ConnectionString)
-                        .WithConfigurationTableName(ConfigurationTableName)
-                        .WithValueFieldName(ConfigurationValueFieldName)
-                        .WithVersionFieldName(ConfigurationVersionFieldName)
-                        .WithKey(ConfigurationRepositoryKey),
-                    source => source.WithPeriodicalReload()),
-            expectedReloadCount, key: ConfigurationParametrizedKey);
+            builder =>
+            {
+                builder
+                    .AddSqlClientJsonRepository(
+                        repository => repository
+                            .UseConnectionString(ConnectionString)
+                            .WithConfigurationTableName(ConfigurationTableName)
+                            .WithValueFieldName(ConfigurationValueFieldName)
+                            .WithVersionFieldName(ConfigurationVersionFieldName)
+                            .WithKey(ConfigurationRepositoryKey),
+                        source => source.WithPeriodicalReload())
+                    .WithParametrization(out var configuration);
+                return configuration;
+            },
+            expectedReloadCount,
+            key: ConfigurationParametrizedKey);
     }
 
     protected override async Task<int> UpdateConfigurationWithNoChanges()

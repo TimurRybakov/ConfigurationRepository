@@ -5,11 +5,11 @@ namespace ConfigurationRepository;
 internal static class ConfigurationExtensions
 {
     /// <summary>
-    /// Get all <see cref="ConfigurationRepositoryProvider"/> instances
+    /// Get all <see cref="IReloadableConfigurationProvider"/> instances
     /// </summary>
-    public static IEnumerable<ConfigurationRepositoryProvider>? GetConfigurationRepositoryProviders(
+    public static IEnumerable<IReloadableConfigurationProvider>? GetReloadableConfigurationProviders(
         this IConfiguration configuration) =>
         (configuration as IConfigurationRoot)?.Providers
-        .OfType<ConfigurationRepositoryProvider>()
-        .Where(x => x.Source.PeriodicalReload);
+        .OfType<IReloadableConfigurationProvider>()
+        .Where(x => x.PeriodicalReload);
 }

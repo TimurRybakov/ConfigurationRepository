@@ -1,50 +1,55 @@
-using System.Collections.Specialized;
+using ConfigurationRepository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 
 namespace ParametrizedConfiguration;
 
-public class ParametrizedConfigurationProvider : ConfigurationProvider, IDisposable
+public class ParametrizedConfigurationProvider : ConfigurationProvider, IReloadableConfigurationProvider
 {
-    private readonly IList<IConfigurationProvider> _providers;
-    private IDisposable? _changeToken = null;
+    private readonly IDisposable? _changeToken = null;
 
-    private IDictionary<string, string?> ParametrizableData { get; set; } = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+    private readonly IConfiguration _configuration;
 
-    public ParametrizedConfigurationProvider(IList<IConfigurationProvider> providers)
+    /// <summary>
+    /// The source settings for this provider.
+    /// </summary>
+    protected ParametrizedConfigurationSource Source { get; }
+
+    /// <summary>
+    /// True means that configuration provider will be reloaded periodically by <see cref="ConfigurationReloader"/> service
+    /// </summary>
+    public bool PeriodicalReload
     {
-        _providers = providers;
+        get => Source.PeriodicalReload;
+        set => Source.PeriodicalReload = value;
+    }
+
+    public ParametrizedConfigurationProvider(ParametrizedConfigurationSource source, IConfiguration configuration)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        Source = source;
+        _configuration = configuration;
+        _changeToken = ChangeToken.OnChange(Changed, Reload);
     }
 
     public override void Load()
     {
-        var data = ParametrizableData;
-        data.Clear();
-
-        foreach (var provider in _providers)
-        {
-            foreach (var key in provider.GetChildKeys(Enumerable.Empty<string>(), null))
-            {
-                if (provider.TryGet(key, out string? value))
-                {
-                    data[key] = value;
-                }
-            }
-        }
-
-        Data = Parametrizer.Parametrize(data);
-
-        // Set change token after first load
-        _changeToken ??= ChangeToken.OnChange(
-            () => GetReloadToken(),
-            () => Load());
+        Data = _configuration.Parametrize();
     }
 
     public override void Set(string key, string? value)
     {
-        ParametrizableData[key] = value;
-        Data = Parametrizer.Parametrize(ParametrizableData);
+        _configuration[key] = value;
+        Data = _configuration.Parametrize();
     }
+
+    public override bool TryGet(string key, out string? value)
+    {
+        return base.TryGet(key, out value);
+    }
+
 
     public void Dispose() => Dispose(true);
 
@@ -53,15 +58,14 @@ public class ParametrizedConfigurationProvider : ConfigurationProvider, IDisposa
         _changeToken?.Dispose();
     }
 
-    private new IChangeToken GetReloadToken()
+    public IChangeToken Changed()
     {
-        var changeTokens = new List<IChangeToken>();
-        foreach (var provider in _providers)
-        {
-            var token = provider.GetReloadToken();
-            changeTokens.Add(token);
-        }
-        return new CompositeChangeToken(changeTokens);
+        return _configuration.GetReloadToken();
+    }
+
+    public void Reload()
+    {
+        Load();
     }
 
     ~ParametrizedConfigurationProvider()

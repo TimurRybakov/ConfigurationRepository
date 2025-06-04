@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 
 namespace ConfigurationRepository.Tests.Integrational;
@@ -21,7 +22,7 @@ internal abstract class MsSqlConfigurationRepositoryTests
     }
 
     protected async Task RepositoryWithReloaderTest(
-        Func<IConfigurationBuilder> createConfigurationBuilder,
+        Func<IConfigurationBuilder, IConfiguration?> configureCofigurationBuilder,
         int expectedReloadCount,
         string key)
     {
@@ -30,7 +31,8 @@ internal abstract class MsSqlConfigurationRepositoryTests
         Console.WriteLine("Configuration saved to repository.");
 
         // 2. Build configuration and prepare infrastructure.
-        var configurationBuilder = createConfigurationBuilder();
+        var configurationBuilder = new ConfigurationBuilder();
+        var parametrizableConfiguration = configureCofigurationBuilder(configurationBuilder);
         var configuration = configurationBuilder.Build();
         var reloadCount = 0;
         using var _ = ChangeToken.OnChange(
@@ -41,11 +43,12 @@ internal abstract class MsSqlConfigurationRepositoryTests
                 reloadCount++;
             });
         var services = new ServiceCollection();
-        services.AddSingleton<IConfiguration>(configuration);
-        services.AddConfigurationRepositoryReloader(TimeSpan.FromMilliseconds(20));
+
+        services.AddConfigurationReloader(parametrizableConfiguration ?? configuration, TimeSpan.FromMilliseconds(20));
         var serviceProvider = services.BuildServiceProvider();
         var tcs = new TaskCompletionSource();
-        var reloader = serviceProvider.GetRequiredService<ConfigurationReloader>();
+        var hostedServices = serviceProvider.GetServices<IHostedService>();
+        var reloader = hostedServices.OfType<ConfigurationReloader>().First();
         reloader.OnProvidersReloaded += _ => tcs.TrySetResult();
 
         // 3. Update configuration with same value to check that no reload will happen on versioned repository.
