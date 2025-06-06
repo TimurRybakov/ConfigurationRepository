@@ -4,6 +4,9 @@ using Microsoft.Data.SqlClient;
 
 namespace ConfigurationRepository.SqlClient;
 
+/// <summary>
+/// A versioned parsable repository that uses SqlClient to fetch data from database.
+/// </summary>
 public class SqlClientParsableConfigurationRepository :
     SqlClientConfigurationRepository, IVersionedRepository
 {

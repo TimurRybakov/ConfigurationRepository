@@ -3,6 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ConfigurationRepository.EntityFramework;
 
+/// <summary>
+/// EF Core configuration entity mapping.
+/// </summary>
+/// <typeparam name="TEntry">Entity type.</typeparam>
 public abstract class BaseConfigurationEntryMapping<TEntry> : IEntityTypeConfiguration<TEntry>
     where TEntry : class, IConfigurationEntry
 {

@@ -5,6 +5,9 @@ using System.Text;
 
 namespace ConfigurationRepository.EntityFramework;
 
+/// <summary>
+/// Repository database option extensions.
+/// </summary>
 public class RepositoryDbContextOptions : IDbContextOptionsExtension
 {
     public string TableName { get; set; } = null!;

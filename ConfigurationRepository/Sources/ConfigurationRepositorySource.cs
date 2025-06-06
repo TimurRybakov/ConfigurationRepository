@@ -3,6 +3,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository;
 
+/// <summary>
+/// Source that configures <see cref="ConfigurationRepositoryProvider"/>.
+/// </summary>
 public class ConfigurationRepositorySource : IReloadableConfigurationSource
 {
     /// <summary>

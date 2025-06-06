@@ -1,5 +1,8 @@
-﻿namespace ConfigurationRepository;
+namespace ConfigurationRepository;
 
+/// <summary>
+/// A version repository interface. Versioned repositories reloads data only on changed versions.
+/// </summary>
 public interface IVersionedRepository : IRepository
 {
     /// <summary>

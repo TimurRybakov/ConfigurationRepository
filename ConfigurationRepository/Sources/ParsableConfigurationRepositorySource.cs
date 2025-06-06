@@ -2,6 +2,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository;
 
+/// <summary>
+/// This repository configuration source uses parsable retrieval strategy.
+/// </summary>
 public class ParsableConfigurationRepositorySource : ConfigurationRepositorySource
 {
     /// <summary>

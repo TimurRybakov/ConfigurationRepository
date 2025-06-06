@@ -2,13 +2,23 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository;
 
+/// <summary>
+/// A service that is to be registered in DI-container to mark the underlying configuration for configuration reload service"/>.
+/// </summary>
+/// <typeparam name="TService"></typeparam>
 internal sealed class ReloadableConfigurationService<TService> : IReloadableConfigurationService<TService>
 {
     public ReloadableConfigurationService(IConfiguration configuration) =>
         Configuration = configuration;
 
+    /// <summary>
+    /// Configuration to be reloaded.
+    /// </summary>
     public IConfiguration Configuration { get; }
 
+    /// <summary>
+    /// A type of marker class. Markers may be used by different reloaders.
+    /// </summary>
     public Type ServiceType => typeof(TService);
 }
 

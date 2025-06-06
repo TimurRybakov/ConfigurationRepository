@@ -1,7 +1,8 @@
 namespace ConfigurationRepository;
 
 /// <summary>
-/// The strategy is used to extract data from a repository represented as a dictionary.
+/// The strategy is used to extract data from a repository represented as a dictionary
+/// of key-value pairs.
 /// </summary>
 public class DictionaryRetrievalStrategy : IRetrievalStrategy
 {

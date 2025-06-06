@@ -5,7 +5,7 @@ using Microsoft.Extensions.Primitives;
 namespace ConfigurationRepository;
 
 /// <summary>
-/// A stored <see cref="ConfigurationProvider"/> in a <see cref="IConfiguration"/>.
+/// A <see cref="ConfigurationProvider"/> that uses repository to access it`s configuration.
 /// </summary>
 public class ConfigurationRepositoryProvider : ConfigurationProvider, IReloadableConfigurationProvider
 {
@@ -64,6 +64,9 @@ public class ConfigurationRepositoryProvider : ConfigurationProvider, IReloadabl
         Load(reload: false);
     }
 
+    /// <summary>
+    /// An inplementation of Reload() method of <see cref="IReloadableConfigurationProvider"/>.
+    /// </summary>
     public void Reload()
     {
         Load(reload: true);

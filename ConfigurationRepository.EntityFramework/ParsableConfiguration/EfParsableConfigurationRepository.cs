@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ConfigurationRepository.EntityFramework;
 
+/// <summary>
+/// A parsable repository that uses Ef Core to fetch data from database.
+/// </summary>
 internal sealed class EfParsableConfigurationRepository<TDbContext, TEntry> : IRepository
     where TDbContext : DbContext, IRepositoryDbContext<TEntry>
     where TEntry : class, IConfigurationEntry

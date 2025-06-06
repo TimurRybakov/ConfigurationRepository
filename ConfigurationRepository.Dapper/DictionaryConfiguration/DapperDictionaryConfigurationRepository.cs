@@ -3,6 +3,9 @@ using Dapper;
 
 namespace ConfigurationRepository.Dapper;
 
+/// <summary>
+/// A versioned dictionary repository that uses Dapper to fetch data from database.
+/// </summary>
 public sealed class DapperDictionaryConfigurationRepository : DapperConfigurationRepository
 {
     /// <summary>

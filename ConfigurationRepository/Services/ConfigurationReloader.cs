@@ -2,6 +2,9 @@ using Microsoft.Extensions.Hosting;
 
 namespace ConfigurationRepository;
 
+/// <summary>
+/// A hosted servce that periodically reloads all providers managed by it.
+/// </summary>
 public sealed class ConfigurationReloader : BackgroundService
 {
     private readonly ICollection<IReloadableConfigurationProvider> _providers;

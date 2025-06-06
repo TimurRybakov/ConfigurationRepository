@@ -2,6 +2,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ConfigurationRepository.EntityFramework;
 
+/// <summary>
+/// Configuration repository database context.
+/// </summary>
 public class RepositoryDbContext
     : DbContext, IRepositoryDbContext<ConfigurationEntry>
 {

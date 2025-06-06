@@ -4,6 +4,13 @@ namespace ConfigurationRepository.SqlClient;
 
 public static class ConfigurationBuilderExtensions
 {
+    /// <summary>
+    /// Adds SqlClient dictionary configuration repository provider to <paramref name="builder"/>.
+    /// </summary>
+    /// <param name="builder">An <see cref="IConfigurationBuilder"/> instance.</param>
+    /// <param name="configureRepository">Configurator for <see cref="SqlClientDictionaryConfigurationRepository"/>.</param>
+    /// <param name="configureSource">Configurator for <see cref="ConfigurationRepositorySource"/>.</param>
+    /// <returns>An <see cref="IConfigurationBuilder"/> instance.</returns>
     public static IConfigurationBuilder AddSqlClientRepository(
         this IConfigurationBuilder builder,
         Action<SqlClientDictionaryConfigurationRepository> configureRepository,
@@ -22,6 +29,13 @@ public static class ConfigurationBuilderExtensions
         return builder.Add(source);
     }
 
+    /// <summary>
+    /// Adds SqlClient parsable json configuration repository provider to <paramref name="builder"/>.
+    /// </summary>
+    /// <param name="builder">An <see cref="IConfigurationBuilder"/> instance.</param>
+    /// <param name="configureRepository">Configurator for <see cref="SqlClientParsableConfigurationRepository"/>.</param>
+    /// <param name="configureSource">Configurator for <see cref="ParsableConfigurationRepositorySource"/>.</param>
+    /// <returns>An <see cref="IConfigurationBuilder"/> instance.</returns>
     public static IConfigurationBuilder AddSqlClientJsonRepository(
         this IConfigurationBuilder builder,
         Action<SqlClientParsableConfigurationRepository> configureRepository,

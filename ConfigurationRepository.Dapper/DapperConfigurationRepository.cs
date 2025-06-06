@@ -15,7 +15,7 @@ public abstract class DapperConfigurationRepository : IVersionedRepository
     public Func<IDbConnection>? DbConnectionFactory { get; set; }
 
     /// <summary>
-    /// SQL query to execute and return configuration. I.e. "select \"Key\", \"Value\" from appcfg.Configuration".
+    /// Select SQL query that returns configuration. I.e. "select \"Key\", \"Value\" from appcfg.Configuration".
     /// </summary>
     [DisallowNull]
     public string? SelectConfigurationQuery { get; set; }

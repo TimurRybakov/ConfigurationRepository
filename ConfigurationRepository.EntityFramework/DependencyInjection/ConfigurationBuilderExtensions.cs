@@ -5,6 +5,13 @@ namespace ConfigurationRepository.EntityFramework;
 
 public static class ConfigurationBuilderExtensions
 {
+    /// <summary>
+    /// Adds EF Core dictionary configuration repository provider to <paramref name="builder"/>.
+    /// </summary>
+    /// <param name="builder">An <see cref="IConfigurationBuilder"/> instance.</param>
+    /// <param name="configureOptions">Configurator for <see cref="DbContextOptionsBuilder"/></param>
+    /// <param name="configureSource">Configurator for <see cref="ConfigurationRepositorySource"/>.</param>
+    /// <returns>An <see cref="IConfigurationBuilder"/> instance.</returns>
     public static IConfigurationBuilder AddEfCoreRepository(
         this IConfigurationBuilder builder,
         Action<DbContextOptionsBuilder> configureOptions,
@@ -17,6 +24,13 @@ public static class ConfigurationBuilderExtensions
         return builder.AddEfCoreRepository(optionsBuilder.Options, configureSource);
     }
 
+    /// <summary>
+    /// Adds EF Core dictionary configuration repository provider to <paramref name="builder"/>.
+    /// </summary>
+    /// <param name="builder">An <see cref="IConfigurationBuilder"/> instance.</param>
+    /// <param name="options">Preconfigured database context options.</param>
+    /// <param name="configureSource">Configurator for <see cref="ConfigurationRepositorySource"/>.</param>
+    /// <returns>An <see cref="IConfigurationBuilder"/> instance.</returns>
     public static IConfigurationBuilder AddEfCoreRepository(
         this IConfigurationBuilder builder,
         DbContextOptions<RepositoryDbContext> options,
@@ -36,6 +50,14 @@ public static class ConfigurationBuilderExtensions
         return builder.Add(source);
     }
 
+    /// <summary>
+    /// Adds EF Core json parsable configuration repository provider to <paramref name="builder"/>.
+    /// </summary>
+    /// <param name="builder">An <see cref="IConfigurationBuilder"/> instance.</param>
+    /// <param name="key">A key string.</param>
+    /// <param name="configureOptions">Configurator for <see cref="DbContextOptionsBuilder"/></param>
+    /// <param name="configureSource">Configurator for <see cref="ConfigurationRepositorySource"/>.</param>
+    /// <returns>An <see cref="IConfigurationBuilder"/> instance.</returns>
     public static IConfigurationBuilder AddEfCoreJsonRepository(
         this IConfigurationBuilder builder,
         string key,
@@ -49,6 +71,14 @@ public static class ConfigurationBuilderExtensions
         return builder.AddEfCoreJsonRepository(key, optionsBuilder.Options, configureSource);
     }
 
+    /// <summary>
+    /// Adds EF Core json parsable configuration repository provider to <paramref name="builder"/>.
+    /// </summary>
+    /// <param name="builder">An <see cref="IConfigurationBuilder"/> instance.</param>
+    /// <param name="key">A key string.</param>
+    /// <param name="options">Preconfigured database context options.</param>
+    /// <param name="configureSource">Configurator for <see cref="ConfigurationRepositorySource"/>.</param>
+    /// <returns>An <see cref="IConfigurationBuilder"/> instance.</returns>
     public static IConfigurationBuilder AddEfCoreJsonRepository(
         this IConfigurationBuilder builder,
         string key,

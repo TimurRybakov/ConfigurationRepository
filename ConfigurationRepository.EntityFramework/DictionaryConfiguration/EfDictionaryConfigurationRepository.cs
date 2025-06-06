@@ -2,6 +2,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ConfigurationRepository.EntityFramework;
 
+/// <summary>
+/// A dictionary repository that uses Ef Core to fetch data from database.
+/// </summary>
 internal sealed class EfDictionaryConfigurationRepository<TDbContext, TEntry> : IRepository
     where TDbContext : DbContext, IRepositoryDbContext<TEntry>
     where TEntry : class, IConfigurationEntry

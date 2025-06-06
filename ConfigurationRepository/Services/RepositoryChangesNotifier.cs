@@ -3,6 +3,9 @@ using Microsoft.Extensions.Primitives;
 
 namespace ConfigurationRepository;
 
+/// <summary>
+/// A service that can be used to track repository configuration changes and to trigger its reload using change tockens.
+/// </summary>
 public class RepositoryChangesNotifier : IRepositoryChangesNotifier
 {
     private readonly Func<CancellationTokenSource> _createCancellationTokenSource;

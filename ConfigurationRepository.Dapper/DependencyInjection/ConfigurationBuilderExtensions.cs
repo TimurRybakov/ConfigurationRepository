@@ -4,6 +4,13 @@ namespace ConfigurationRepository.Dapper;
 
 public static class ConfigurationBuilderExtensions
 {
+    /// <summary>
+    /// Adds dapper dictionary configuration repository provider to <paramref name="builder"/>.
+    /// </summary>
+    /// <param name="builder">An <see cref="IConfigurationBuilder"/> instance.</param>
+    /// <param name="configureRepository">Configurator for <see cref="DapperDictionaryConfigurationRepository"/>.</param>
+    /// <param name="configureSource">Configurator for <see cref="ConfigurationRepositorySource"/>.</param>
+    /// <returns>An <see cref="IConfigurationBuilder"/> instance.</returns>
     public static IConfigurationBuilder AddDapperRepository(
         this IConfigurationBuilder builder,
         Action<DapperDictionaryConfigurationRepository> configureRepository,
@@ -22,6 +29,13 @@ public static class ConfigurationBuilderExtensions
         return builder.Add(source);
     }
 
+    /// <summary>
+    /// Adds dapper parsable json configuration repository provider to <paramref name="builder"/>.
+    /// </summary>
+    /// <param name="builder">An <see cref="IConfigurationBuilder"/> instance.</param>
+    /// <param name="configureRepository">Configurator for <see cref="DapperParsableConfigurationRepository"/>.</param>
+    /// <param name="configureSource">Configurator for <see cref="ParsableConfigurationRepositorySource"/>.</param>
+    /// <returns>An <see cref="IConfigurationBuilder"/> instance.</returns>
     public static IConfigurationBuilder AddDapperJsonRepository(
         this IConfigurationBuilder builder,
         Action<DapperParsableConfigurationRepository> configureRepository,

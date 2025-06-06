@@ -5,7 +5,7 @@ namespace ConfigurationRepository;
 internal static class ConfigurationExtensions
 {
     /// <summary>
-    /// Get all <see cref="IReloadableConfigurationProvider"/> instances
+    /// Get all instances of <see cref="IReloadableConfigurationProvider"/> from <paramref name="configuration"/>.
     /// </summary>
     public static IEnumerable<IReloadableConfigurationProvider>? GetReloadableConfigurationProviders(
         this IConfiguration configuration) =>

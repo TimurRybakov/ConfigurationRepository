@@ -4,6 +4,9 @@ using Microsoft.Extensions.Primitives;
 
 namespace ParametrizedConfiguration;
 
+/// <summary>
+/// Privider that parametrizes underlying configuration using it`s own values.
+/// </summary>
 public class ParametrizedConfigurationProvider : ConfigurationProvider, IReloadableConfigurationProvider
 {
     private readonly IDisposable? _changeToken = null;
@@ -49,7 +52,6 @@ public class ParametrizedConfigurationProvider : ConfigurationProvider, IReloada
     {
         return base.TryGet(key, out value);
     }
-
 
     public void Dispose() => Dispose(true);
 

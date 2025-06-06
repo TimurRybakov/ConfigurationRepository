@@ -1,9 +1,10 @@
-using System.Collections;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.SqlClient;
 
 namespace ConfigurationRepository.SqlClient;
 
+/// <summary>
+/// A versioned dictionary repository that uses SqlClient to fetch data from database.
+/// </summary>
 public sealed class SqlClientDictionaryConfigurationRepository : SqlClientConfigurationRepository
 {
     /// <summary>

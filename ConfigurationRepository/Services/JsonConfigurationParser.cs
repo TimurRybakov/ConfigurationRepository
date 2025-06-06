@@ -4,6 +4,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository;
 
+/// <summary>
+/// Standard json configuration parser. Works same as one for json configuration files.
+/// </summary>
 public sealed class JsonConfigurationParser : IConfigurationParser
 {
     private readonly Dictionary<string, string?> _data = new (StringComparer.OrdinalIgnoreCase);
