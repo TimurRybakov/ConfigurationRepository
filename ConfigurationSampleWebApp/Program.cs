@@ -73,6 +73,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthorization();
 
+// Mapping for fetching current configuration. We will use it after we update the config.
 app.MapGet("/configuration", (IConfiguration configuration) =>
 {
     var valueDictionary = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
@@ -85,9 +86,10 @@ app.MapGet("/configuration", (IConfiguration configuration) =>
     return valueDictionary;
 })
 .WithName("GetConfiguration")
-.WithDescription("Gets all values from current configuration.")
+.WithDescription("Gets all values from current configuration. Use to see configuration changes after updates.")
 .WithOpenApi();
 
+// Mapping for updating configuration. For simplification the database config is updated with current date and time value.
 app.MapPut("/database", async (IConfiguration configuration) =>
 {
     var connectionString = configuration.GetConnectionString("mssql")
@@ -99,6 +101,7 @@ app.MapPut("/database", async (IConfiguration configuration) =>
 .WithDescription("Sets database configuration values. Configuration will reload these changes in time.")
 .WithOpenApi();
 
+// Mapping for updating vault secrets. For simplification the vault is updated only with user name and password.
 app.MapPut("/vault", async (string? userName, string? password) =>
 {
     await SaveSecretsToVault(vaultUri, userName, password);
@@ -106,7 +109,7 @@ app.MapPut("/vault", async (string? userName, string? password) =>
     return;
 })
 .WithName("SetVaultSecrets")
-.WithDescription("Sets user name and password values in vault. Configuration will reload these changes in time.")
+.WithDescription("Sets user name and password values in vault wich are used in database connection string as parameters. Configuration will reload these changes in time.")
 .WithOpenApi();
 
 app.Run();
