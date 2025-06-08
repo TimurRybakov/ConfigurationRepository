@@ -7,6 +7,9 @@ using ConfigurationRepository.Dapper;
 using ConfigurationRepository;
 using ConfigurationSampleWebApp;
 using Microsoft.Data.SqlClient;
+using System.Data;
+using System.Linq;
+using System.Collections.Generic;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,7 +86,7 @@ app.MapGet("/configuration", (IConfiguration configuration) =>
         valueDictionary.Add(kvp.Key, kvp.Value);
     }
 
-    return valueDictionary;
+    return Results.Ok(valueDictionary);
 })
 .WithName("GetConfiguration")
 .WithDescription("Gets all values from current configuration. Use to see configuration changes after updates.")
@@ -96,6 +99,9 @@ app.MapPut("/database", async (IConfiguration configuration) =>
     ?? throw new Exception("Connection string 'mssql' is not defined.");
 
     await UpsertConfigurationTable(connectionString);
+    var results = await GetConfiguration(connectionString);
+
+    return Results.Ok(results);
 })
 .WithName("SetDatabaseConfiguration")
 .WithDescription("Sets database configuration values. Configuration will reload these changes in time.")
@@ -106,7 +112,7 @@ app.MapPut("/vault", async (string? userName, string? password) =>
 {
     await SaveSecretsToVault(vaultUri, userName, password);
 
-    return;
+    return Results.Ok(new { userName, password });
 })
 .WithName("SetVaultSecrets")
 .WithDescription("Sets user name and password values in vault wich are used in database connection string as parameters. Configuration will reload these changes in time.")
@@ -207,10 +213,32 @@ static async Task UpsertConfigurationTable(string connectionString)
     Console.WriteLine("Database configuration updated successfully.");
 }
 
+static async Task<List<ConfigurationEntry>> GetConfiguration(string connectionString)
+{
+    const string commandText = "select [Key], [Value] from Configuration";
+
+    await using var connection = new SqlConnection(connectionString);
+    await connection.OpenAsync();
+    await using var command = new SqlCommand(commandText, connection);
+    await using var reader = await command.ExecuteReaderAsync();
+
+    List<ConfigurationEntry> list = [];
+    while (await reader.ReadAsync())
+    {
+        list.Add(new ConfigurationEntry()
+        {
+            Key = reader.GetString(reader.GetOrdinal("Key")),
+            Value = reader.GetString(reader.GetOrdinal("Value"))
+        });
+    }
+
+    return list;
+}
+
 static async Task ExecuteCommand(string connectionString, string commandText)
 {
     await using var connection = new SqlConnection(connectionString);
-    var query = new SqlCommand(commandText, connection);
+    await using var query = new SqlCommand(commandText, connection);
 
     await query.Connection.OpenAsync();
     await query.ExecuteNonQueryAsync();

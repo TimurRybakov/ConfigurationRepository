@@ -136,7 +136,7 @@ public partial class MsSqlContainerSingleton : IDisposable
     private static async Task ExecuteCommand(string connectionString, string commandText)
     {
         await using var connection = new SqlConnection(connectionString);
-        var query = new SqlCommand(commandText, connection);
+        await using var query = new SqlCommand(commandText, connection);
 
         await query.Connection.OpenAsync();
         await query.ExecuteNonQueryAsync();

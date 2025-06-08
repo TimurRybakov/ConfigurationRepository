@@ -128,7 +128,7 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : MsSqlConfigurat
             """;
 
         await using var connection = new SqlConnection(ConnectionString);
-        var query = new SqlCommand(updateQuery, connection);
+        await using var query = new SqlCommand(updateQuery, connection);
 
         await query.Connection.OpenAsync();
 
