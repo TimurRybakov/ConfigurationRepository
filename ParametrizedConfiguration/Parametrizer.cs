@@ -8,7 +8,10 @@ namespace ParametrizedConfiguration;
 
 public static class Parametrizer
 {
-    public static IDictionary<string, string?> Parametrize(this IConfiguration config)
+    public static IDictionary<string, string?> Parametrize(
+        this IConfiguration config,
+        string parameterPlaceholderOpening = "%",
+        string parameterPlaceholderClosing = "%")
     {
         var values = config.AsEnumerable().ToDictionary(
             x => x.Key,
@@ -17,7 +20,8 @@ public static class Parametrizer
 
         var graph = values.ToDictionary(
             kvp => kvp.Key,
-            kvp => ScanForPlaceholders(kvp.Value).Select(x => x.Key).ToList(),
+            kvp => ScanForPlaceholders(kvp.Value, parameterPlaceholderOpening, parameterPlaceholderClosing)
+                .Select(x => x.Key).ToList(),
             StringComparer.OrdinalIgnoreCase);
 
         var ordered = TopologicalSort(graph);
@@ -27,7 +31,7 @@ public static class Parametrizer
         {
             ref var value = ref CollectionsMarshal.GetValueRefOrNullRef(values, key);
             Debug.Assert(!Unsafe.IsNullRef(ref value));
-            value = ReplacePlaceholders(values, value);
+            value = ReplacePlaceholders(values, value, parameterPlaceholderOpening, parameterPlaceholderClosing);
         }
 
         return values;
@@ -49,18 +53,21 @@ public static class Parametrizer
         public string Key { get; }
     }
 
-    private static IEnumerable<Marker> ScanForPlaceholders(string? value)
+    private static IEnumerable<Marker> ScanForPlaceholders(
+        string? value,
+        string parameterPlaceholderOpening,
+        string parameterPlaceholderClosing)
     {
         if (string.IsNullOrEmpty(value))
             yield break;
 
         for (int i = 0; ;)
         {
-            int open = value.IndexOf('%', i);
-            if (open == -1) yield break; // Parameter placeholder opening '%' not found
+            int open = value.IndexOf(parameterPlaceholderOpening, i);
+            if (open == -1) yield break; // Parameter placeholder opening not found
 
-            int close = value.IndexOf('%', open + 1);
-            if (close == -1) yield break; // Parameter placeholder closing '%' not found
+            int close = value.IndexOf(parameterPlaceholderClosing, open + 1);
+            if (close == -1) yield break; // Parameter placeholder closing not found
 
             var key = value.Substring(open + 1, close - open - 1);
             yield return new Marker(open, close + 1, key);
@@ -70,7 +77,10 @@ public static class Parametrizer
     }
 
     private static string? ReplacePlaceholders(
-        IDictionary<string, string?> map, string? value)
+        IDictionary<string, string?> map,
+        string? value,
+        string parameterPlaceholderOpening,
+        string parameterPlaceholderClosing)
     {
         if (string.IsNullOrEmpty(value))
             return value;
@@ -78,7 +88,7 @@ public static class Parametrizer
         var sb = new StringBuilder(value.Length);
         int incrementalStart = 0;
 
-        foreach (var marker in ScanForPlaceholders(value))
+        foreach (var marker in ScanForPlaceholders(value, parameterPlaceholderOpening, parameterPlaceholderClosing))
         {
             // Substitute parameter value
             sb.Append(value, incrementalStart, marker.Start - incrementalStart);

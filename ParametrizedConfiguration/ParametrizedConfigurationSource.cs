@@ -12,6 +12,16 @@ public class ParametrizedConfigurationSource : IReloadableConfigurationSource
     public IConfiguration? Configuration { get; set; }
 
     /// <summary>
+    /// The string that indicates a start of parameter placeholder.
+    /// </summary>
+    public string ParameterPlaceholderOpening { get; set; } = "%";
+
+    /// <summary>
+    /// The string that indicates an end of parameter placeholder.
+    /// </summary>
+    public string ParameterPlaceholderClosing { get; set; } = "%";
+
+    /// <summary>
     /// True means that configuration provider will be reloaded periodically by <see cref="ConfigurationReloader"/> service.
     /// </summary>
     public bool PeriodicalReload { get; set; } = false;

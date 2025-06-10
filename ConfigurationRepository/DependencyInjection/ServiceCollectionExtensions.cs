@@ -32,7 +32,7 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Adds new <see cref="IReloadableConfigurationService"/> service and it`s generic version to <paramref name="services"/>.
     /// </summary>
-    /// <typeparam name="TService">A generic type on a marker class.</typeparam>
+    /// <typeparam name="TService">A generic type of a marker class.</typeparam>
     /// <param name="services">A collection of services.</param>
     /// <param name="configuration">A configuration to be bounded with <see cref="IReloadableConfigurationService"/> service.</param>
     /// <returns>A collection of services.</returns>

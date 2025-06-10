@@ -19,7 +19,7 @@ public class ParametrizedConfigurationProvider : ConfigurationProvider, IReloada
     protected ParametrizedConfigurationSource Source { get; }
 
     /// <summary>
-    /// True means that configuration provider will be reloaded periodically by <see cref="ConfigurationReloader"/> service
+    /// True means that configuration provider will be reloaded periodically by <see cref="ConfigurationReloader"/> service.
     /// </summary>
     public bool PeriodicalReload
     {
@@ -39,13 +39,13 @@ public class ParametrizedConfigurationProvider : ConfigurationProvider, IReloada
 
     public override void Load()
     {
-        Data = _configuration.Parametrize();
+        Parametrize();
     }
 
     public override void Set(string key, string? value)
     {
         _configuration[key] = value;
-        Data = _configuration.Parametrize();
+        Parametrize();
     }
 
     public override bool TryGet(string key, out string? value)
@@ -68,6 +68,11 @@ public class ParametrizedConfigurationProvider : ConfigurationProvider, IReloada
     public void Reload()
     {
         Load();
+    }
+
+    private void Parametrize()
+    {
+        Data = _configuration.Parametrize(Source.ParameterPlaceholderOpening, Source.ParameterPlaceholderClosing);
     }
 
     ~ParametrizedConfigurationProvider()

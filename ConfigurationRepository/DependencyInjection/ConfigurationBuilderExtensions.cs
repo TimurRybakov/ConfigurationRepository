@@ -10,7 +10,7 @@ public static class ConfigurationBuilderExtensions
     /// <summary>
     /// Adds a ConfigurationRepositorySource to <paramref name="builder"/>.
     /// </summary>
-    /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
+    /// <param name="builder">A configuration builder instance for adding <see cref="ConfigurationRepositorySource"/> or it`s descendant.</param>
     /// <param name="configureSource">Configures the source.</param>
     /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
     public static IConfigurationBuilder AddRepository<TSource>(
@@ -30,7 +30,7 @@ public static class ConfigurationBuilderExtensions
     /// <summary>
     /// Adds the ConfigurationRepositorySource to <paramref name="builder"/>.
     /// </summary>
-    /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
+    /// <param name="builder">A configuration builder instance for adding <see cref="ConfigurationRepositorySource"/>.</param>
     /// <param name="configureSource">Configures the source.</param>
     /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
     public static IConfigurationBuilder AddRepository(
@@ -42,12 +42,12 @@ public static class ConfigurationBuilderExtensions
     }
 
     /// <summary>
-    /// Sets a default action to be invoked for file-based providers when an error occurs.
+    /// Sets a default action to be invoked for repository providers when an error occurs.
     /// </summary>
-    /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
+    /// <param name="builder">A configuration builder instance for adding property with handler.</param>
     /// <param name="handler">The Action to be invoked on a database load exception.</param>
     /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-    public static IConfigurationBuilder SetDatabaseLoadExceptionHandler(this IConfigurationBuilder builder,
+    public static IConfigurationBuilder SetRepositoryLoadExceptionHandler(this IConfigurationBuilder builder,
         Action<RepositoryLoadExceptionContext> handler)
     {
         _ = builder ?? throw new ArgumentNullException(nameof(builder));
@@ -57,11 +57,11 @@ public static class ConfigurationBuilderExtensions
     }
 
     /// <summary>
-    /// Gets a default action to be invoked for database-based providers when an error occurs.
+    /// Gets a default action to be invoked for repository providers when an error occurs.
     /// </summary>
     /// <param name="builder">The <see cref="IConfigurationBuilder"/>.</param>
-    /// <returns>The The Action to be invoked on a database load exception, if set.</returns>
-    public static Action<RepositoryLoadExceptionContext>? GetDatabaseLoadExceptionHandler(this IConfigurationBuilder builder)
+    /// <returns>The Action to be invoked on a database load exception, if set.</returns>
+    public static Action<RepositoryLoadExceptionContext>? GetRepositoryLoadExceptionHandler(this IConfigurationBuilder builder)
     {
         _ = builder ?? throw new ArgumentNullException(nameof(builder));
 
@@ -73,10 +73,10 @@ public static class ConfigurationBuilderExtensions
     }
 
     /// <summary>
-    /// Sets a configuration parser to be used parsing data being loaded from database.
+    /// Sets a configuration parser to be used parsing data being loaded from repository.
     /// </summary>
     /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
-    /// <param name="parser">The configuration parser to be used parsing load data from database.</param>
+    /// <param name="parser">The configuration parser to be used parsing load data from repository.</param>
     /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
     public static IConfigurationBuilder SetParsableConfigurationParser(this IConfigurationBuilder builder,
         IConfigurationParser parser)
