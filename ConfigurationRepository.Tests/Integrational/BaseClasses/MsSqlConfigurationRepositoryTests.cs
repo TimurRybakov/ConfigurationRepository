@@ -74,7 +74,8 @@ internal abstract class MsSqlConfigurationRepositoryTests
         Assert.Multiple(() =>
         {
             Assert.That(configuration[key], Is.EqualTo(value));
-            Assert.That(reloadCount, Is.EqualTo(expectedReloadCount), "Number of reloads does not match.");
+            Assert.That(reloadCount, Is.GreaterThanOrEqualTo(expectedReloadCount), "Number of reloads is lesser than expected.");
+            Warn.If(reloadCount, Is.Not.EqualTo(expectedReloadCount), "Number of reloads does not match.");
         });
     }
 

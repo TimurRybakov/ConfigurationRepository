@@ -1,4 +1,3 @@
-
 using System.Data;
 using ConfigurationRepository.SqlClient;
 using Microsoft.Data.SqlClient;

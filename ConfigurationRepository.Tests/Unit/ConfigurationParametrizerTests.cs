@@ -1,4 +1,3 @@
-
 using Microsoft.Extensions.Configuration;
 using ParametrizedConfiguration;
 
@@ -54,7 +53,7 @@ internal class ConfigurationParametrizerTests
 
         var configBuilder = new ConfigurationBuilder()
             .AddInMemoryCollection(configuration)
-            .WithParametrization(out _);
+            .WithParametrization();
 
         Assert.Throws<CyclicDependencyException>(() => configBuilder.Build());
     }
@@ -70,7 +69,23 @@ internal class ConfigurationParametrizerTests
 
         var configBuilder = new ConfigurationBuilder()
             .AddInMemoryCollection(configuration)
-            .WithParametrization(out _);
+            .WithParametrization();
+
+        Assert.Throws<InvalidOperationException>(() => configBuilder.Build());
+    }
+
+    [Test]
+    public void Configuration_Parametrizer_Should_Fail_On_Null_Parameters()
+    {
+        Dictionary<string, string?> configuration = new()
+        {
+            { "null parameter", null },
+            { "Key", "%null parameter%" },
+        };
+
+        var configBuilder = new ConfigurationBuilder()
+            .AddInMemoryCollection(configuration)
+            .WithParametrization();
 
         Assert.Throws<InvalidOperationException>(() => configBuilder.Build());
     }

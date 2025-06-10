@@ -1,6 +1,4 @@
-
 using Microsoft.Extensions.Configuration;
-using ParametrizedConfiguration;
 
 namespace ConfigurationRepository.Tests.Integrational;
 
