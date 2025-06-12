@@ -23,11 +23,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConfigurationRepository.Dapper\ConfigurationRepository.Dapper.csproj" />
-    <ProjectReference Include="..\ConfigurationRepository.EntityFramework\ConfigurationRepository.EntityFramework.csproj" />
-    <ProjectReference Include="..\ConfigurationRepository.SqlClient\ConfigurationRepository.SqlClient.csproj" />
-    <ProjectReference Include="..\ConfigurationRepository\ConfigurationRepository.csproj" />
-    <ProjectReference Include="..\ParametrizedConfiguration\ParametrizedConfiguration.csproj" />
+    <ProjectReference Include="..\..\src\ConfigurationRepository.Dapper\ConfigurationRepository.Dapper.csproj" />
+    <ProjectReference Include="..\..\src\ConfigurationRepository.EntityFramework\ConfigurationRepository.EntityFramework.csproj" />
+    <ProjectReference Include="..\..\src\ConfigurationRepository.SqlClient\ConfigurationRepository.SqlClient.csproj" />
+    <ProjectReference Include="..\..\src\ConfigurationRepository\ConfigurationRepository.csproj" />
+    <ProjectReference Include="..\..\src\ParametrizedConfiguration\ParametrizedConfiguration.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,14 +5,29 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+    <DockerComposeProjectPath>vault-with-db-web-app-docker-compose.dcproj</DockerComposeProjectPath>
+    <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="GlobalSuppressions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="launchSettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="docker-compose.override.yml" />
+    <None Remove="docker-compose.yml" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.16" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.5" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageReference Include="Polly.Core" Version="8.6.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     <PackageReference Include="VaultSharp" Version="1.17.5.1" />
     <PackageReference Include="VaultSharp.Extensions.Configuration" Version="1.1.3" />
@@ -20,8 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConfigurationRepository.Dapper\ConfigurationRepository.Dapper.csproj" />
-    <ProjectReference Include="..\ParametrizedConfiguration\ParametrizedConfiguration.csproj" />
+    <ProjectReference Include="..\..\src\ConfigurationRepository.Dapper\ConfigurationRepository.Dapper.csproj" />
+    <ProjectReference Include="..\..\src\ParametrizedConfiguration\ParametrizedConfiguration.csproj" />
   </ItemGroup>
 
 </Project>

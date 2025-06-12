@@ -13,7 +13,7 @@ public partial class MsSqlContainerSingleton : IDisposable
         .WithImage("mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04")
         .WithName("mssql_configuration_repository")
         .WithReuse(true)
-        .WithBindMount($"{Environment.CurrentDirectory}\\..\\..\\..\\..\\mssql_mount", "/var/opt/mssql/data")
+        .WithBindMount($"{Environment.CurrentDirectory}\\tests\\mssql_configuration_repository", "/var/opt/mssql/data")
         .Build();
 
     public string ConnectionString { get; private set; } = "";

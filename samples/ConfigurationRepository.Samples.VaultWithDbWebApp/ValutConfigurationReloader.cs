@@ -1,4 +1,4 @@
-namespace ConfigurationSampleWebApp;
+namespace ConfigurationRepository.Samples.VaultWithDbWebApp;
 
 using System;
 using System.Collections.Generic;
@@ -6,10 +6,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ConfigurationRepository;
-using global::VaultSharp.Extensions.Configuration;
+using VaultSharp.Extensions.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
+public sealed class ReloadableVaultConfiguration
+{ }
+
+public sealed class ReloadableDatabaseConfiguration
+{ }
 
 /// <summary>
 /// Background service to notify about Vault data changes.
@@ -33,7 +39,7 @@ public class ValutConfigurationReloader : BackgroundService
         var configurationRoot = (IConfigurationRoot)configurationService.Configuration;
         if (configurationRoot == null)
         {
-            throw new ArgumentNullException(nameof(configurationRoot));
+            throw new NullReferenceException(nameof(configurationRoot));
         }
 
         _logger = logger;
@@ -58,7 +64,7 @@ public class ValutConfigurationReloader : BackgroundService
         if (minTime == int.MaxValue)
             return;
 
-        _logger?.LogInformation($"VaultChangeWatcher will use {minTime} seconds interval");
+        _logger?.LogInformation("VaultChangeWatcher will use {minTime} seconds interval", minTime);
 
         while (!stoppingToken.IsCancellationRequested)
         {

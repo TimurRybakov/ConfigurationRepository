@@ -1,13 +1,15 @@
-name: configuration_sample_web_api
 services:
-  configurationsamplewebapp:
-    container_name: app
-    image: ${DOCKER_REGISTRY-}configurationsamplewebapp
+  configurationrepository.samples.vaultwithdbwebapp:
+    image: ${DOCKER_REGISTRY-}configurationrepositorysamplesvaultwithdbwebapp
+    build:
+      context: ../../
+      dockerfile: samples/ConfigurationRepository.Samples.VaultWithDbWebApp/Dockerfile
+    labels:
+      com.microsoft.visual-studio.project-name: "configurationrepository.samples.vaultwithdbwebapp"
+    ports:
+      - "8080:8080"
     environment:
       VAULT_ADDR: "http://vault-server:8200"
-    build:
-      context: .
-      dockerfile: ConfigurationSampleWebApp/Dockerfile
     depends_on:
       mssql:
         condition: service_started
@@ -20,10 +22,10 @@ services:
 
   vault:
     container_name: vault
+    image: hashicorp/vault:1.19
     ports:
       - "8200:8200"
       - "8201:8201"
-    image: hashicorp/vault:1.19
     environment:
       VAULT_ADDR: "http://0.0.0.0:8200"
       VAULT_DEV_ROOT_TOKEN_ID: "root"
@@ -52,16 +54,15 @@ services:
     command: sh -c ' chmod +x ./entrypoint.sh; ./entrypoint.sh & /opt/mssql/bin/sqlservr;'
     ports:
       - "${MSSQL_PORT:-1433}:1433"
+    restart: unless-stopped
     networks:
       net:
         aliases:
           - mssql-server
-    restart: unless-stopped
-
 
 networks:
   net:
-    name: configuration_sample_web_api
+    name: cs_vault_with_db_web_api
     driver: bridge
 
 volumes:

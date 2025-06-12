@@ -5,11 +5,11 @@ using VaultSharp.V1.AuthMethods;
 using ParametrizedConfiguration;
 using ConfigurationRepository.Dapper;
 using ConfigurationRepository;
-using ConfigurationSampleWebApp;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using System.Linq;
-using System.Collections.Generic;
+using ConfigurationRepository.Samples.VaultWithDbWebApp;
+using Polly;
+using Polly.Retry;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +36,9 @@ var baseConfiguration = new ConfigurationBuilder()
 // Get database connection string using parametrized configuration.
 var connectionString = baseConfiguration.GetConnectionString("mssql")
     ?? throw new Exception("Connection string 'mssql' is not defined.");
+
+// Wait for database server gets available
+await WaitForDBServerStartup(connectionString);
 
 // Populate database with data.
 var finalConnectionString = await PopulateDatabaseWithData(baseConfiguration, connectionString);
@@ -122,22 +125,30 @@ app.Run();
 
 static async Task SaveSecretsToVault(string vaultUri, string? userName = null, string? password = null)
 {
-    // Authentication
+    // Authentication.
     IAuthMethodInfo authMethod = new TokenAuthMethodInfo(vaultToken: "root");
     VaultClientSettings vaultClientSettings = new VaultClientSettings(vaultUri, authMethod);
-    IVaultClient vaultClient = new VaultClient(vaultClientSettings);
+    VaultClient vaultClient = new VaultClient(vaultClientSettings);
 
-    // Writing a secret
+    // Writing a secret.
     var secretData = new Dictionary<string, object>
     {
         { "ConnectionStrings:Mssql:UserName", userName ?? "sa" },
         { "ConnectionStrings:Mssql:Password", password ?? "yourStrong(!)Password" }
     };
-    await vaultClient.V1.Secrets.KeyValue.V2.WriteSecretAsync(
-        path: "configuration_sample_web_api",
-        data: secretData,
-        mountPoint: "secret"
-    );
+
+    // We add retries to ensure that vault service had enough time to get up.
+    ResiliencePipeline pipeline = new ResiliencePipelineBuilder()
+        .AddRetry(new RetryStrategyOptions())
+        .AddTimeout(TimeSpan.FromSeconds(10))
+        .Build();
+
+    await pipeline.ExecuteAsync(async token =>
+        await vaultClient.V1.Secrets.KeyValue.V2.WriteSecretAsync(
+            path: "configuration_sample_web_api",
+            data: secretData,
+            mountPoint: "secret"
+        ));
 
     Console.WriteLine("Secret written successfully.");
 }
@@ -161,6 +172,17 @@ static async Task<string> PopulateDatabaseWithData(IConfigurationRoot baseConfig
     await UpsertConfigurationTable(finalConnectionString);
 
     return finalConnectionString;
+}
+
+static ValueTask WaitForDBServerStartup(string connectionString)
+{
+    // We add retries to ensure that database server had enough time to get up.
+    ResiliencePipeline pipeline = new ResiliencePipelineBuilder()
+        .AddRetry(new RetryStrategyOptions())
+        .AddTimeout(TimeSpan.FromSeconds(10))
+        .Build();
+
+    return pipeline.ExecuteAsync(async token => await ExecuteCommand(connectionString, "select 1"));
 }
 
 static Task EnsureDatabaseCreated(string connectionString)
@@ -243,9 +265,3 @@ static async Task ExecuteCommand(string connectionString, string commandText)
     await query.Connection.OpenAsync();
     await query.ExecuteNonQueryAsync();
 }
-
-public sealed class ReloadableVaultConfiguration
-{ }
-
-public sealed class ReloadableDatabaseConfiguration
-{ }

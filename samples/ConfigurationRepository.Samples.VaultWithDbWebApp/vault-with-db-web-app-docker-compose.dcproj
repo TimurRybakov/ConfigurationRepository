@@ -4,11 +4,15 @@
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
     <DockerPublishLocally>False</DockerPublishLocally>
-    <ProjectGuid>86457da3-b84c-4784-9ef6-387e079c6fb9</ProjectGuid>
+    <ProjectGuid>d58923cc-122f-46c4-8ae9-81b1f04d6857</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
-    <DockerServiceName>configurationsamplewebapp</DockerServiceName>
+    <DockerServiceName>configurationrepository.samples.vaultwithdbwebapp</DockerServiceName>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="appsettings.Development.json" />
+    <None Remove="appsettings.json" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">
       <DependentUpon>docker-compose.yml</DependentUpon>
