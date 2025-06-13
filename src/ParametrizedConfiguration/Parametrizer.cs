@@ -96,6 +96,8 @@ public static class Parametrizer
             if (!map.TryGetValue(marker.Key, out var repl) || repl is null)
                 throw new InvalidOperationException($"Undefined parameter value '{marker.Key}'.");
 
+            repl = ReplacePlaceholders(map, repl, parameterPlaceholderOpening, parameterPlaceholderClosing);
+
             sb.Append(repl);
             incrementalStart = marker.End;
         }

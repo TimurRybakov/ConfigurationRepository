@@ -17,10 +17,32 @@ internal class ConfigurationParametrizerTests
 
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(configuration)
-            .WithParametrization(out _)
+            .WithParametrization()
             .Build();
 
         Assert.That(config["parameter"], Is.EqualTo("value"));
+    }
+
+    [Test]
+    public void Configuration_Parametrizer_Should_Support_Nested_Parametrization()
+    {
+        Dictionary<string, string?> configuration = new()
+        {
+            { "param1", "%param2%" },
+            { "param2", "%param3%" },
+            { "param3", "param3value" }
+        };
+
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(configuration)
+            .WithParametrization()
+            .Build();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(config["param1"], Is.EqualTo("param3value"));
+            Assert.That(config["param2"], Is.EqualTo("param3value"));
+        });
     }
 
     [Test]
@@ -34,7 +56,7 @@ internal class ConfigurationParametrizerTests
 
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(configuration)
-            .WithParametrization(out _)
+            .WithParametrization()
             .Build();
 
         config["Key"] = "changed";
