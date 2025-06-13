@@ -4,6 +4,18 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Authors>Timur Rybakov</Authors>
+    <Description>Configuration repository provider that stored in a database and accessed via EfCore ORM.</Description>
+    <Copyright>Copyright Timur Rybakov</Copyright>
+    <PackageTags>configuration-repository-provider;configuration-storage-ef-core;configuration-storage-entity-framework;configuration-storage;configuration-repository;configuration;repository;storage;ef-core</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <Version>1.0.0</Version>
+    <RootNamespace>ConfigurationRepository</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
