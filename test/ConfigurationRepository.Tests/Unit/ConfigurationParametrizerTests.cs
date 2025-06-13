@@ -28,9 +28,9 @@ internal class ConfigurationParametrizerTests
     {
         Dictionary<string, string?> configuration = new()
         {
-            { "param1", "%param2%" },
-            { "param2", "%param3%" },
-            { "param3", "param3value" }
+            { "param1", "1+%param2%" },
+            { "param2", "2+%param3%" },
+            { "param3", "3" }
         };
 
         var config = new ConfigurationBuilder()
@@ -40,8 +40,9 @@ internal class ConfigurationParametrizerTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(config["param1"], Is.EqualTo("param3value"));
-            Assert.That(config["param2"], Is.EqualTo("param3value"));
+            Assert.That(config["param1"], Is.EqualTo("1+2+3"));
+            Assert.That(config["param2"], Is.EqualTo("2+3"));
+            Assert.That(config["param3"], Is.EqualTo("3"));
         });
     }
 
