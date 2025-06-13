@@ -8,9 +8,6 @@ on:
     branches:
       - master
 
-env:
-  TC_CLOUD_TOKEN: $
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,9 +20,10 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.100'
-    - name: Prepare Testcontainers Cloud agent
-      if: env.TC_CLOUD_TOKEN != ''
-      uses: atomicjar/testcontainers-cloud-setup-action@main
+    - name: Setup Testcontainers Cloud Client
+      uses: atomicjar/testcontainers-cloud-setup-action@v1
+      with:
+          token: ${{ secrets.TC_CLOUD_TOKEN }}
     - name: Build and Test
       run: ./Build.ps1
       shell: pwsh
