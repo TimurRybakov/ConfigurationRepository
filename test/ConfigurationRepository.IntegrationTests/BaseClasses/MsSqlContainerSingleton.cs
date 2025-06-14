@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
 using Testcontainers.MsSql;
 
-namespace ConfigurationRepository.Tests.Integrational;
+namespace ConfigurationRepository.IntegrationTests;
 
 public partial class MsSqlContainerSingleton : IDisposable
 {

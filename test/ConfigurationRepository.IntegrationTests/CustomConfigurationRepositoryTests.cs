@@ -27,7 +27,7 @@ public class CustomConfigurationRepositoryTests
             .Build();
 
         TestDelegate getValue = () => _ = Repository.GetConfiguration<IDictionary<string, string?>>()["key1"];
-        Assert.DoesNotThrow(getValue, "Repository keys should be read ignoring case!");
+        Assert.DoesNotThrow(getValue, "Repository keys should be read ignoring case");
         Repository.SetConfiguration("key1", "changed value1");
 
         Assert.That(configuration["Key1"], Is.EqualTo("changed value1"));

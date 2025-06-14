@@ -4,7 +4,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using ParametrizedConfiguration;
 
-namespace ConfigurationRepository.Tests.Integrational;
+namespace ConfigurationRepository.IntegrationTests;
 
 [TestFixture]
 internal class SqlClientJsonConfigurationRepositoryTests : MsSqlConfigurationRepositoryTests

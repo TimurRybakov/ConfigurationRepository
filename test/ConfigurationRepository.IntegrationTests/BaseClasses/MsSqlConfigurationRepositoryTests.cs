@@ -1,9 +1,10 @@
+using ConfigurationRepository.Tests.Integrational;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 
-namespace ConfigurationRepository.Tests.Integrational;
+namespace ConfigurationRepository.IntegrationTests;
 
 [TestFixture]
 internal abstract class MsSqlConfigurationRepositoryTests

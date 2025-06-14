@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace ConfigurationRepository.Tests.Unit;
+namespace ConfigurationRepository.UnitTests;
 
 [Parallelizable]
 [TestFixture]
@@ -22,8 +22,8 @@ internal class JsonConfigurationParserTests
         }
         """;
         // Arrange
-        JsonConfigurationParser parser = new JsonConfigurationParser();
-        byte[] byteArray = Encoding.UTF8.GetBytes(input);
+        var parser = new JsonConfigurationParser();
+        var byteArray = Encoding.UTF8.GetBytes(input);
         var sream = new MemoryStream(byteArray);
 
         // Act

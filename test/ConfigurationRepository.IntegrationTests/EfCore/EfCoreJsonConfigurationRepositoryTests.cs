@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using ParametrizedConfiguration;
 
-namespace ConfigurationRepository.Tests.Integrational;
+namespace ConfigurationRepository.IntegrationTests;
 
 [TestFixture]
 public class EfCoreJsonConfigurationRepositoryTests

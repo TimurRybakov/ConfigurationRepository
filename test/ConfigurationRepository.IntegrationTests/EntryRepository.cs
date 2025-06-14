@@ -1,7 +1,7 @@
 using ConfigurationRepository.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 
-namespace ConfigurationRepository.Tests;
+namespace ConfigurationRepository.IntegrationTests;
 
 internal sealed class EntryRepository : IUpdatableRepository
 {

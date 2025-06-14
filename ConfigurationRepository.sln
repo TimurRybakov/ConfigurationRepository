@@ -19,7 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationRepository.Dap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParametrizedConfiguration", "src\ParametrizedConfiguration\ParametrizedConfiguration.csproj", "{554C98F7-BAAA-4875-BFAB-9F7C615410E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationRepository.Tests", "test\ConfigurationRepository.Tests\ConfigurationRepository.Tests.csproj", "{1CB60FBD-189B-43FE-8D47-0BDDA4C09CB8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationRepository.IntegrationTests", "test\ConfigurationRepository.IntegrationTests\ConfigurationRepository.IntegrationTests.csproj", "{1CB60FBD-189B-43FE-8D47-0BDDA4C09CB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationRepository.UnitTests", "test\ConfigurationRepository.UnitTests\ConfigurationRepository.UnitTests.csproj", "{17DE3839-F3C8-4323-ACA0-1BF80CC5BECA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationRepository.Samples.VaultWithDbWebApp", "samples\ConfigurationRepository.Samples.VaultWithDbWebApp\ConfigurationRepository.Samples.VaultWithDbWebApp.csproj", "{9F26C7A8-1FA6-470A-AE3B-15E4687A630C}"
 EndProject
@@ -63,6 +65,10 @@ Global
 		{D58923CC-122F-46C4-8AE9-81B1F04D6857}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D58923CC-122F-46C4-8AE9-81B1F04D6857}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D58923CC-122F-46C4-8AE9-81B1F04D6857}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17DE3839-F3C8-4323-ACA0-1BF80CC5BECA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17DE3839-F3C8-4323-ACA0-1BF80CC5BECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17DE3839-F3C8-4323-ACA0-1BF80CC5BECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17DE3839-F3C8-4323-ACA0-1BF80CC5BECA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,5 +82,6 @@ Global
 		{1CB60FBD-189B-43FE-8D47-0BDDA4C09CB8} = {DBF52721-4EEC-4491-8A5B-6C80A79878C8}
 		{9F26C7A8-1FA6-470A-AE3B-15E4687A630C} = {333E19FB-6395-431F-8EC7-E84A8F076203}
 		{D58923CC-122F-46C4-8AE9-81B1F04D6857} = {333E19FB-6395-431F-8EC7-E84A8F076203}
+		{17DE3839-F3C8-4323-ACA0-1BF80CC5BECA} = {DBF52721-4EEC-4491-8A5B-6C80A79878C8}
 	EndGlobalSection
 EndGlobal

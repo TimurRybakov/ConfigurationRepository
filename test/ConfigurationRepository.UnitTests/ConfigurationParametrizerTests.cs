@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using ParametrizedConfiguration;
 
-namespace ConfigurationRepository.Tests.Unit;
+namespace ConfigurationRepository.UnitTests;
 
 [TestFixture]
 internal class ConfigurationParametrizerTests
@@ -152,12 +152,12 @@ internal class ConfigurationParametrizerTests
         }
 
         // Recursively process all child keys
-        IEnumerable<string> childKeys = provider.GetChildKeys(Enumerable.Empty<string>(), currentPath);
+        var childKeys = provider.GetChildKeys(Enumerable.Empty<string>(), currentPath);
 
-        foreach (string childKey in childKeys)
+        foreach (var childKey in childKeys)
         {
             // Combine current path with child key to get next path
-            string fullChildPath = currentPath is null ? childKey : ConfigurationPath.Combine(currentPath, childKey);
+            var fullChildPath = currentPath is null ? childKey : ConfigurationPath.Combine(currentPath, childKey);
 
             ProviderDataToDictionary(provider, resultDictionary, fullChildPath);
         }

@@ -23,6 +23,7 @@ function Exec
 }
 
 $artifacts = ".\artifacts"
+$tests = ".\test\ConfigurationRepository.UnitTests\ConfigurationRepository.UnitTests.csproj"
 
 if(Test-Path $artifacts) { Remove-Item $artifacts -Force -Recurse }
 
@@ -30,6 +31,6 @@ exec { & dotnet clean -c Release }
 
 exec { & dotnet build -c Release }
 
-exec { & dotnet test -c Release --no-build -l trx --verbosity=normal }
+exec { & dotnet test -c Release --no-build -l trx --verbosity=normal $tests }
 
 exec { & dotnet pack -c Release -o $artifacts --no-build }

@@ -1,6 +1,4 @@
-using ConfigurationRepository.EntityFramework;
-
-namespace ConfigurationRepository.Tests;
+namespace ConfigurationRepository.IntegrationTests;
 
 internal interface IUpdatableRepository : IRepository
 {
