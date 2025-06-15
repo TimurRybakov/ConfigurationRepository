@@ -4,6 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ConfigurationRepository;
 
+/// <summary>
+/// Extension methods for <see cref="IServiceCollection"/>.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>

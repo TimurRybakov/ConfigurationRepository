@@ -10,11 +10,12 @@ public class DapperParsableConfigurationRepository :
     DapperConfigurationRepository, IVersionedRepository
 {
     /// <summary>
-    /// The key value of <see cref="KeyFieldName"/> in <see cref="ConfigurationTableName"/> table that identifies desired configuration record.
+    /// Assuming there are several configurations in the database, this key is used to fetch exact one of them.
     /// </summary>
     [DisallowNull]
     public string? Key { get; set; }
 
+    /// <inheritdoc/>
     public override TData GetConfiguration<TData>()
     {
         return (TData)Convert.ChangeType(GetConfiguration(), typeof(TData));
@@ -31,6 +32,7 @@ public class DapperParsableConfigurationRepository :
             ?? throw new InvalidOperationException("Null configuration returned from server.");
     }
 
+    /// <inheritdoc/>
     protected override byte[]? GetCurrentVersion()
     {
         using var connection = DbConnectionFactory!();
@@ -38,6 +40,7 @@ public class DapperParsableConfigurationRepository :
         return connection.ExecuteScalar<byte[]?>(SelectCurrentVersionQuery!, new { Key });
     }
 
+    /// <inheritdoc/>
     protected override void ThrowIfPropertiesNotSet()
     {
         base.ThrowIfPropertiesNotSet();

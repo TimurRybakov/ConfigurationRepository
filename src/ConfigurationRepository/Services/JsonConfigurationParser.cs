@@ -12,6 +12,7 @@ public sealed class JsonConfigurationParser : IConfigurationParser
     private readonly Dictionary<string, string?> _data = new (StringComparer.OrdinalIgnoreCase);
     private readonly Stack<string> _paths = new ();
 
+   /// <inheritdoc/>
     public IDictionary<string, string?> Parse(Stream input)
     {
         _data.Clear();

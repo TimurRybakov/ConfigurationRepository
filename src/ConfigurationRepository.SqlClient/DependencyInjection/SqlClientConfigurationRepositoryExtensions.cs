@@ -1,15 +1,17 @@
 
 namespace ConfigurationRepository.SqlClient;
 
-public static class SqlClientDictionaryConfigurationRepositoryExtensions
+/// <summary>
+/// Extension methods for <see cref="SqlClientConfigurationRepository"/> or it`s descendants.
+/// </summary>
+public static class SqlClientConfigurationRepositoryExtensions
 {
     /// <summary>
     /// Sets ConnectionString property for <paramref name="repository"/>.
-    /// Сonnection string is used to create <see cref="IDbConnection"/>.
     /// </summary>
     /// <typeparam name="TRepository">A generic type of <see cref="SqlClientConfigurationRepository"/> class.</typeparam>
     /// <param name="repository">An instance of <see cref="SqlClientConfigurationRepository"/> class or it`s descendant.</param>
-    /// <param name="dbConnectionFactory">A factory method that creates database connection of type <see cref="IDbConnection"/>.</param>
+    /// <param name="connectionString">A database connection string.</param>
     /// <returns>An instance of <see cref="SqlClientConfigurationRepository"/> class or it`s descendant.</returns>
 
     public static TRepository UseConnectionString<TRepository>(
@@ -46,7 +48,7 @@ public static class SqlClientDictionaryConfigurationRepositoryExtensions
     /// </summary>
     /// <param name="repository">An instance of <see cref="SqlClientDictionaryConfigurationRepository"/> class.</param>
     /// <param name="versionTableName">Configuration version table name.</param>
-    /// <returns>An instance of <see cref="DapperConfigurationRepository"/> class or it`s descendant.</returns>
+    /// <returns>An instance of <see cref="SqlClientDictionaryConfigurationRepository"/> class or it`s descendant.</returns>
     public static SqlClientDictionaryConfigurationRepository WithVersionTableName(
         this SqlClientDictionaryConfigurationRepository repository,
         string? versionTableName)

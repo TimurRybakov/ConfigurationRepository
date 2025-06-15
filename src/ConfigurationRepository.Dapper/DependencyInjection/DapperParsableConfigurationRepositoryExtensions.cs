@@ -1,7 +1,10 @@
 
 namespace ConfigurationRepository.Dapper;
 
-public static class DapperJsonConfigurationRepositoryExtensions
+/// <summary>
+/// Extension methods for <see cref="DapperParsableConfigurationRepository"/>.
+/// </summary>
+public static class DapperParsableConfigurationRepositoryExtensions
 {
     /// <summary>
     /// Sets the key that used to fetch configuration from repository.

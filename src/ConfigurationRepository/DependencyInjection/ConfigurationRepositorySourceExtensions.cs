@@ -1,6 +1,9 @@
 
 namespace ConfigurationRepository;
 
+/// <summary>
+/// Extension methods for <see cref="ConfigurationRepositorySource"/>.
+/// </summary>
 public static class ConfigurationRepositorySourceExtensions
 {
     /// <summary>
@@ -8,7 +11,7 @@ public static class ConfigurationRepositorySourceExtensions
     /// An optional provider may contain no data in it`s repository.
     /// </summary>
     /// <typeparam name="TSource">A type of <see cref="ConfigurationRepositorySource"/>.</typeparam>
-    /// <param name="source">Instance of <see cref="TSource"/> type.</param>
+    /// <param name="source">Instance of <see cref="ConfigurationRepositorySource"/> type or it`s descendant.</param>
     /// <returns>An instance of <see cref="ConfigurationRepositorySource"/> type.</returns>
     public static TSource UseOptional<TSource>(this TSource source)
         where TSource : ConfigurationRepositorySource
@@ -22,7 +25,7 @@ public static class ConfigurationRepositorySourceExtensions
     /// This is a service that used to track configuration repository changes using change tokens.
     /// </summary>
     /// <typeparam name="TSource">A type of <see cref="ConfigurationRepositorySource"/> or it`s descendant.</typeparam>
-    /// <param name="source">Instance of <see cref="TSource"/> type.</param>
+    /// <param name="source">Instance of <see cref="ConfigurationRepositorySource"/> type or it`s descendant.</param>
     /// <param name="repositoryChangesNotifier">Concrete notifier/</param>
     /// <returns>An instance of <see cref="ConfigurationRepositorySource"/> type.</returns>
     public static TSource UseRepositoryChangesNotifier<TSource>(
@@ -39,7 +42,7 @@ public static class ConfigurationRepositorySourceExtensions
     /// This is a service that used to track configuration repository changes using change tokens.
     /// </summary>
     /// <typeparam name="TSource">A type of <see cref="ConfigurationRepositorySource"/> or it`s descendant.</typeparam>
-    /// <param name="source">Instance of <see cref="TSource"/> type.</param>
+    /// <param name="source">Instance of <see cref="ConfigurationRepositorySource"/> type or it`s descendant.</param>
     /// <param name="reloadPeriod">A span of time to wait before reloads.</param>
     /// <returns>An instance of <see cref="ConfigurationRepositorySource"/> type.</returns>
     public static TSource UseRepositoryChangesNotifier<TSource>(

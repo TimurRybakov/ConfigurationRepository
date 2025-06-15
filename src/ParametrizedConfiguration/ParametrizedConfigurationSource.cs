@@ -4,6 +4,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace ParametrizedConfiguration;
 
+/// <summary>
+/// A configuration source for creating <see cref="ParametrizedConfigurationProvider"/>.
+/// </summary>
 public class ParametrizedConfigurationSource : IReloadableConfigurationSource
 {
     /// <summary>
@@ -26,6 +29,7 @@ public class ParametrizedConfigurationSource : IReloadableConfigurationSource
     /// </summary>
     public bool PeriodicalReload { get; set; } = false;
 
+    /// <inheritdoc/>
     public IConfigurationProvider Build(IConfigurationBuilder builder)
     {
         _ = Configuration ?? throw new NullReferenceException($"{nameof(Configuration)} is not set.");

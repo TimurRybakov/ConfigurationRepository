@@ -157,10 +157,7 @@ internal class SqlClientDictionaryConfigurationRepositoryTests : MsSqlConfigurat
             """;
 
         using var connection = new SqlConnection(ConnectionString);
-        connection.InfoMessage += (sender, args) =>
-        {
-            Debug.WriteLine(args.Message); // Log SQL queries
-        };
+        connection.InfoMessage += (sender, args) => Debug.WriteLine(args.Message);
 
         using var command = new SqlCommand(upsertQuery, connection);
         command.Parameters.Add("@value", SqlDbType.DateTime).Value = value;

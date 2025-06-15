@@ -26,8 +26,8 @@ public class CustomConfigurationRepositoryTests
             .AddRepository(Repository, source => source.RetrievalStrategy = DictionaryRetrievalStrategy.Instance)
             .Build();
 
-        TestDelegate getValue = () => _ = Repository.GetConfiguration<IDictionary<string, string?>>()["key1"];
-        Assert.DoesNotThrow(getValue, "Repository keys should be read ignoring case");
+        void GetValue() => _ = Repository.GetConfiguration<IDictionary<string, string?>>()["key1"];
+        Assert.DoesNotThrow(GetValue, "Repository keys should be read ignoring case");
         Repository.SetConfiguration("key1", "changed value1");
 
         Assert.That(configuration["Key1"], Is.EqualTo("changed value1"));

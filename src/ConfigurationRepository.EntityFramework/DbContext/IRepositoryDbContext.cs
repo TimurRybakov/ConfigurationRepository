@@ -9,5 +9,8 @@ namespace ConfigurationRepository.EntityFramework;
 public interface IRepositoryDbContext<TEntry>
     where TEntry : class, IConfigurationEntry
 {
+    /// <summary>
+    /// A <see cref="DbSet{TEntry}"/> of configuration entries.
+    /// </summary>
     DbSet<TEntry> ConfigurationEntryDbSet { get; }
 }

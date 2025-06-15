@@ -1,7 +1,10 @@
 
 namespace ConfigurationRepository.SqlClient;
 
-public static class SqlClientJsonConfigurationRepositoryExtensions
+/// <summary>
+/// Extension methods for <see cref="SqlClientParsableConfigurationRepository"/>.
+/// </summary>
+public static class SqlClientParsableConfigurationRepositoryExtensions
 {
     /// <summary>
     /// Sets ConnectionString for <paramref name="repository"/>.

@@ -3,11 +3,14 @@ using System.Data;
 
 namespace ConfigurationRepository.Dapper;
 
-public static class DapperDictionaryConfigurationRepositoryExtensions
+/// <summary>
+/// Extension methods for <see cref="DapperConfigurationRepository"/> or it`s descendants.
+/// </summary>
+public static class DapperConfigurationRepositoryExtensions
 {
     /// <summary>
     /// Sets DbConnectionFactory property for <paramref name="repository"/>.
-    /// Сonnection factory is used to create <see cref="IDbConnection"/> using <see cref="ConnectionString"/>.
+    /// Сonnection factory is used to create <see cref="IDbConnection"/> using connection string.
     /// </summary>
     /// <typeparam name="TRepository">A generic type of <see cref="DapperConfigurationRepository"/> class.</typeparam>
     /// <param name="repository">An instance of <see cref="DapperConfigurationRepository"/> class or it`s descendant.</param>

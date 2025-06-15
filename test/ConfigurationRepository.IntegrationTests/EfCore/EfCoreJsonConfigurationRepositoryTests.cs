@@ -73,11 +73,7 @@ public class EfCoreJsonConfigurationRepositoryTests
             .AddEfCoreJsonRepository(
                 Key,
                 options,
-                source =>
-                {
-                    //source.UseRepositoryChangesNotifier();
-                    source.WithPeriodicalReload();
-                })
+                source => source.WithPeriodicalReload())
             .Build();
 
         Assert.That(configuration["Host"], Is.EqualTo("127.0.0.1"));
@@ -127,11 +123,7 @@ public class EfCoreJsonConfigurationRepositoryTests
             .AddEfCoreJsonRepository(
                 Key,
                 options,
-                source =>
-                {
-                    //source.UseRepositoryChangesNotifier();
-                    source.WithPeriodicalReload();
-                })
+                source => source.WithPeriodicalReload())
             .WithParametrization(out var parametrizableConfiguration)
             .Build();
 

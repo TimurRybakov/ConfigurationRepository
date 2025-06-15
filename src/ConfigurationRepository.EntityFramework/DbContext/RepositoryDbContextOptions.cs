@@ -10,18 +10,32 @@ namespace ConfigurationRepository.EntityFramework;
 /// </summary>
 public class RepositoryDbContextOptions : IDbContextOptionsExtension
 {
+    /// <summary>
+    /// The name for a table that stores configuration as key-value pairs.
+    /// </summary>
     public string TableName { get; set; } = null!;
 
+    /// <summary>
+    /// The name for a schema of configuration table.
+    /// </summary>
     public string? SchemaName { get; set; }
 
+    /// <summary>
+    /// The name for a column storing keys.
+    /// </summary>
     public string KeyColumnName { get; set; } = "Key";
 
+    /// <summary>
+    /// The name for a column storing values.
+    /// </summary>
     public string ValueColumnName { get; set; } = "Value";
 
+    /// <inheritdoc/>
     public void ApplyServices(IServiceCollection services)
     {
     }
 
+    /// <inheritdoc/>
     public void Validate(IDbContextOptions options)
     {
         if (string.IsNullOrEmpty(TableName))
@@ -30,10 +44,16 @@ public class RepositoryDbContextOptions : IDbContextOptionsExtension
         }
     }
 
+    /// <inheritdoc/>
     public DbContextOptionsExtensionInfo Info => new ExtensionInfo(this);
 
+    /// <inheritdoc/>
     public RepositoryDbContextOptions() { }
 
+    /// <summary>
+    /// Creates a new instance of <see cref="RepositoryDbContextOptions"/> and copies fields values from <paramref name="copyFrom"/>.
+    /// </summary>
+    /// <param name="copyFrom"></param>
     protected RepositoryDbContextOptions(RepositoryDbContextOptions copyFrom)
     {
         SchemaName = copyFrom.SchemaName;
@@ -42,12 +62,10 @@ public class RepositoryDbContextOptions : IDbContextOptionsExtension
         ValueColumnName = copyFrom.ValueColumnName;
     }
 
-    private sealed class ExtensionInfo : DbContextOptionsExtensionInfo
+    private sealed class ExtensionInfo(IDbContextOptionsExtension extension) : DbContextOptionsExtensionInfo(extension)
     {
         private string? _logFragment;
         private int? _serviceProviderHashCode;
-
-        public ExtensionInfo(IDbContextOptionsExtension extension) : base(extension) { }
 
         private new RepositoryDbContextOptions Extension
             => (RepositoryDbContextOptions)base.Extension;

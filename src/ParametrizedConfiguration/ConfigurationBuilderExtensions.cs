@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ParametrizedConfiguration;
 
+/// <summary>
+/// Extension methods for <see cref="IConfigurationBuilder"/>.
+/// </summary>
 public static class ConfigurationBuilderExtensions
 {
     /// <summary>
@@ -14,16 +17,18 @@ public static class ConfigurationBuilderExtensions
     /// <param name="builder">A configuration builder instance to wich we add <see cref="ParametrizedConfigurationSource"/>.</param>
     /// <param name="parametrizableConfiguration">Created instance of parametrizable configuration.
     /// We return this to use it elsewere, i.e. in configuration reloader service.</param>
-    /// <param name="configureSource">Configures the source.</param>
-    /// <returns>A configuration builder instance.</returns>
+    /// <param name="configureSource">Configures the <see cref="ParametrizedConfigurationSource"/>, if set.</param>
+    /// <returns>A configuration <paramref name="builder"/> instance.</returns>
     public static IConfigurationBuilder WithParametrization(
         this IConfigurationBuilder builder,
         out IConfiguration parametrizableConfiguration,
         Action<ParametrizedConfigurationSource>? configureSource = null)
     {
         parametrizableConfiguration = builder.Build();
-        var source = new ParametrizedConfigurationSource();
-        source.Configuration = parametrizableConfiguration;
+        var source = new ParametrizedConfigurationSource
+        {
+            Configuration = parametrizableConfiguration
+        };
 
         configureSource?.Invoke(source);
 
@@ -33,6 +38,12 @@ public static class ConfigurationBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Builds parametrizable configuration, chains it to the builder and adds <see cref="ParametrizedConfigurationSource"/> to the builder.
+    /// </summary>
+    /// <param name="builder">A configuration builder instance to wich we add <see cref="ParametrizedConfigurationSource"/>.</param>
+    /// <param name="configureSource">Configures the <see cref="ParametrizedConfigurationSource"/>, if set.</param>
+    /// <returns>A configuration <paramref name="builder"/> instance.</returns>
     public static IConfigurationBuilder WithParametrization(
         this IConfigurationBuilder builder,
         Action<ParametrizedConfigurationSource>? configureSource = null)
@@ -47,7 +58,8 @@ public static class ConfigurationBuilderExtensions
     /// <typeparam name="TService">A generic type of a marker class for <see cref="IReloadableConfigurationService"/>.</typeparam>
     /// <param name="builder">A configuration builder instance to wich we add <see cref="ParametrizedConfigurationSource"/>.</param>
     /// <param name="services">A service collection for reloadable service registration.</param>
-    /// <returns></returns>
+    /// <param name="configureSource">Configures the <see cref="ParametrizedConfigurationSource"/>, if set.</param>
+    /// <returns>A configuration <paramref name="builder"/> instance.</returns>
     public static IConfigurationBuilder WithParametrization<TService>(
         this IConfigurationBuilder builder,
         IServiceCollection services,

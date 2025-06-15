@@ -152,7 +152,7 @@ internal class ConfigurationParametrizerTests
         }
 
         // Recursively process all child keys
-        var childKeys = provider.GetChildKeys(Enumerable.Empty<string>(), currentPath);
+        var childKeys = provider.GetChildKeys([], currentPath);
 
         foreach (var childKey in childKeys)
         {

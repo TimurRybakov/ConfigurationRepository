@@ -4,6 +4,7 @@ namespace ConfigurationRepository.SqlClient;
 
 /// <summary>
 /// A versioned dictionary repository that uses SqlClient to fetch data from database.
+/// Configuration is stored in key-value pairs.
 /// </summary>
 public sealed class SqlClientDictionaryConfigurationRepository : SqlClientConfigurationRepository
 {
@@ -17,12 +18,10 @@ public sealed class SqlClientDictionaryConfigurationRepository : SqlClientConfig
     /// </summary>
     public string? VersionFieldName { get; set; } = "[CurrentVersion]";
 
-    public override TData GetConfiguration<TData>()
-    {
-        return (TData)GetConfiguration();
-    }
+    /// <inheritdoc/>
+    public override TData GetConfiguration<TData>() => (TData)(IDictionary<string, string?>)GetConfiguration();
 
-    private IDictionary<string, string?> GetConfiguration()
+    private Dictionary<string, string?> GetConfiguration()
     {
         ThrowIfPropertiesNotSet();
         CheckVersionInitialized();
@@ -48,6 +47,7 @@ public sealed class SqlClientDictionaryConfigurationRepository : SqlClientConfig
         return configuration;
     }
 
+    /// <inheritdoc/>
     protected override byte[] GetCurrentVersion()
     {
         string selectCurrentVersionQuery = $"select top (1) {VersionFieldName} from {VersionTableName}";
@@ -60,5 +60,6 @@ public sealed class SqlClientDictionaryConfigurationRepository : SqlClientConfig
         return (byte[])command.ExecuteScalar();
     }
 
+    /// <inheritdoc/>
     protected override bool IsVersioned() => VersionTableName is not null;
 }

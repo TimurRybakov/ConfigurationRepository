@@ -2,6 +2,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository.Dapper;
 
+/// <summary>
+/// Extension methods for <see cref="IConfigurationBuilder"/>.
+/// </summary>
 public static class ConfigurationBuilderExtensions
 {
     /// <summary>

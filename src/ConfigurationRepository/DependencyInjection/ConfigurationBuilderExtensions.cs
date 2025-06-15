@@ -8,10 +8,11 @@ namespace ConfigurationRepository;
 public static class ConfigurationBuilderExtensions
 {
     /// <summary>
-    /// Adds a ConfigurationRepositorySource to <paramref name="builder"/>.
+    /// Adds an <see cref="IRepository"/> object to <paramref name="builder"/>.
     /// </summary>
-    /// <param name="builder">A configuration builder instance for adding <see cref="ConfigurationRepositorySource"/> or it`s descendant.</param>
-    /// <param name="configureSource">Configures the source.</param>
+    /// <param name="builder">A configuration builder instance for adding <see cref="IRepository"/> or it`s descendant.</param>
+    /// <param name="repository">An <see cref="IRepository"/> object.</param>
+    /// <param name="configureSource">If set, configures <see cref="ConfigurationRepositorySource"/>.</param>
     /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
     public static IConfigurationBuilder AddRepository<TSource>(
         this IConfigurationBuilder builder,
@@ -19,8 +20,10 @@ public static class ConfigurationBuilderExtensions
         Action<TSource>? configureSource = null)
         where TSource : ConfigurationRepositorySource, new()
     {
-        var source = new TSource();
-        source.Repository = repository;
+        var source = new TSource
+        {
+            Repository = repository
+        };
         configureSource?.Invoke(source);
 
         builder.Add(source);
@@ -28,10 +31,11 @@ public static class ConfigurationBuilderExtensions
     }
 
     /// <summary>
-    /// Adds the ConfigurationRepositorySource to <paramref name="builder"/>.
+    /// Adds an <see cref="IRepository"/> object to <paramref name="builder"/>.
     /// </summary>
-    /// <param name="builder">A configuration builder instance for adding <see cref="ConfigurationRepositorySource"/>.</param>
-    /// <param name="configureSource">Configures the source.</param>
+    /// <param name="builder">A configuration builder instance for adding <see cref="IRepository"/>.</param>
+    /// <param name="repository">An <see cref="IRepository"/> object.</param>
+    /// <param name="configureSource">If set, configures <see cref="ConfigurationRepositorySource"/>.</param>
     /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
     public static IConfigurationBuilder AddRepository(
         this IConfigurationBuilder builder,
@@ -65,11 +69,9 @@ public static class ConfigurationBuilderExtensions
     {
         _ = builder ?? throw new ArgumentNullException(nameof(builder));
 
-        if (builder.Properties.TryGetValue(RepositoryLoadExceptionHandlerKey, out object? handler))
-        {
-            return handler as Action<RepositoryLoadExceptionContext>;
-        }
-        return null;
+        return builder.Properties.TryGetValue(RepositoryLoadExceptionHandlerKey, out object? handler)
+            ? handler as Action<RepositoryLoadExceptionContext>
+            : null;
     }
 
     /// <summary>

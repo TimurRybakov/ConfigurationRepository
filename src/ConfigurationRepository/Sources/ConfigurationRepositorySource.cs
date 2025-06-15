@@ -36,7 +36,7 @@ public class ConfigurationRepositorySource : IReloadableConfigurationSource
     public IRepositoryChangesNotifier? RepositoryChangesNotifier { get; set; }
 
     /// <summary>
-    /// Will be called if an uncaught exception occurs in <see cref="ConfigurationRepositoryProvider.Load"/>.
+    /// Will be called if an uncaught exception occurs in ConfigurationRepositoryProvider.Load() method.
     /// </summary>
     public Action<RepositoryLoadExceptionContext>? OnLoadException { get; set; }
 

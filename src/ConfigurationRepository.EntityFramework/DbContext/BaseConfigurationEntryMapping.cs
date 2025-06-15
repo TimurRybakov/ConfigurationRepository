@@ -7,25 +7,27 @@ namespace ConfigurationRepository.EntityFramework;
 /// EF Core configuration entity mapping.
 /// </summary>
 /// <typeparam name="TEntry">Entity type.</typeparam>
-public abstract class BaseConfigurationEntryMapping<TEntry> : IEntityTypeConfiguration<TEntry>
-    where TEntry : class, IConfigurationEntry
+public abstract class BaseConfigurationEntryMapping<TEntry>(
+    string tableName,
+    string? schemaName = null)
+    : IEntityTypeConfiguration<TEntry> where TEntry : class, IConfigurationEntry
 {
-    private readonly string _tableName;
-    private readonly string? _schemaName;
+    private readonly string _tableName = tableName ?? throw new ArgumentNullException(nameof(tableName));
 
+    /// <summary>
+    /// The name for a column storing keys.
+    /// </summary>
     protected virtual string KeyColumnName { get; } = "Key";
 
+    /// <summary>
+    /// The name for a column storing values.
+    /// </summary>
     protected virtual string ValueColumnName { get; } = "Value";
 
-    protected BaseConfigurationEntryMapping(string tableName, string? schemaName = null)
-    {
-        _tableName = tableName ?? throw new ArgumentNullException(nameof(tableName));
-        _schemaName = schemaName;
-    }
-
+    /// <inheritdoc/>
     public void Configure(EntityTypeBuilder<TEntry> builder)
     {
-        builder.ToTable(_tableName, _schemaName);
+        builder.ToTable(_tableName, schemaName);
         builder.HasKey(x => x.Key);
 
         builder.Property(x => x.Key).HasColumnName(KeyColumnName).IsRequired();

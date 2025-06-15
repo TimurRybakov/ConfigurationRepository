@@ -6,8 +6,26 @@ using Microsoft.Extensions.Configuration;
 
 namespace ParametrizedConfiguration;
 
+/// <summary>
+/// Configuration parametrizer logic is here.
+/// </summary>
 public static class Parametrizer
 {
+    /// <summary>
+    /// Parametrizes input <paramref name="config"/>.
+    /// <code>
+    /// IConfiguration config:               returned dictionary:
+    /// {                                    {
+    ///     { "param1", "1+%param2%" },          { "param1", "1+2+3" },
+    ///     { "param2", "2+%param3%" },  -->     { "param2", "2+3" },
+    ///     { "param3", "3" }                    { "param3", "3" }
+    /// };                                   };
+    /// </code>
+    /// </summary>
+    /// <param name="config">A configuration for parametrization.</param>
+    /// <param name="parameterPlaceholderOpening">The string that indicates a start of parameter placeholder.</param>
+    /// <param name="parameterPlaceholderClosing">The string that indicates an end of parameter placeholder.</param>
+    /// <returns></returns>
     public static IDictionary<string, string?> Parametrize(
         this IConfiguration config,
         string parameterPlaceholderOpening = "%",

@@ -1,13 +1,13 @@
-using System.Collections;
-using System;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository.SqlClient;
 
-public abstract class SqlClientConfigurationRepository : IVersionedRepository
+/// <summary>
+/// A configuration storage repository in a database accessed using SqlClient library.
+/// </summary>
+public abstract class SqlClientConfigurationRepository : VersionedRepository
 {
-    protected byte[]? _version;
-
     /// <summary>
     /// The connection string to connect to the database with configuration.
     /// </summary>
@@ -21,47 +21,19 @@ public abstract class SqlClientConfigurationRepository : IVersionedRepository
     public string? ConfigurationTableName { get; set; }
 
     /// <summary>
-    /// Key field name that contains <see cref="Key"/> values.
+    /// Key field name in <see cref="ConfigurationTableName"/> configuration table.
+    /// Configuration keys delimited by <see cref="ConfigurationPath.KeyDelimiter"/>. Column is not null, case ingnored.
     /// </summary>
     [DisallowNull]
     public string KeyFieldName { get; set; } = "[Key]";
 
     /// <summary>
-    /// Field name in <see cref="ConfigurationTableName"/> table with configuration.
+    /// Value field name in <see cref="ConfigurationTableName"/> configuration table. Column is nullable.
     /// </summary>
     [DisallowNull]
     public string ValueFieldName { get; set; } = "[Value]";
 
-    public abstract TData GetConfiguration<TData>();
-
-    public bool VersionChanged()
-    {
-        if (!IsVersioned())
-            return true;
-
-        var newVersion = GetCurrentVersion();
-
-        if (StructuralComparisons.StructuralComparer.Compare(newVersion, _version) == 0)
-        {
-            return false;
-        }
-
-        _version = newVersion;
-        return true;
-    }
-
-    protected abstract byte[]? GetCurrentVersion();
-
-    protected abstract bool IsVersioned();
-
-    protected void CheckVersionInitialized()
-    {
-        if (_version is null && IsVersioned())
-        {
-            _version = GetCurrentVersion();
-        }
-    }
-
+    /// <inheritdoc/>
     protected virtual void ThrowIfPropertiesNotSet()
     {
         _ = ConnectionString ?? throw new ArgumentNullException(nameof(ConnectionString));

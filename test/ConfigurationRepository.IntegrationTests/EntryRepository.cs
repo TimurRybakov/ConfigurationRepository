@@ -3,43 +3,32 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ConfigurationRepository.IntegrationTests;
 
-internal sealed class EntryRepository : IUpdatableRepository
+internal sealed class EntryRepository(RepositoryDbContext context) : IUpdatableRepository
 {
-    private readonly RepositoryDbContext _context;
-
-    public EntryRepository(RepositoryDbContext context)
-    {
-        _context = context;
-        RetrievalStrategy = DictionaryRetrievalStrategy.Instance;
-    }
-
-    public IRetrievalStrategy RetrievalStrategy { get; }
+    public IRetrievalStrategy RetrievalStrategy { get; } = DictionaryRetrievalStrategy.Instance;
 
     public Task<List<ConfigurationEntry>> GetAllAsync() =>
-        _context.ConfigurationEntryDbSet.ToListAsync();
+        context.ConfigurationEntryDbSet.ToListAsync();
 
     public async Task<ConfigurationEntry?> GetByIdAsync(string key) =>
-        await _context.ConfigurationEntryDbSet.FindAsync(key);
+        await context.ConfigurationEntryDbSet.FindAsync(key);
 
     public async Task AddAsync(ConfigurationEntry entry)
     {
-        _context.ConfigurationEntryDbSet.Add(entry);
-        await _context.SaveChangesAsync();
+        context.ConfigurationEntryDbSet.Add(entry);
+        await context.SaveChangesAsync();
     }
 
-    public bool VersionIsChanged()
+    public TData GetConfiguration<TData>() => (TData)(IDictionary<string, string?>)GetConfiguration();
+
+    private Dictionary<string, string?> GetConfiguration()
+    {
+        return context.ConfigurationEntryDbSet.AsNoTracking()
+            .ToDictionary(entry => entry.Key, entry => entry.Value, StringComparer.OrdinalIgnoreCase);
+    }
+
+    public static bool VersionIsChanged()
     {
         return true;
-    }
-
-    public TData GetConfiguration<TData>()
-    {
-        return (TData)GetConfiguration();
-    }
-
-    private IDictionary<string, string?> GetConfiguration()
-    {
-        return _context.ConfigurationEntryDbSet.AsNoTracking()
-            .ToDictionary(entry => entry.Key, entry => entry.Value, StringComparer.OrdinalIgnoreCase);
     }
 }

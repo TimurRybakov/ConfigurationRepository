@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.SqlClient;
 
@@ -16,11 +15,12 @@ public class SqlClientParsableConfigurationRepository :
     public string? VersionFieldName { get; set; }
 
     /// <summary>
-    /// The key value of <see cref="KeyFieldName"/> in <see cref="ConfigurationTableName"/> table that identifies desired configuration record.
+    /// Assuming there are several configurations in the database, this key is used to fetch exact one of them.
     /// </summary>
     [DisallowNull]
     public string? Key { get; set; }
 
+    /// <inheritdoc/>
     public override TData GetConfiguration<TData>()
     {
         return (TData)Convert.ChangeType(GetConfiguration(), typeof(TData));
@@ -50,6 +50,7 @@ public class SqlClientParsableConfigurationRepository :
             : reader.GetString(0);
     }
 
+    /// <inheritdoc/>
     protected override byte[]? GetCurrentVersion()
     {
         string selectCurrentVersionQuery = $"""
@@ -67,11 +68,13 @@ public class SqlClientParsableConfigurationRepository :
         return (byte[]?)command.ExecuteScalar();
     }
 
+    /// <inheritdoc/>
     protected override void ThrowIfPropertiesNotSet()
     {
         base.ThrowIfPropertiesNotSet();
         _ = Key ?? throw new ArgumentNullException(nameof(Key));
     }
 
+    /// <inheritdoc/>
     protected override bool IsVersioned() => VersionFieldName is not null;
 }

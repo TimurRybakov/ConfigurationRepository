@@ -8,7 +8,7 @@ namespace ConfigurationRepository;
 public interface IRepository
 {
     /// <summary>
-    /// Gets configuration of type <see cref="TData"/>.
+    /// Gets configuration of type TData.
     /// </summary>
     /// <typeparam name="TData">Type of data to be returned by this method.</typeparam>
     /// <returns></returns>

@@ -72,8 +72,12 @@ public class ConfigurationRepositoryProvider : ConfigurationProvider, IReloadabl
         Load(reload: true);
     }
 
-    /// <inheritdoc />
-    public void Dispose() => Dispose(true);
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
     /// <summary>
     /// Dispose the provider.
@@ -84,6 +88,7 @@ public class ConfigurationRepositoryProvider : ConfigurationProvider, IReloadabl
         _changeTokenRegistration?.Dispose();
     }
 
+    /// <inheritdoc/>
     ~ConfigurationRepositoryProvider()
     {
         Dispose(false);

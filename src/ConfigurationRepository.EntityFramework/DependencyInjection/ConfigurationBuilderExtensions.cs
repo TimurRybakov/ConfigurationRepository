@@ -3,6 +3,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConfigurationRepository.EntityFramework;
 
+/// <summary>
+/// Extension methods for <see cref="IConfigurationBuilder"/>.
+/// </summary>
 public static class ConfigurationBuilderExtensions
 {
     /// <summary>
@@ -89,9 +92,10 @@ public static class ConfigurationBuilderExtensions
 
         var repository =
             new EfParsableConfigurationRepository<RepositoryDbContext, ConfigurationEntry>(
-                new RepositoryDbContext(options));
-
-        repository.Key = key;
+                new RepositoryDbContext(options))
+            {
+                Key = key
+            };
 
         source.Repository = repository;
         source.ConfigurationParser = new JsonConfigurationParser();

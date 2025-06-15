@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ConfigurationRepository.EntityFramework;
 
+/// <summary>
+/// Extension methods for <see cref="DbContextOptionsBuilder{TContext}"/>.
+/// </summary>
 public static class RepositoryDbContextOptionsBuilderExtensions
 {
     /// <summary>

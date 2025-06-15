@@ -7,9 +7,9 @@ namespace ConfigurationRepository.IntegrationTests;
 public partial class MsSqlContainerSingleton : IDisposable
 {
     public static readonly Lazy<MsSqlContainerSingleton> Instance =
-        new Lazy<MsSqlContainerSingleton>(() => new MsSqlContainerSingleton());
+        new(() => new MsSqlContainerSingleton());
 
-    public readonly MsSqlContainer _mssql = new MsSqlBuilder()
+    public readonly MsSqlContainer Mssql = new MsSqlBuilder()
         .WithImage("mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04")
         .WithName("mssql_configuration_repository")
         .WithReuse(true)
@@ -21,7 +21,7 @@ public partial class MsSqlContainerSingleton : IDisposable
     [GeneratedRegex(@"Database=[^;]+")]
     private static partial Regex DatabaseReplacementRegex();
 
-    private bool disposed = false;
+    private bool _disposed = false;
 
     private MsSqlContainerSingleton()
     {
@@ -35,9 +35,9 @@ public partial class MsSqlContainerSingleton : IDisposable
 
     private async Task Init()
     {
-        await _mssql.StartAsync();
+        await Mssql.StartAsync();
 
-        var connectionString = _mssql.GetConnectionString();
+        var connectionString = Mssql.GetConnectionString();
 
         await EnsureTestDatabaseCreated(connectionString);
 
@@ -52,18 +52,19 @@ public partial class MsSqlContainerSingleton : IDisposable
     public void Dispose()
     {
         Dispose(true).GetAwaiter().GetResult();
+        GC.SuppressFinalize(this);
     }
 
     private async Task Dispose(bool disposing)
     {
-        if (!disposed)
+        if (!_disposed)
         {
             if (disposing)
             {
-                await _mssql.DisposeAsync();
+                await Mssql.DisposeAsync();
             }
 
-            disposed = true;
+            _disposed = true;
         }
     }
 

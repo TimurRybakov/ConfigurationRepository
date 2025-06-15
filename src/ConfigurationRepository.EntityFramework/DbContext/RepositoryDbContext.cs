@@ -5,20 +5,16 @@ namespace ConfigurationRepository.EntityFramework;
 /// <summary>
 /// Configuration repository database context.
 /// </summary>
-public class RepositoryDbContext
-    : DbContext, IRepositoryDbContext<ConfigurationEntry>
+public class RepositoryDbContext(DbContextOptions<RepositoryDbContext> options)
+    : DbContext(options), IRepositoryDbContext<ConfigurationEntry>
 {
-    private readonly RepositoryDbContextOptions _options;
+    private readonly RepositoryDbContextOptions _options = options.FindExtension<RepositoryDbContextOptions>()
+            ?? throw new InvalidOperationException($"{nameof(RepositoryDbContextOptions)} instance not found. Configure options with UseTable() extension method.");
 
+    /// <inheritdoc/>
     public DbSet<ConfigurationEntry> ConfigurationEntryDbSet { get; set; }
 
-    public RepositoryDbContext(DbContextOptions<RepositoryDbContext> options)
-        : base(options)
-    {
-        _options = options.FindExtension<RepositoryDbContextOptions>()
-            ?? throw new InvalidOperationException($"{nameof(RepositoryDbContextOptions)} instance not found. Configure options with UseTable() extension method.");
-    }
-
+    /// <inheritdoc/>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new ConfigurationEntryMapping(_options));
@@ -26,17 +22,11 @@ public class RepositoryDbContext
         base.OnModelCreating(modelBuilder);
     }
 
-    private class ConfigurationEntryMapping : BaseConfigurationEntryMapping<ConfigurationEntry>
+    private class ConfigurationEntryMapping(RepositoryDbContextOptions options)
+        : BaseConfigurationEntryMapping<ConfigurationEntry>(options.TableName, options.SchemaName)
     {
-        protected override string KeyColumnName { get; }
+        protected override string KeyColumnName { get; } = options.KeyColumnName;
 
-        protected override string ValueColumnName { get; }
-
-        public ConfigurationEntryMapping(RepositoryDbContextOptions options)
-            : base(options.TableName, options.SchemaName)
-        {
-            KeyColumnName = options.KeyColumnName;
-            ValueColumnName = options.ValueColumnName;
-        }
+        protected override string ValueColumnName { get; } = options.ValueColumnName;
     }
 }

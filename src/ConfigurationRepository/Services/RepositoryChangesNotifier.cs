@@ -11,16 +11,19 @@ public class RepositoryChangesNotifier : IRepositoryChangesNotifier
     private readonly Func<CancellationTokenSource> _createCancellationTokenSource;
     private volatile CancellationTokenSource? _cancellationTokenSource;
 
+    /// <inheritdoc/>
     public RepositoryChangesNotifier()
     {
         _createCancellationTokenSource = () => new CancellationTokenSource();
     }
 
+    /// <inheritdoc/>
     public RepositoryChangesNotifier(TimeSpan reloadPeriod)
     {
         _createCancellationTokenSource = () => new CancellationTokenSource(reloadPeriod);
     }
 
+    /// <inheritdoc/>
     public IChangeToken CreateChangeToken()
     {
         var previousToken = Interlocked.Exchange(
@@ -29,11 +32,14 @@ public class RepositoryChangesNotifier : IRepositoryChangesNotifier
         return new CancellationChangeToken(_cancellationTokenSource!.Token);
     }
 
+    /// <inheritdoc/>
     public void Dispose()
     {
         _cancellationTokenSource?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
+    /// <inheritdoc/>
     public void DoReload()
     {
         _cancellationTokenSource?.Cancel();
