@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using ParametrizedConfiguration;
 
 namespace ConfigurationRepository.UnitTests;
@@ -114,7 +115,7 @@ internal class ConfigurationParametrizerTests
     }
 
     [Test]
-    public void Providers()
+    public void Building_Configuration_With_Providers_Succeeds()
     {
         Dictionary<string, string?> configuration = new()
         {
@@ -132,7 +133,6 @@ internal class ConfigurationParametrizerTests
 
         CollectionAssert.AreEqual(configuration, dict);
     }
-
 
     /// <summary>
     /// Builds dictionary from <see cref="IConfigurationProvider"/> provider.

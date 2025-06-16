@@ -54,6 +54,18 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
+    /// Adds new <see cref="IReloadableConfigurationService"/> service and it`s generic version to <paramref name="services"/> with <see cref="ReloadableConfiguration"/> marker.
+    /// </summary>
+    /// <param name="services">A collection of services.</param>
+    /// <param name="configuration">A configuration to be bounded with <see cref="IReloadableConfigurationService"/> service.</param>
+    /// <returns>A collection of services.</returns>
+    public static IServiceCollection AddReloadableConfigurationService(
+        this IServiceCollection services, IConfiguration configuration)
+    {
+        return services.AddReloadableConfigurationService<ReloadableConfiguration>(configuration);
+    }
+
+    /// <summary>
     /// Adds <see cref="ConfigurationReloader"/> hosted service to <paramref name="services"/>
     /// with TService marker class.
     /// </summary>

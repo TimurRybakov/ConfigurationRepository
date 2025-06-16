@@ -22,6 +22,7 @@ await SaveSecretsToVault(vaultUri);
 
 // Define and build base configuration that will aquire secrets from vault and parametrize itself with values from it.
 var baseConfiguration = new ConfigurationBuilder()
+    .AddEnvironmentVariables()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddVaultConfiguration(
