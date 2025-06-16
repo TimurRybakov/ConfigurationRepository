@@ -33,10 +33,10 @@ So then in our application Program.cs file we may add a configuration provider l
 > app.Run();
 > ```
 > Here we:
-> - extract connection string named "Dapper" from existing configuration providers (i.e. "appsettings,json");
-> - add database repository using Dapper with AddDapperRepository() extension method;
-> - define database connection factory that will create database connection for our provider using UseDbConnectionFactory() extension method and our connection string;
-> - define the select configuration query with WithSelectConfigurationQuery() extension method.
+> - extract connection string named "Dapper" from existing configuration providers (i.e. `appsettings,json`);
+> - add database repository using Dapper with `AddDapperRepository()` extension method;
+> - define database connection factory that will create database connection for our provider using `UseDbConnectionFactory()` extension method and our connection string;
+> - define the select configuration query with `WithSelectConfigurationQuery()` extension method.
 
 If our database source can change at any time in any way we may also add configuration reloader that with periodically reload our configuration from database:
 > ```csharp
@@ -57,10 +57,10 @@ If our database source can change at any time in any way we may also add configu
 > app.Run();
 > ```
 > Here we additionaly:
-> - define that our configuration provider source will use PeriodicalReload background service;
-> - register PeriodicalReload background service in our service collection.
+> - define that our configuration provider source will use `PeriodicalReload` background service;
+> - register `PeriodicalReload` background service in our service collection.
 >
-> We can define reload period as a time span passed as a parameter to WithPeriodicalReload() exstension method.
+> We can define reload period as a time span passed as a parameter to `WithPeriodicalReload()` exstension method.
 
 What if our config in database is too heavy to reload it frequently and we want to minimize our network traffic? Let`s just version our configurations adding a rowversion column to the configuration table:
 > ```tsql
@@ -98,4 +98,52 @@ Then we make our configuration versioned by adding SelectCurrentVersionQuery to 
 > 
 > app.Run();
 > ```
-> Here we additionaly add WithSelectCurrentVersionQuery() extension method passing query that selects current configuration version.
+> Here we additionaly add `WithSelectCurrentVersionQuery()` extension method passing query that selects current configuration version.
+
+# ParametrizedConfiguration
+ParametrizedConfiguration library presents a configuration provider that uses it\`s own configuration data via other providers to parametrize parameter placeholders with values, accessed by parameter keys. By default placeholders defined between two `%` symbols like `%param name%`, where `param name` should be the key of the same configuration, the value of which will be substituted into `%param name%`. for example:
+This configuration:
+```
+{
+  { "param1", "1+%param2%" },
+  { "param2", "2+%param3%" },
+  { "param3", "3" }
+};
+```
+will be parametrized into this:
+```
+{
+  { "param1", "1+2+3" },
+  { "param2", "2+3" },
+  { "param3", "3" }
+};
+```
+This can be used to hide sensitive data from publicly stored configurations or to reuse same configuration values in several places. The code below demonstrates this:
+> ```csharp
+> using ParametrizedConfiguration;
+> using Microsoft.Extensions.Configuration;
+> 
+> // Assume secrets are set via environment variables somewere outside this code,
+> // we set them here just for clarity:
+> Environment.SetEnvironmentVariable("DatabaseName", "MyDatabase");
+> Environment.SetEnvironmentVariable("UserName", "Bob");
+> Environment.SetEnvironmentVariable("Password", "strongPassword");
+> 
+> // Define configuration that will be parametrized with it`s own values:
+> var configuration = new ConfigurationBuilder()
+>     .AddEnvironmentVariables()
+>     .WithParametrization()
+>     .Build();
+> 
+> // Let`s define our configuration key with parameters. It also won't be here
+> // in our production code, but will be loaded from configuration providers
+> // such as json-files or any other defined in ConfigurationBuilder.
+> configuration["ConnectionStrings:Mssql"] =
+>     "Server=mssql-server;Database=%DatabaseName%;User Id=%UserName%;Password=%Password%;TrustServerCertificate=True";
+> 
+> // Ok, now let`s get the connection string from configuration:
+> Console.WriteLine(configuration.GetConnectionString("mssql"));
+> 
+> // Output will be parametrized with values from same configuration:
+> // Server=mssql-server;Database=MyDatabase;User Id=Bob;Password=strongPassword;TrustServerCertificate=True
+> ```
