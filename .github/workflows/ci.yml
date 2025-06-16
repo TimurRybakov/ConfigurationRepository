@@ -12,22 +12,29 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+
     - name: Checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
+
     - name: Setup dotnet 8.0
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.100'
+
     - name: Clean
       run: dotnet clean -c Release
+
     - name: Build
       run: dotnet build -c Release
+
     - name: Test
       run: dotnet test -c Release --no-build -l trx --verbosity=normal ./test/ConfigurationRepository.UnitTests/ConfigurationRepository.UnitTests.csproj
+
     - name: Pack
       run: dotnet pack -c Release -o artifacts --no-build
+
     - name: Artifacts
       uses: actions/upload-artifact@v4
       with:
