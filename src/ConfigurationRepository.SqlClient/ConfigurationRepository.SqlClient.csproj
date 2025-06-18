@@ -27,4 +27,8 @@
     <ProjectReference Include="..\ConfigurationRepository\ConfigurationRepository.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include=".\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
 </Project>
