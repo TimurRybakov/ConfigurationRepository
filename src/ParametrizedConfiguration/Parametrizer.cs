@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 
-namespace ParametrizedConfiguration;
+namespace ConfigurationRepository;
 
 /// <summary>
 /// Configuration parametrizer logic is here.
@@ -55,20 +55,13 @@ public static class Parametrizer
         return values;
     }
 
-    private readonly struct Marker
+    private readonly struct Marker(int start, int end, string key)
     {
-        public Marker(int start, int end, string key)
-        {
-            Start = start;
-            End = end;
-            Key = key;
-        }
+        public int Start { get; } = start;
 
-        public int Start { get; }
+        public int End { get; } = end;
 
-        public int End { get; }
-
-        public string Key { get; }
+        public string Key { get; } = key;
     }
 
     private static IEnumerable<Marker> ScanForPlaceholders(

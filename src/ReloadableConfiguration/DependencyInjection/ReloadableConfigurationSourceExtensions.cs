@@ -7,7 +7,7 @@ public static class ReloadableConfigurationSourceExtensions
 {
     /// <summary>
     /// Sets PeriodicalReload property of <see cref="IReloadableConfigurationSource"/> to true.
-    /// This tell the reloadable configuration provider to be periodically reloaded by <see cref="ConfigurationReloader"/> hosted service.
+    /// This tells the reloadable configuration provider to be reloaded periodically by <see cref="ConfigurationReloader"/> hosted service.
     /// </summary>
     /// <typeparam name="TSource">A type of <see cref="IReloadableConfigurationSource"/>.</typeparam>
     /// <param name="source">Instance of <see cref="IReloadableConfigurationSource"/> type or it`s descendant.</param>

@@ -14,13 +14,17 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Deterministic>true</Deterministic>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ReloadableConfiguration\ReloadableConfiguration.csproj" />
   </ItemGroup>
 
 </Project>

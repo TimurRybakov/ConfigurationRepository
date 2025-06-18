@@ -1,8 +1,7 @@
-using ConfigurationRepository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 
-namespace ParametrizedConfiguration;
+namespace ConfigurationRepository;
 
 /// <summary>
 /// Provider that provides parametrization of underlying configuration with substitution from it`s own values.

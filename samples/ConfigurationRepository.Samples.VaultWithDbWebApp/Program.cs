@@ -2,7 +2,6 @@ using VaultSharp;
 using VaultSharp.Extensions.Configuration;
 using VaultSharp.V1.AuthMethods.Token;
 using VaultSharp.V1.AuthMethods;
-using ParametrizedConfiguration;
 using ConfigurationRepository.Dapper;
 using ConfigurationRepository;
 using Microsoft.Data.SqlClient;

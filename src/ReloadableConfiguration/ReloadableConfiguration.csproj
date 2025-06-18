@@ -5,9 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Authors>Timur Rybakov</Authors>
-    <Description>Configuration repository provider that stored in an MS SQL Server database and accessed via SqlClient library.</Description>
+    <Description>Reloadable configuration marker class with reloading background service. Used for configuration provaiders that needs external service for periodical reload.</Description>
     <Copyright>Copyright Timur Rybakov</Copyright>
-    <PackageTags>configuration-repository-provider;configuration-storage-sql-client;configuration-storage-sql;configuration-storage;configuration-repository;configuration;repository;storage;ms-sql;</PackageTags>
+    <PackageTags>reloadable-configuration;reload-configuration-provider;configuration;configuration-reloader;configuration-updater;</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
@@ -16,15 +16,12 @@
     <Deterministic>true</Deterministic>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Version>1.0.0</Version>
-    <RootNamespace>ConfigurationRepository</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\ConfigurationRepository\ConfigurationRepository.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,7 @@
 
-using ConfigurationRepository;
 using Microsoft.Extensions.Configuration;
 
-namespace ParametrizedConfiguration;
+namespace ConfigurationRepository;
 
 /// <summary>
 /// A configuration source for creating <see cref="ParametrizedConfigurationProvider"/>.

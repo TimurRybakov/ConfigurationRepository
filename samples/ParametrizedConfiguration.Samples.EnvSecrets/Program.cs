@@ -1,5 +1,5 @@
-using ParametrizedConfiguration;
 using Microsoft.Extensions.Configuration;
+using ConfigurationRepository;
 
 // Assume secrets are set via environment variables somewere outside this code,
 // we set them here just for clarity:

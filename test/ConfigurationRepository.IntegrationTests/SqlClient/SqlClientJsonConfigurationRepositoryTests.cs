@@ -2,7 +2,6 @@ using System.Data;
 using ConfigurationRepository.SqlClient;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using ParametrizedConfiguration;
 
 namespace ConfigurationRepository.IntegrationTests;
 

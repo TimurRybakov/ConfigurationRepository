@@ -1,9 +1,8 @@
 
-using ConfigurationRepository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ParametrizedConfiguration;
+namespace ConfigurationRepository;
 
 /// <summary>
 /// Extension methods for <see cref="IConfigurationBuilder"/>.

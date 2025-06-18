@@ -1,4 +1,3 @@
-using ConfigurationRepository.Tests.Integrational;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

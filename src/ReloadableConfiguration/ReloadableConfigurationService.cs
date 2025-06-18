@@ -6,15 +6,14 @@ namespace ConfigurationRepository;
 /// A service that is to be registered in DI-container to mark the underlying configuration for configuration reload service"/>.
 /// </summary>
 /// <typeparam name="TService"></typeparam>
-internal sealed class ReloadableConfigurationService<TService> : IReloadableConfigurationService<TService>
+internal sealed class ReloadableConfigurationService<TService>(
+    IConfiguration configuration) : IReloadableConfigurationService<TService>
 {
-    public ReloadableConfigurationService(IConfiguration configuration) =>
-        Configuration = configuration;
 
     /// <summary>
     /// Configuration to be reloaded.
     /// </summary>
-    public IConfiguration Configuration { get; }
+    public IConfiguration Configuration { get; } = configuration;
 
     /// <summary>
     /// A type of marker class. Markers may be used by different reloaders.

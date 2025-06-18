@@ -1,5 +1,5 @@
 
-namespace ParametrizedConfiguration;
+namespace ConfigurationRepository;
 
 /// <summary>
 /// Represents a cyclic dependency error during configuration parametrization.
