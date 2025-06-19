@@ -46,7 +46,6 @@ public static class ConfigurationBuilderExtensions
                 new RepositoryDbContext(options));
 
         source.Repository = repository;
-        source.RetrievalStrategy = DictionaryRetrievalStrategy.Instance;
 
         configureSource?.Invoke(source);
 
@@ -98,8 +97,6 @@ public static class ConfigurationBuilderExtensions
             };
 
         source.Repository = repository;
-        source.ConfigurationParser = new JsonConfigurationParser();
-
         configureSource?.Invoke(source);
 
         return builder.Add(source);

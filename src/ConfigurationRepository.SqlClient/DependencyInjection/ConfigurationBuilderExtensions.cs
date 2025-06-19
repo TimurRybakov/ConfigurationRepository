@@ -21,13 +21,12 @@ public static class ConfigurationBuilderExtensions
     {
         var source = new ConfigurationRepositorySource();
         var repository = new SqlClientDictionaryConfigurationRepository();
+        repository.TryAddConnectionString(builder);
 
         source.Repository = repository;
 
         configureRepository.Invoke(repository);
         configureSource?.Invoke(source);
-
-        source.RetrievalStrategy ??= DictionaryRetrievalStrategy.Instance;
 
         return builder.Add(source);
     }
@@ -46,14 +45,26 @@ public static class ConfigurationBuilderExtensions
     {
         var source = new ParsableConfigurationRepositorySource();
         var repository = new SqlClientParsableConfigurationRepository();
+        repository.TryAddConnectionString(builder);
 
         source.Repository = repository;
 
         configureRepository.Invoke(repository);
         configureSource?.Invoke(source);
 
-        source.ConfigurationParser ??= new JsonConfigurationParser();
-
         return builder.Add(source);
+    }
+
+    private static SqlClientConfigurationRepository TryAddConnectionString(
+        this SqlClientConfigurationRepository repository,
+        IConfigurationBuilder builder)
+    {
+        var connectionString = builder.GetDatabaseConnectionString();
+        if (connectionString is not null)
+        {
+            repository.ConnectionString = connectionString;
+        }
+
+        return repository;
     }
 }

@@ -27,8 +27,6 @@ public static class ConfigurationBuilderExtensions
         configureRepository.Invoke(repository);
         configureSource?.Invoke(source);
 
-        source.RetrievalStrategy ??= DictionaryRetrievalStrategy.Instance;
-
         return builder.Add(source);
     }
 
@@ -51,8 +49,6 @@ public static class ConfigurationBuilderExtensions
 
         configureRepository.Invoke(repository);
         configureSource?.Invoke(source);
-
-        source.ConfigurationParser ??= new JsonConfigurationParser();
 
         return builder.Add(source);
     }

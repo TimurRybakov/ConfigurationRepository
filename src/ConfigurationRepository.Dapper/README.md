@@ -16,6 +16,8 @@ Let's assume that we have a database that stores a configuration table as key-va
 
 So then in our application Program.cs file we may add a configuration provider like this:
 > ```csharp
+> using ConfigurationRepository;
+>
 > var builder = WebApplication.CreateBuilder(args);
 > 
 > var connectionString = builder.Configuration.GetConnectionString("Dapper");
@@ -37,6 +39,8 @@ So then in our application Program.cs file we may add a configuration provider l
 
 If our database source can change at any time in any way we may also add configuration reloader that with periodically reload our configuration from database:
 > ```csharp
+> using ConfigurationRepository;
+>
 > var builder = WebApplication.CreateBuilder(args);
 > 
 > var connectionString = builder.Configuration.GetConnectionString("Dapper");
@@ -78,6 +82,8 @@ What if our config in database is too heavy to reload it frequently and we want 
 
 Then we make our configuration versioned by adding SelectCurrentVersionQuery to our repository:
 > ```csharp
+> using ConfigurationRepository;
+> 
 > var builder = WebApplication.CreateBuilder(args);
 > 
 > var connectionString = builder.Configuration.GetConnectionString("Dapper");

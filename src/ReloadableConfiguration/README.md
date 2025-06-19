@@ -19,7 +19,7 @@ will be parametrized into this:
 ```
 This can be used to hide sensitive data from publicly stored configurations or to reuse same configuration values in several places. The code below demonstrates this:
 > ```csharp
-> using ParametrizedConfiguration;
+> using ConfigurationRepository;
 > using Microsoft.Extensions.Configuration;
 > 
 > // Assume secrets are set via environment variables somewere outside this code,

@@ -15,6 +15,40 @@ Install-Package ConfigurationRepository
 ```
 dotnet add package ConfigurationRepository
 ```
+```csharp
+using ConfigurationRepository;
+
+var builder = WebApplication.CreateBuilder(args);
+
+var configDictData = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+{ { "DICT KEY", "DICT VALUE" } };
+
+builder.Configuration.AddDictionaryRepository(new InMemoryDictionaryRepository(configDictData));
+
+var configJsonData = """{"JSON KEY":"JSON VALUE"}""";
+
+builder.Configuration.AddParsableRepository(new InMemoryJsonRepository(configJsonData));
+
+var app = builder.Build();
+
+app.Run();
+
+class InMemoryDictionaryRepository(IDictionary<string, string?> configData) : IRepository
+{
+    public TData GetConfiguration<TData>()
+    {
+        return (TData)configData;
+    }
+}
+
+class InMemoryJsonRepository(string jsonConfig) : IRepository
+{
+    public TData GetConfiguration<TData>()
+    {
+        return (TData)Convert.ChangeType(jsonConfig, typeof(TData));
+    }
+}
+```
 
 # [Dapper configuration repository](/src/ConfigurationRepository.Dapper/README.md)
 

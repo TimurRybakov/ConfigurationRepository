@@ -16,6 +16,7 @@ public class ConfigurationRepositorySource : IReloadableConfigurationSource
 
     /// <summary>
     /// Strategy that will be used to retrieve configuration from repository.
+    /// <see cref="DictionaryRetrievalStrategy"/> is used by default if not set.
     /// </summary>
     [DisallowNull]
     public IRetrievalStrategy? RetrievalStrategy { get; set; }
@@ -48,7 +49,7 @@ public class ConfigurationRepositorySource : IReloadableConfigurationSource
     public virtual IConfigurationProvider Build(IConfigurationBuilder builder)
     {
         Repository ??= builder.GetConfigurationRepository() ?? throw new NullReferenceException($"{nameof(Repository)} is not set.");
-        _ = RetrievalStrategy ?? throw new NullReferenceException($"{nameof(RetrievalStrategy)} is not set.");
+        RetrievalStrategy ??= DictionaryRetrievalStrategy.Instance;
 
         return new ConfigurationRepositoryProvider(this);
     }

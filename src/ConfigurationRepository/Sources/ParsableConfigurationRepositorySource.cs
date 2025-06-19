@@ -8,15 +8,15 @@ namespace ConfigurationRepository;
 public class ParsableConfigurationRepositorySource : ConfigurationRepositorySource
 {
     /// <summary>
-    /// Parser to parse data from database.
+    /// Parser selector function, thart returns parser to parse data from a source.
     /// </summary>
-    public IConfigurationParser? ConfigurationParser { get; set; }
+    public Func<IConfigurationParser>? GetConfigurationParser { get; set; }
 
     /// <inheritdoc/>
     public override IConfigurationProvider Build(IConfigurationBuilder builder)
     {
-        ConfigurationParser ??= builder.GetParsableConfigurationParser();
-        RetrievalStrategy ??= new ParsableRetrievalStrategy(ConfigurationParser);
+        GetConfigurationParser ??= builder.GetConfigurationParserFactory() ?? (() => new JsonConfigurationParser());
+        RetrievalStrategy ??= new ParsableRetrievalStrategy(GetConfigurationParser);
 
         return base.Build(builder);
     }

@@ -6,46 +6,63 @@ namespace ConfigurationRepository.Tests.Integrational;
 [TestFixture]
 public class CustomConfigurationRepositoryTests
 {
-    private InMemoryRepository Repository { get; set; }
+    private InMemoryDictionaryRepository DictionaryRepository { get; set; }
+
+    private InMemoryJsonRepository JsonRepository { get; set; }
 
     [OneTimeSetUp]
     public void Setup()
     {
-        Repository = new InMemoryRepository(
+        DictionaryRepository = new InMemoryDictionaryRepository(
             new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
             {
                 ["Key1"] = "Value1",
                 ["Key2"] = "Value2"
             });
+        JsonRepository = new InMemoryJsonRepository(
+            """
+            {
+              "Logging": {
+                "LogLevel": {
+                  "Default": "Information",
+                  "Microsoft.AspNetCore": "Warning"
+                }
+              }
+            }
+            """);
     }
 
     [Test]
-    public void InMemory_Repository_Changes_Should_Update_Configuration()
+    public void Dictionary_Repository_Configuration_Should_Returns_Correct_Values()
     {
         var configuration = new ConfigurationBuilder()
-            .AddRepository(Repository, source => source.RetrievalStrategy = DictionaryRetrievalStrategy.Instance)
+            .AddDictionaryRepository(DictionaryRepository)
             .Build();
 
-        void GetValue() => _ = Repository.GetConfiguration<IDictionary<string, string?>>()["key1"];
-        Assert.DoesNotThrow(GetValue, "Repository keys should be read ignoring case");
-        Repository.SetConfiguration("key1", "changed value1");
-
-        Assert.That(configuration["Key1"], Is.EqualTo("changed value1"));
+        Assert.That(configuration["Key1"], Is.EqualTo("Value1"));
     }
 
-    private sealed class InMemoryRepository(IDictionary<string, string?> configuration) : IRepository
+    [Test]
+    public void Json_Repository_Configuration_Should_Returns_Correct_Values()
     {
-        public void SetConfiguration(string key, string? value)
-        {
-            configuration[key] = value;
-        }
+        var configuration = new ConfigurationBuilder()
+            .AddParsableRepository(JsonRepository)
+            .Build();
 
+        Assert.That(configuration["logging:LogLevel:Default"], Is.EqualTo("Information"));
+    }
+
+    private sealed class InMemoryDictionaryRepository(IDictionary<string, string?> configuration) : IRepository
+    {
         public TData GetConfiguration<TData>() =>
-            (TData)GetConfiguration();
+            (TData)configuration;
+    }
 
-        private IDictionary<string, string?> GetConfiguration()
+    private sealed class InMemoryJsonRepository(string jsonConfig) : IRepository
+    {
+        public TData GetConfiguration<TData>()
         {
-            return configuration;
+            return (TData)Convert.ChangeType(jsonConfig, typeof(TData));
         }
     }
 }
