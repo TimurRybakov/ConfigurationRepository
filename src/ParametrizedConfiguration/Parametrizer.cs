@@ -74,16 +74,16 @@ public static class Parametrizer
 
         for (int i = 0; ;)
         {
-            int open = value.IndexOf(parameterPlaceholderOpening, i);
+            int open = value.IndexOf(parameterPlaceholderOpening, i, StringComparison.Ordinal);
             if (open == -1) yield break; // Parameter placeholder opening not found
 
-            int close = value.IndexOf(parameterPlaceholderClosing, open + 1);
+            int close = value.IndexOf(parameterPlaceholderClosing, open + parameterPlaceholderOpening.Length, StringComparison.Ordinal);
             if (close == -1) yield break; // Parameter placeholder closing not found
 
-            var key = value.Substring(open + 1, close - open - 1);
-            yield return new Marker(open, close + 1, key);
+            var key = value.Substring(open + parameterPlaceholderOpening.Length, close - open - parameterPlaceholderOpening.Length);
+            yield return new Marker(open, close + parameterPlaceholderClosing.Length, key);
 
-            i = close + 1;
+            i = close + parameterPlaceholderClosing.Length;
         }
     }
 
@@ -121,8 +121,7 @@ public static class Parametrizer
     private static List<string> TopologicalSort(IDictionary<string, List<string>> graph)
     {
         var ordered  = new List<string>(graph.Count);
-        var visited  = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var visiting = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var states = new Dictionary<string, NodeState>(graph.Count, StringComparer.OrdinalIgnoreCase);
 
         foreach (var node in graph.Keys)
             Dfs(node);
@@ -132,21 +131,36 @@ public static class Parametrizer
 
         void Dfs(string node)
         {
-            if (!visiting.Add(node))
-                throw new CyclicDependencyException(
-                    $"Cyclic dependency detected on parameter '{node}'.");
+            ref var stateRef = ref CollectionsMarshal.GetValueRefOrAddDefault(states, node, out bool exists);
 
-            if (!visited.Add(node))
-                return;
+            if (exists)
+            {
+                if (stateRef == NodeState.Visiting)
+                    throw new CyclicDependencyException($"Cyclic dependency detected on parameter '{node}'.");
+
+                if (stateRef == NodeState.Visited)
+                    return;
+            }
+
+            stateRef = NodeState.Visiting;
 
             if (!graph.TryGetValue(node, out var children))
                 throw new InvalidOperationException($"Undefined parameter '{node}'.");
 
             foreach (var child in children)
+            {
                 Dfs(child);
+            }
 
-            visiting.Remove(node);
+            stateRef = NodeState.Visited;
             ordered.Add(node);
         }
     }
+
+    private enum NodeState : Byte
+    {
+        Visiting,
+        Visited
+    }
 }
+

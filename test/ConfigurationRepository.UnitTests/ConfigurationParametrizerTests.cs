@@ -132,6 +132,28 @@ internal class ConfigurationParametrizerTests
         CollectionAssert.AreEqual(configuration, dict);
     }
 
+
+    [Test]
+    public void Parametrization_Should_Work_With_Custom_Placehplders()
+    {
+        Dictionary<string, string?> configuration = new()
+        {
+            { "parameter", "value" },
+            { "Key", "%parameter% ${{parameter}} %parameter%" },
+        };
+
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(configuration)
+            .WithParametrization(configureSource =>
+            {
+                configureSource.ParameterPlaceholderOpening = "${{";
+                configureSource.ParameterPlaceholderClosing = "}}";
+            })
+            .Build();
+
+        Assert.That(config["Key"], Is.EqualTo("%parameter% value %parameter%"));
+    }
+
     /// <summary>
     /// Builds dictionary from <see cref="IConfigurationProvider"/> provider.
     /// </summary>
