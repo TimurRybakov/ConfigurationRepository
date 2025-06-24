@@ -1,0 +1,27 @@
+<Project>
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TargetFramework>net8.0</TargetFramework>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+        
+    <Version>1.1.0</Version>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <Authors>Timur Rybakov</Authors>
+    <Copyright>Copyright Timur Rybakov</Copyright>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

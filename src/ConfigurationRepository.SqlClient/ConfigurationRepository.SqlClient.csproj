@@ -1,34 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Authors>Timur Rybakov</Authors>
     <Description>Configuration repository provider that stored in an MS SQL Server database and accessed via SqlClient library.</Description>
-    <Copyright>Copyright Timur Rybakov</Copyright>
     <PackageTags>configuration-repository-provider;configuration-storage-sql-client;configuration-storage-sql;configuration-storage;configuration-repository;configuration;repository;storage;ms-sql;</PackageTags>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <Deterministic>true</Deterministic>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Version>1.0.0</Version>
     <RootNamespace>ConfigurationRepository</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ConfigurationRepository\ConfigurationRepository.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include=".\README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>

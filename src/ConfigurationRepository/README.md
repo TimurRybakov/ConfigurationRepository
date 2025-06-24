@@ -1,5 +1,5 @@
 # ConfigurationRepository
-A class library for ASP .NET Core applications for using databases as configuration repositories.
+An ASP .NET Core class library for using databases as configuration repositories.
 
 [![NuGet](https://img.shields.io/nuget/dt/ConfigurationRepository.svg)](https://www.nuget.org/packages/ConfigurationRepository)
 [![NuGet](https://img.shields.io/nuget/vpre/ConfigurationRepository.svg)](https://www.nuget.org/packages/ConfigurationRepository)

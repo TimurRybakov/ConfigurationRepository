@@ -1,29 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Authors>Timur Rybakov</Authors>
     <Description>Parametrized configuration provider. A configuration that may contain parameter placeholders replaceable with values. Parameter values substitute with keys from the same configuration.</Description>
-    <Copyright>Copyright Timur Rybakov</Copyright>
     <PackageTags>replaceable-configuration;configuration-placeholders;parametrized-configuration-provider;configuration;substitution;configuration-parametrization;</PackageTags>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <Deterministic>true</Deterministic>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ReloadableConfiguration\ReloadableConfiguration.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include=".\README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>
