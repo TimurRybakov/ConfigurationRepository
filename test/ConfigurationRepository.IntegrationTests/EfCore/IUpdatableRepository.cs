@@ -1,6 +1,6 @@
 namespace ConfigurationRepository.IntegrationTests;
 
-internal interface IUpdatableRepository : IRepository
+internal interface IUpdatableRepository : IConfigurationRepository
 {
     Task AddAsync(ConfigurationEntry entry);
 }

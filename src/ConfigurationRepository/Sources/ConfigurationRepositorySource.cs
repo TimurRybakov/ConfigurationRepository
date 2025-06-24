@@ -12,7 +12,7 @@ public class ConfigurationRepositorySource : IReloadableConfigurationSource
     /// The configuration storage repository.
     /// </summary>
     [DisallowNull]
-    public IRepository? Repository { get; set; }
+    public IConfigurationRepository? Repository { get; set; }
 
     /// <summary>
     /// Strategy that will be used to retrieve configuration from repository.

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ConfigurationRepository.IntegrationTests;
 
-internal sealed class EntryRepository(RepositoryDbContext context) : IUpdatableRepository
+internal sealed class EntryRepository(ConfigurationRepositoryDbContext context) : IUpdatableRepository
 {
     public IRetrievalStrategy RetrievalStrategy { get; } = DictionaryRetrievalStrategy.Instance;
 

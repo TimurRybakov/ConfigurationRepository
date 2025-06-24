@@ -12,7 +12,7 @@ public class DictionaryRetrievalStrategy : IRetrievalStrategy
     public static readonly DictionaryRetrievalStrategy Instance = new ();
 
     /// <inheritdoc/>
-    public IDictionary<string, string?> RetrieveConfiguration(IRepository repository)
+    public IDictionary<string, string?> RetrieveConfiguration(IConfigurationRepository repository)
     {
         return repository.GetConfiguration<IDictionary<string, string?>>();
     }

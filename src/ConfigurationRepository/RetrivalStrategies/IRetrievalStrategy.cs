@@ -10,5 +10,5 @@ public interface IRetrievalStrategy
     /// </summary>
     /// <param name="repository">A repository that stores configuration.</param>
     /// <returns>Configuration as dictionary.</returns>
-    IDictionary<string, string?> RetrieveConfiguration(IRepository repository);
+    IDictionary<string, string?> RetrieveConfiguration(IConfigurationRepository repository);
 }

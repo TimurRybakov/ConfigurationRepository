@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace ConfigurationRepository;
 
 /// <summary>
-/// A single configuration entry stored in an <see cref="IRepository"/>.
+/// A single configuration entry stored in an <see cref="IConfigurationRepository"/>.
 /// </summary>
 public interface IConfigurationEntry
 {

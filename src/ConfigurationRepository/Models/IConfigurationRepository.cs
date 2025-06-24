@@ -5,7 +5,7 @@ namespace ConfigurationRepository;
 /// <summary>
 /// A storage for <see cref="IConfigurationProvider"/> to access a configuration.
 /// </summary>
-public interface IRepository
+public interface IConfigurationRepository
 {
     /// <summary>
     /// Gets configuration of type TData.

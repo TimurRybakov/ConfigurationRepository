@@ -6,8 +6,8 @@ namespace ConfigurationRepository.EntityFramework;
 /// A dictionary repository that uses Ef Core to fetch data from database.
 /// Configuration is stored in key-value pairs.
 /// </summary>
-internal sealed class EfDictionaryConfigurationRepository<TDbContext, TEntry>(TDbContext dbContext) : IRepository
-    where TDbContext : DbContext, IRepositoryDbContext<TEntry>
+internal sealed class EfDictionaryConfigurationRepository<TDbContext, TEntry>(TDbContext dbContext) : IConfigurationRepository
+    where TDbContext : DbContext, IConfigurationRepositoryDbContext<TEntry>
     where TEntry : class, IConfigurationEntry
 {
     public TData GetConfiguration<TData>() => (TData)(IDictionary<string, string?>)GetConfiguration();

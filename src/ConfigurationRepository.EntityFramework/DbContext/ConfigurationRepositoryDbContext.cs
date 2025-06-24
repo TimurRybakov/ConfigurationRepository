@@ -5,8 +5,8 @@ namespace ConfigurationRepository.EntityFramework;
 /// <summary>
 /// Configuration repository database context.
 /// </summary>
-public class RepositoryDbContext(DbContextOptions<RepositoryDbContext> options)
-    : DbContext(options), IRepositoryDbContext<ConfigurationEntry>
+public class ConfigurationRepositoryDbContext(DbContextOptions<ConfigurationRepositoryDbContext> options)
+    : DbContext(options), IConfigurationRepositoryDbContext<ConfigurationEntry>
 {
     private readonly RepositoryDbContextOptions _options = options.FindExtension<RepositoryDbContextOptions>()
             ?? throw new InvalidOperationException($"{nameof(RepositoryDbContextOptions)} instance not found. Configure options with UseTable() extension method.");

@@ -125,13 +125,13 @@ public class CustomConfigurationRepositoryTests
         }
     }
 
-    private sealed class InMemoryDictionaryRepository(IDictionary<string, string?> configuration) : IRepository
+    private sealed class InMemoryDictionaryRepository(IDictionary<string, string?> configuration) : IConfigurationRepository
     {
         public TData GetConfiguration<TData>() =>
             (TData)configuration;
     }
 
-    private sealed class InMemoryJsonRepository(string jsonConfig) : IRepository
+    private sealed class InMemoryJsonRepository(string jsonConfig) : IConfigurationRepository
     {
         public string JsonConfig { get; set; } = jsonConfig;
 

@@ -6,7 +6,7 @@ namespace ConfigurationRepository.EntityFramework;
 /// Configuration repository database context abstraction.
 /// </summary>
 /// <typeparam name="TEntry"></typeparam>
-public interface IRepositoryDbContext<TEntry>
+public interface IConfigurationRepositoryDbContext<TEntry>
     where TEntry : class, IConfigurationEntry
 {
     /// <summary>

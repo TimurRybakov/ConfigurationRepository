@@ -8,15 +8,15 @@ namespace ConfigurationRepository;
 public static class ConfigurationBuilderExtensions
 {
     /// <summary>
-    /// Adds an <see cref="IRepository"/> object to <paramref name="builder"/>.
+    /// Adds an <see cref="IConfigurationRepository"/> object to <paramref name="builder"/>.
     /// </summary>
-    /// <param name="builder">A configuration builder instance for adding <see cref="IRepository"/> or it`s descendant.</param>
-    /// <param name="repository">An <see cref="IRepository"/> object.</param>
+    /// <param name="builder">A configuration builder instance for adding <see cref="IConfigurationRepository"/> or it`s descendant.</param>
+    /// <param name="repository">An <see cref="IConfigurationRepository"/> object.</param>
     /// <param name="configureSource">If set, configures <see cref="ConfigurationRepositorySource"/>.</param>
     /// <returns>An <see cref="IConfigurationBuilder"/>.</returns>
     public static IConfigurationBuilder AddRepository<TSource>(
         this IConfigurationBuilder builder,
-        IRepository repository,
+        IConfigurationRepository repository,
         Action<TSource>? configureSource = null)
         where TSource : ConfigurationRepositorySource, new()
     {
@@ -31,15 +31,15 @@ public static class ConfigurationBuilderExtensions
     }
 
     /// <summary>
-    /// Adds an <see cref="IRepository"/> object to <paramref name="builder"/> with <see cref="DictionaryRetrievalStrategy"/>.
+    /// Adds an <see cref="IConfigurationRepository"/> object to <paramref name="builder"/> with <see cref="DictionaryRetrievalStrategy"/>.
     /// </summary>
-    /// <param name="builder">A configuration builder instance for adding <see cref="IRepository"/> or it`s descendant.</param>
-    /// <param name="repository">An <see cref="IRepository"/> object.</param>
+    /// <param name="builder">A configuration builder instance for adding <see cref="IConfigurationRepository"/> or it`s descendant.</param>
+    /// <param name="repository">An <see cref="IConfigurationRepository"/> object.</param>
     /// <param name="configureSource">If set, configures <see cref="ConfigurationRepositorySource"/>.</param>
     /// <returns>An <see cref="IConfigurationBuilder"/>.</returns>
     public static IConfigurationBuilder AddDictionaryRepository<TSource>(
         this IConfigurationBuilder builder,
-        IRepository repository,
+        IConfigurationRepository repository,
         Action<TSource>? configureSource = null)
         where TSource : ConfigurationRepositorySource, new()
     {
@@ -55,10 +55,10 @@ public static class ConfigurationBuilderExtensions
     }
 
     /// <summary>
-    /// Adds an <see cref="IRepository"/> object to <paramref name="builder"/> with <see cref="ParsableRetrievalStrategy"/>.
+    /// Adds an <see cref="IConfigurationRepository"/> object to <paramref name="builder"/> with <see cref="ParsableRetrievalStrategy"/>.
     /// </summary>
-    /// <param name="builder">A configuration builder instance for adding <see cref="IRepository"/> or it`s descendant.</param>
-    /// <param name="repository">An <see cref="IRepository"/> object.</param>
+    /// <param name="builder">A configuration builder instance for adding <see cref="IConfigurationRepository"/> or it`s descendant.</param>
+    /// <param name="repository">An <see cref="IConfigurationRepository"/> object.</param>
     /// <param name="parserFactory">A factory method that returns an instance of
     /// configuration parser to be used for parsing data being loaded from repository. If not specified then a factory
     /// creating instance of <see cref="JsonConfigurationParser"/> is used by default.</param>
@@ -66,7 +66,7 @@ public static class ConfigurationBuilderExtensions
     /// <returns>An <see cref="IConfigurationBuilder"/>.</returns>
     public static IConfigurationBuilder AddParsableRepository<TSource>(
         this IConfigurationBuilder builder,
-        IRepository repository,
+        IConfigurationRepository repository,
         Func<IConfigurationParser>? parserFactory = null,
         Action<TSource>? configureSource = null)
         where TSource : ConfigurationRepositorySource, new()
@@ -85,40 +85,40 @@ public static class ConfigurationBuilderExtensions
     }
 
     /// <summary>
-    /// Adds an <see cref="IRepository"/> object to <paramref name="builder"/>.
+    /// Adds an <see cref="IConfigurationRepository"/> object to <paramref name="builder"/>.
     /// </summary>
-    /// <param name="builder">A configuration builder instance for adding <see cref="IRepository"/>.</param>
-    /// <param name="repository">An <see cref="IRepository"/> object.</param>
+    /// <param name="builder">A configuration builder instance for adding <see cref="IConfigurationRepository"/>.</param>
+    /// <param name="repository">An <see cref="IConfigurationRepository"/> object.</param>
     /// <param name="configureSource">If set, configures <see cref="ConfigurationRepositorySource"/>.</param>
     /// <returns>An <see cref="IConfigurationBuilder"/>.</returns>
     public static IConfigurationBuilder AddRepository(
         this IConfigurationBuilder builder,
-        IRepository repository,
+        IConfigurationRepository repository,
         Action<ConfigurationRepositorySource>? configureSource = null)
     {
         return builder.AddRepository<ConfigurationRepositorySource>(repository, configureSource);
     }
 
     /// <summary>
-    /// Adds an <see cref="IRepository"/> object to <paramref name="builder"/> with <see cref="DictionaryRetrievalStrategy"/>.
+    /// Adds an <see cref="IConfigurationRepository"/> object to <paramref name="builder"/> with <see cref="DictionaryRetrievalStrategy"/>.
     /// </summary>
-    /// <param name="builder">A configuration builder instance for adding <see cref="IRepository"/>.</param>
-    /// <param name="repository">An <see cref="IRepository"/> object.</param>
+    /// <param name="builder">A configuration builder instance for adding <see cref="IConfigurationRepository"/>.</param>
+    /// <param name="repository">An <see cref="IConfigurationRepository"/> object.</param>
     /// <param name="configureSource">If set, configures <see cref="ConfigurationRepositorySource"/>.</param>
     /// <returns>An <see cref="IConfigurationBuilder"/>.</returns>
     public static IConfigurationBuilder AddDictionaryRepository(
         this IConfigurationBuilder builder,
-        IRepository repository,
+        IConfigurationRepository repository,
         Action<ConfigurationRepositorySource>? configureSource = null)
     {
         return builder.AddDictionaryRepository<ConfigurationRepositorySource>(repository, configureSource);
     }
 
     /// <summary>
-    /// Adds an <see cref="IRepository"/> object to <paramref name="builder"/> with <see cref="DictionaryRetrievalStrategy"/>.
+    /// Adds an <see cref="IConfigurationRepository"/> object to <paramref name="builder"/> with <see cref="DictionaryRetrievalStrategy"/>.
     /// </summary>
-    /// <param name="builder">A configuration builder instance for adding <see cref="IRepository"/>.</param>
-    /// <param name="repository">An <see cref="IRepository"/> object.</param>
+    /// <param name="builder">A configuration builder instance for adding <see cref="IConfigurationRepository"/>.</param>
+    /// <param name="repository">An <see cref="IConfigurationRepository"/> object.</param>
     /// <param name="parserFactory">A factory method that returns an instance of
     /// configuration parser to be used for parsing data being loaded from repository. If not specified then a factory
     /// creating instance of <see cref="JsonConfigurationParser"/> is used by default.</param>
@@ -126,7 +126,7 @@ public static class ConfigurationBuilderExtensions
     /// <returns>An <see cref="IConfigurationBuilder"/>.</returns>
     public static IConfigurationBuilder AddParsableRepository(
         this IConfigurationBuilder builder,
-        IRepository repository,
+        IConfigurationRepository repository,
         Func<IConfigurationParser>? parserFactory = null,
         Action<ConfigurationRepositorySource>? configureSource = null)
     {
@@ -225,16 +225,16 @@ public static class ConfigurationBuilderExtensions
     }
 
     /// <summary>
-    /// Gets the <see cref="IRepository"/> that will be used to store configurations.
+    /// Gets the <see cref="IConfigurationRepository"/> that will be used to store configurations.
     /// </summary>
     /// <param name="builder">An <see cref="IConfigurationBuilder"/>.</param>
-    /// <returns>An <see cref="IRepository"/>.</returns>
-    public static IRepository? GetConfigurationRepository(this IConfigurationBuilder builder)
+    /// <returns>An <see cref="IConfigurationRepository"/>.</returns>
+    public static IConfigurationRepository? GetConfigurationRepository(this IConfigurationBuilder builder)
     {
         _ = builder ?? throw new ArgumentNullException(nameof(builder));
 
         return (builder.Properties.TryGetValue(RepositoryKey, out object? repository))
-            ? (IRepository)repository : null;
+            ? (IConfigurationRepository)repository : null;
     }
 
     private const string RepositoryKey = "ConfigurationRepository:Key";

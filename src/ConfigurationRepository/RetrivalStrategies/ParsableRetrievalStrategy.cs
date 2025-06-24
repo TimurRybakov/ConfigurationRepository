@@ -10,7 +10,7 @@ namespace ConfigurationRepository;
 public class ParsableRetrievalStrategy(Func<IConfigurationParser> parserFactory) : IRetrievalStrategy
 {
     /// <inheritdoc/>
-    public IDictionary<string, string?> RetrieveConfiguration(IRepository repository)
+    public IDictionary<string, string?> RetrieveConfiguration(IConfigurationRepository repository)
     {
         var data = repository.GetConfiguration<string>();
 

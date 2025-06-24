@@ -14,7 +14,7 @@ public class EfCoreDictionaryConfigurationRepositoryTests
     {
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Repository_Should_Return_Same_Value_As_Saved));
-        await using var context = new RepositoryDbContext(options);
+        await using var context = new ConfigurationRepositoryDbContext(options);
         var repository = new EntryRepository(context);
         var entry = new ConfigurationEntry { Key = "Host", Value = "127.0.0.1" };
 
@@ -33,7 +33,7 @@ public class EfCoreDictionaryConfigurationRepositoryTests
     {
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Parametrized_Repository_Should_Return_Same_Value_As_Saved));
-        await using var context = new RepositoryDbContext(options);
+        await using var context = new ConfigurationRepositoryDbContext(options);
         var repository = new EntryRepository(context);
 
         // Act
@@ -65,7 +65,7 @@ public class EfCoreDictionaryConfigurationRepositoryTests
     {
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Repository_With_Reloader_Should_Periodically_Reload));
-        await using var context = new RepositoryDbContext(options);
+        await using var context = new ConfigurationRepositoryDbContext(options);
         var repository = new EntryRepository(context);
         var entry = new ConfigurationEntry { Key = "Key", Value = "Value" };
 
@@ -114,7 +114,7 @@ public class EfCoreDictionaryConfigurationRepositoryTests
     {
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Parametrized_Repository_With_Reloader_Should_Periodically_Reload));
-        await using var context = new RepositoryDbContext(options);
+        await using var context = new ConfigurationRepositoryDbContext(options);
         var repository = new EntryRepository(context);
 
         // Act
@@ -171,9 +171,9 @@ public class EfCoreDictionaryConfigurationRepositoryTests
         Assert.That(configuration["ConnectionString"], Is.EqualTo(savedEntry.Value));
     }
 
-    private static DbContextOptions<RepositoryDbContext> GetDbContextOptions(string databaseName)
+    private static DbContextOptions<ConfigurationRepositoryDbContext> GetDbContextOptions(string databaseName)
     {
-        var options = new DbContextOptionsBuilder<RepositoryDbContext>();
+        var options = new DbContextOptionsBuilder<ConfigurationRepositoryDbContext>();
         options
             .UseInMemoryDatabase(databaseName)
             .UseTable(tableName: "testConfiguration");

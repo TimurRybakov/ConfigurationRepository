@@ -33,7 +33,7 @@ var app = builder.Build();
 
 app.Run();
 
-class InMemoryDictionaryRepository(IDictionary<string, string?> configData) : IRepository
+class InMemoryDictionaryRepository(IDictionary<string, string?> configData) : IConfigurationRepository
 {
     public TData GetConfiguration<TData>()
     {
@@ -41,7 +41,7 @@ class InMemoryDictionaryRepository(IDictionary<string, string?> configData) : IR
     }
 }
 
-class InMemoryJsonRepository(string jsonConfig) : IRepository
+class InMemoryJsonRepository(string jsonConfig) : IConfigurationRepository
 {
     public TData GetConfiguration<TData>()
     {

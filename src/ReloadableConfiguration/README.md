@@ -23,7 +23,10 @@ var builder = WebApplication.CreateBuilder(args);
 var configDictData = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
 { { "DICT KEY", "DICT VALUE" } };
 
-builder.Configuration.AddDictionaryRepository(new InMemoryDictionaryRepository(configDictData));
+builder.Configuration
+    .AddParsableRepository(
+        new InMemoryDictionaryRepository(configDictData),
+        configureSource: source => source.WithPeriodicalReload());
 
 var configJsonData = """{"JSON KEY":"JSON VALUE"}""";
 
@@ -33,15 +36,7 @@ var app = builder.Build();
 
 app.Run();
 
-class InMemoryDictionaryRepository(IDictionary<string, string?> configData) : IRepository
-{
-    public TData GetConfiguration<TData>()
-    {
-        return (TData)configData;
-    }
-}
-
-class InMemoryJsonRepository(string jsonConfig) : IRepository
+class InMemoryJsonRepository(string jsonConfig) : IConfigurationRepository
 {
     public TData GetConfiguration<TData>()
     {

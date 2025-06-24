@@ -20,7 +20,7 @@ public static class ConfigurationBuilderExtensions
         Action<DbContextOptionsBuilder> configureOptions,
         Action<ConfigurationRepositorySource>? configureSource = null)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<RepositoryDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<ConfigurationRepositoryDbContext>();
 
         configureOptions.Invoke(optionsBuilder);
 
@@ -36,14 +36,14 @@ public static class ConfigurationBuilderExtensions
     /// <returns>An <see cref="IConfigurationBuilder"/> instance.</returns>
     public static IConfigurationBuilder AddEfCoreRepository(
         this IConfigurationBuilder builder,
-        DbContextOptions<RepositoryDbContext> options,
+        DbContextOptions<ConfigurationRepositoryDbContext> options,
         Action<ConfigurationRepositorySource>? configureSource = null)
     {
         var source = new ConfigurationRepositorySource();
 
         var repository =
-            new EfDictionaryConfigurationRepository<RepositoryDbContext, ConfigurationEntry>(
-                new RepositoryDbContext(options));
+            new EfDictionaryConfigurationRepository<ConfigurationRepositoryDbContext, ConfigurationEntry>(
+                new ConfigurationRepositoryDbContext(options));
 
         source.Repository = repository;
 
@@ -66,7 +66,7 @@ public static class ConfigurationBuilderExtensions
         Action<DbContextOptionsBuilder> configureOptions,
         Action<ConfigurationRepositorySource>? configureSource = null)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<RepositoryDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<ConfigurationRepositoryDbContext>();
 
         configureOptions.Invoke(optionsBuilder);
 
@@ -84,14 +84,14 @@ public static class ConfigurationBuilderExtensions
     public static IConfigurationBuilder AddEfCoreJsonRepository(
         this IConfigurationBuilder builder,
         string key,
-        DbContextOptions<RepositoryDbContext> options,
+        DbContextOptions<ConfigurationRepositoryDbContext> options,
         Action<ParsableConfigurationRepositorySource>? configureSource = null)
     {
         var source = new ParsableConfigurationRepositorySource();
 
         var repository =
-            new EfParsableConfigurationRepository<RepositoryDbContext, ConfigurationEntry>(
-                new RepositoryDbContext(options))
+            new EfParsableConfigurationRepository<ConfigurationRepositoryDbContext, ConfigurationEntry>(
+                new ConfigurationRepositoryDbContext(options))
             {
                 Key = key
             };

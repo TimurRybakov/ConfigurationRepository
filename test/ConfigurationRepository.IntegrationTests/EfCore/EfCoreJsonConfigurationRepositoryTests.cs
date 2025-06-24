@@ -17,7 +17,7 @@ public class EfCoreJsonConfigurationRepositoryTests
     {
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Json_Repository_Should_Return_Same_Value_As_Saved));
-        await using var context = new RepositoryDbContext(options);
+        await using var context = new ConfigurationRepositoryDbContext(options);
         var repository = new EntryRepository(context);
         var entry = new ConfigurationEntry { Key = Key, Value = """{"Host":"127.0.0.1"}""" };
 
@@ -36,7 +36,7 @@ public class EfCoreJsonConfigurationRepositoryTests
     {
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Parametrized_Json_Repository_Should_Return_Same_Value_As_Saved));
-        await using var context = new RepositoryDbContext(options);
+        await using var context = new ConfigurationRepositoryDbContext(options);
         var repository = new EntryRepository(context);
         var entry = new ConfigurationEntry
         {
@@ -60,7 +60,7 @@ public class EfCoreJsonConfigurationRepositoryTests
     {
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Json_Repository_With_Reloader_Should_Periodically_Reload));
-        await using var context = new RepositoryDbContext(options);
+        await using var context = new ConfigurationRepositoryDbContext(options);
         var repository = new EntryRepository(context);
         var entry = new ConfigurationEntry { Key = Key, Value = """{"Host":"127.0.0.1"}""" };
 
@@ -106,7 +106,7 @@ public class EfCoreJsonConfigurationRepositoryTests
     {
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Parametrized_Json_Repository_With_Reloader_Should_Periodically_Reload));
-        await using var context = new RepositoryDbContext(options);
+        await using var context = new ConfigurationRepositoryDbContext(options);
         var repository = new EntryRepository(context);
         var entry = new ConfigurationEntry
         {
@@ -152,9 +152,9 @@ public class EfCoreJsonConfigurationRepositoryTests
         Assert.That(configuration["Host"], Is.EqualTo("192.168.0.1"));
     }
 
-    private static DbContextOptions<RepositoryDbContext> GetDbContextOptions(string databaseName)
+    private static DbContextOptions<ConfigurationRepositoryDbContext> GetDbContextOptions(string databaseName)
     {
-        var options = new DbContextOptionsBuilder<RepositoryDbContext>();
+        var options = new DbContextOptionsBuilder<ConfigurationRepositoryDbContext>();
         options
             .UseInMemoryDatabase(databaseName)
             .UseTable(tableName: "testConfiguration");

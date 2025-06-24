@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 namespace ConfigurationRepository;
 
 /// <summary>
-/// A single configuration entry stored in an <see cref="IRepository"/>.
+/// A single configuration entry stored in an <see cref="IConfigurationRepository"/>.
 /// </summary>
 public class ConfigurationEntry : IConfigurationEntry
 {

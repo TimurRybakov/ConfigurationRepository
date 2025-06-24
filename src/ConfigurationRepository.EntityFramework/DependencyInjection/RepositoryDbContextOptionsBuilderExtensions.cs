@@ -12,7 +12,7 @@ public static class RepositoryDbContextOptionsBuilderExtensions
     /// <summary>
     /// Configures table for <see cref="DbContextOptionsBuilder{TContext}"/>.
     /// </summary>
-    /// <typeparam name="TContext">Type of <see cref="RepositoryDbContext"/> or it`s descendant.</typeparam>
+    /// <typeparam name="TContext">Type of <see cref="ConfigurationRepositoryDbContext"/> or it`s descendant.</typeparam>
     /// <param name="optionsBuilder">Database context options builder.</param>
     /// <param name="tableName">Configuration table name in the database.</param>
     /// <param name="schemaName">Schema name of the configuration table.</param>
@@ -23,7 +23,7 @@ public static class RepositoryDbContextOptionsBuilderExtensions
         string tableName,
         string? schemaName = null,
         Action<RepositoryDbContextOptions>? configurator = null)
-        where TContext : RepositoryDbContext
+        where TContext : ConfigurationRepositoryDbContext
     {
         var extension = (optionsBuilder.Options.FindExtension<RepositoryDbContextOptions>()
                 ?? new RepositoryDbContextOptions());
