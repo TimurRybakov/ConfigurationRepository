@@ -1,24 +1,8 @@
-# ReloadableConfiguration
-An ASP .NET Core class library for using databases as configuration repositories.
-
-[![NuGet](https://img.shields.io/nuget/dt/ReloadableConfiguration.svg)](https://www.nuget.org/packages/ReloadableConfiguration)
-[![NuGet](https://img.shields.io/nuget/vpre/ReloadableConfiguration.svg)](https://www.nuget.org/packages/ReloadableConfiguration)
-
-### Installation:
-
-+ from [NuGet](https://www.nuget.org/packages/ReloadableConfiguration);
-+ from package manager console:
-```
-Install-Package ReloadableConfiguration
-```    
-+ from command line:
-```
-dotnet add package ReloadableConfiguration
-```
-The following sample explains how to define a configuration repository that is periodically reloaded to update it\`s configuration if provider data changes. A working example you may find in [ReloadableRepository.ParsableInMemory sample project on github](../../samples/ReloadableRepository.ParsableInMemory).
-```csharp
 using ConfigurationRepository;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,14 +30,19 @@ builder.Services.AddConfigurationReloader(
     builder.Configuration,
     TimeSpan.FromSeconds(0.5));
 
+// Register hosted service ConfigTestService.
+builder.Services.AddHostedService<ConfigTestService>();
+// Add our repository to service colletion just to be able to
+// inject it into constructor of ConfigTestService afterwards.
+builder.Services.AddSingleton(x => repository);
+
 var app = builder.Build();
 
 app.Run();
 
 // In memory configuration repository that takes a json and returns
 // it to a configuration parser. JsonConfig can be set outside to
-// simulate external repository changes. This class just demonstrates
-// a minimal parsable repository implementation.
+// simulate external repository changes.
 class InMemoryJsonRepository(string jsonConfig)
     : IConfigurationRepository
 {
@@ -64,4 +53,31 @@ class InMemoryJsonRepository(string jsonConfig)
         return (TData)Convert.ChangeType(JsonConfig, typeof(TData));
     }
 }
-```
+
+// This hosted service when started demonstrates how configuration
+// changes are updated by ConfigurationReloader hosted service.
+class ConfigTestService(
+    InMemoryJsonRepository repository, IConfiguration configuration) : IHostedService
+{
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        // Return current value from configuration.
+        Console.WriteLine(configuration["JSON KEY"]);
+
+        // Change configuration.
+        repository.JsonConfig = """{"JSON KEY": "JSON VALUE CHANGED"}""";
+
+        // Wait for reload to happen.
+        await Task.Delay(TimeSpan.FromSeconds(1));
+
+        // Return changed value from configuration.
+        Console.WriteLine(configuration["JSON KEY"]);
+
+        return;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+}

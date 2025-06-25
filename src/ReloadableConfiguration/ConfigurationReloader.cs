@@ -20,7 +20,7 @@ public sealed class ConfigurationReloader(
     /// <inheritdoc/>
     public override void Dispose()
     {
-        _timer.Dispose();
+        _timer.Dispose();   
     }
 
     /// <inheritdoc/>

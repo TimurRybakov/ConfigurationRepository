@@ -33,6 +33,37 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
+    /// Adds <see cref="ConfigurationReloader"/> hosted service to <paramref name="services"/>
+    /// with TService marker class.
+    /// </summary>
+    /// <param name="services">A collection of services.</param>
+    /// <param name="configuration">A configuration to be bounded with <see cref="IReloadableConfigurationService"/> service.</param>
+    /// <param name="period">A time span for <see cref="ConfigurationReloader"/> to wait between reloads.</param>
+    /// <returns>A collection of services.</returns>
+    public static IServiceCollection AddConfigurationReloader<TService>(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        TimeSpan? period = null) =>
+        services
+            .AddReloadableConfigurationService<TService>(configuration)
+            .AddConfigurationReloader(period);
+
+    /// <summary>
+    /// Adds <see cref="ConfigurationReloader"/> hosted service to <paramref name="services"/>
+    /// with default <see cref="ReloadableConfiguration"/> marker class.
+    /// </summary>
+    /// <param name="services">A collection of services.</param>
+    /// <param name="configuration">A configuration to be bounded with <see cref="IReloadableConfigurationService"/> service.</param>
+    /// <param name="period">A time span for <see cref="ConfigurationReloader"/> to wait between reloads.</param>
+    /// <returns>A collection of services.</returns>
+    public static IServiceCollection AddConfigurationReloader(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        TimeSpan? period = null) =>
+        services
+            .AddConfigurationReloader<ReloadableConfiguration>(configuration, period);
+
+    /// <summary>
     /// Adds new <see cref="IReloadableConfigurationService"/> service and it`s generic version to <paramref name="services"/>.
     /// </summary>
     /// <typeparam name="TService">A generic type of a marker class.</typeparam>
@@ -64,36 +95,4 @@ public static class ServiceCollectionExtensions
     {
         return services.AddReloadableConfigurationService<ReloadableConfiguration>(configuration);
     }
-
-    /// <summary>
-    /// Adds <see cref="ConfigurationReloader"/> hosted service to <paramref name="services"/>
-    /// with TService marker class.
-    /// </summary>
-    /// <param name="services">A collection of services.</param>
-    /// <param name="configuration">A configuration to be bounded with <see cref="IReloadableConfigurationService"/> service.</param>
-    /// <param name="period">A time span for <see cref="ConfigurationReloader"/> to wait between reloads.</param>
-    /// <returns>A collection of services.</returns>
-    public static IServiceCollection AddConfigurationReloader<TService>(
-        this IServiceCollection services,
-        IConfiguration configuration,
-        TimeSpan? period = null) =>
-        services
-            .AddReloadableConfigurationService<TService>(configuration)
-            .AddConfigurationReloader(period);
-
-    /// <summary>
-    /// Adds <see cref="ConfigurationReloader"/> hosted service to <paramref name="services"/>
-    /// with default <see cref="ReloadableConfiguration"/> marker class.
-    /// </summary>
-    /// <param name="services">A collection of services.</param>
-    /// <param name="configuration">A configuration to be bounded with <see cref="IReloadableConfigurationService"/> service.</param>
-    /// <param name="period">A time span for <see cref="ConfigurationReloader"/> to wait between reloads.</param>
-    /// <returns>A collection of services.</returns>
-    public static IServiceCollection AddConfigurationReloader(
-        this IServiceCollection services,
-        IConfiguration configuration,
-        TimeSpan? period = null) =>
-        services
-            .AddConfigurationReloader<ReloadableConfiguration>(configuration, period);
-
 }

@@ -1,4 +1,4 @@
-namespace ConfigurationRepository.Samples.VaultWithDbWebApp;
+namespace ConfigurationRepository.VaultWithDbWebApp;
 
 using System;
 using System.Collections.Generic;

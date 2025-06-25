@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 namespace ConfigurationRepository;
 
 /// <summary>
-/// A service that is to be registered in DI-container to mark the underlying configuration for configuration reload service"/>.
+/// A service that provides the underlying configuration for configuration reload service.
 /// </summary>
 /// <typeparam name="TService"></typeparam>
 internal sealed class ReloadableConfigurationService<TService>(

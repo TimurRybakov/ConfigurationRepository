@@ -7,7 +7,7 @@
     <ProjectGuid>d58923cc-122f-46c4-8ae9-81b1f04d6857</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
-    <DockerServiceName>configurationrepository.samples.vaultwithdbwebapp</DockerServiceName>
+    <DockerServiceName>configurationrepository.vaultwithdbwebapp</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="appsettings.Development.json" />

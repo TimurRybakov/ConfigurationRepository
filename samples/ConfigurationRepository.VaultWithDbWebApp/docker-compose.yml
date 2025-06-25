@@ -1,11 +1,11 @@
 services:
-  configurationrepository.samples.vaultwithdbwebapp:
-    image: ${DOCKER_REGISTRY-}configurationrepositorysamplesvaultwithdbwebapp
+  configurationrepository.vaultwithdbwebapp:
+    image: ${DOCKER_REGISTRY-}configurationrepositoryvaultwithdbwebapp
     build:
       context: ../../
-      dockerfile: samples/ConfigurationRepository.Samples.VaultWithDbWebApp/Dockerfile
+      dockerfile: samples/ConfigurationRepository.VaultWithDbWebApp/Dockerfile
     labels:
-      com.microsoft.visual-studio.project-name: "configurationrepository.samples.vaultwithdbwebapp"
+      com.microsoft.visual-studio.project-name: "configurationrepository.vaultwithdbwebapp"
     ports:
       - "8080:8080"
     environment:

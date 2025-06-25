@@ -15,25 +15,35 @@ Install-Package ConfigurationRepository
 ```
 dotnet add package ConfigurationRepository
 ```
+Here is a simple example with two in-memory repositories:
+- A dictionary repository that stores it`s data as key-value pairs.
+- A parsable repository that is stored as a string parsed into a JSON.
+
 ```csharp
 using ConfigurationRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Define our sample data for dictionary repository.
 var configDictData = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
 { { "DICT KEY", "DICT VALUE" } };
 
-builder.Configuration.AddDictionaryRepository(new InMemoryDictionaryRepository(configDictData));
-
+// Define our sample data for json repository.
 var configJsonData = """{"JSON KEY":"JSON VALUE"}""";
 
-builder.Configuration.AddParsableRepository(new InMemoryJsonRepository(configJsonData));
+// Add our two configuration repository providers with different
+// repositories to configuration builder.
+builder.Configuration
+    .AddDictionaryRepository(new InMemoryDictionaryRepository(configDictData))
+    .AddParsableRepository(new InMemoryJsonRepository(configJsonData));
 
 var app = builder.Build();
 
 app.Run();
 
-class InMemoryDictionaryRepository(IDictionary<string, string?> configData) : IConfigurationRepository
+// A dictionary in-memory repository.
+class InMemoryDictionaryRepository(IDictionary<string, string?> configData)
+    : IConfigurationRepository
 {
     public TData GetConfiguration<TData>()
     {
@@ -41,7 +51,9 @@ class InMemoryDictionaryRepository(IDictionary<string, string?> configData) : IC
     }
 }
 
-class InMemoryJsonRepository(string jsonConfig) : IConfigurationRepository
+// A parsable json in-memory repository.
+class InMemoryJsonRepository(string jsonConfig)
+    : IConfigurationRepository
 {
     public TData GetConfiguration<TData>()
     {
@@ -49,7 +61,10 @@ class InMemoryJsonRepository(string jsonConfig) : IConfigurationRepository
     }
 }
 ```
+More complex example with database-stored configuration repository that stores secrets separatley in `Vault` and parametrizes this configuration with these secret values you may find in [ConfigurationRepository.VaultWithDbWebApp sample project on github](../../samples/ConfigurationRepository.VaultWithDbWebApp).
+Note that It uses `docker` and `docker-compose` to set things up.
 
+The main purpose of `ConfigurationRepository` is to store the configuration in a database. The following libraries provide this:
 # [Dapper configuration repository](/src/ConfigurationRepository.Dapper/README.md)
 
 # [EntityFramework configuration repository](/src/ConfigurationRepository.EntityFramework/README.md)

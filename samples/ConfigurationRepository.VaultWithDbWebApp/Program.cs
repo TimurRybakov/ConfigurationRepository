@@ -6,7 +6,7 @@ using ConfigurationRepository.Dapper;
 using ConfigurationRepository;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using ConfigurationRepository.Samples.VaultWithDbWebApp;
+using ConfigurationRepository.VaultWithDbWebApp;
 using Polly;
 using Polly.Retry;
 
