@@ -15,8 +15,8 @@ public class EfCoreDictionaryConfigurationRepositoryTests
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Repository_Should_Return_Same_Value_As_Saved));
         await using var context = new ConfigurationRepositoryDbContext(options);
-        var repository = new EntryRepository(context);
-        var entry = new ConfigurationEntry { Key = "Host", Value = "127.0.0.1" };
+        var repository = new ConfigurationEntryRepository(context);
+        var entry = new ConfigurationEntry("Host", "127.0.0.1");
 
         // Act
         await repository.AddAsync(entry);
@@ -34,19 +34,11 @@ public class EfCoreDictionaryConfigurationRepositoryTests
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Parametrized_Repository_Should_Return_Same_Value_As_Saved));
         await using var context = new ConfigurationRepositoryDbContext(options);
-        var repository = new EntryRepository(context);
+        var repository = new ConfigurationEntryRepository(context);
 
         // Act
-        await repository.AddAsync(new ConfigurationEntry
-        {
-            Key = "localhost",
-            Value = "127.0.0.1"
-        });
-        await repository.AddAsync(new ConfigurationEntry
-        {
-            Key = "HostParameter",
-            Value = "%LOCALHOST%:8080"
-        });
+        await repository.AddAsync(new ConfigurationEntry("localhost", "127.0.0.1"));
+        await repository.AddAsync(new ConfigurationEntry("HostParameter", "%LOCALHOST%:8080"));
 
         var configuration = new ConfigurationBuilder()
             .AddEfCoreRepository(options)
@@ -66,8 +58,8 @@ public class EfCoreDictionaryConfigurationRepositoryTests
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Repository_With_Reloader_Should_Periodically_Reload));
         await using var context = new ConfigurationRepositoryDbContext(options);
-        var repository = new EntryRepository(context);
-        var entry = new ConfigurationEntry { Key = "Key", Value = "Value" };
+        var repository = new ConfigurationEntryRepository(context);
+        var entry = new ConfigurationEntry("Key", "Value");
 
         // Act
         await repository.AddAsync(entry);
@@ -115,19 +107,11 @@ public class EfCoreDictionaryConfigurationRepositoryTests
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Parametrized_Repository_With_Reloader_Should_Periodically_Reload));
         await using var context = new ConfigurationRepositoryDbContext(options);
-        var repository = new EntryRepository(context);
+        var repository = new ConfigurationEntryRepository(context);
 
         // Act
-        await repository.AddAsync(new ConfigurationEntry
-        {
-            Key = "ConnectionString",
-            Value = "<some connection string>"
-        });
-        await repository.AddAsync(new ConfigurationEntry
-        {
-            Key = "ExtendedConnectionString",
-            Value = "%ConnectionString%(extended)"
-        });
+        await repository.AddAsync(new ConfigurationEntry("ConnectionString", "<some connection string>"));
+        await repository.AddAsync(new ConfigurationEntry("ExtendedConnectionString", "%ConnectionString%(extended)"));
         Console.WriteLine("Configuration saved to repository.");
         var savedEntry = context.ConfigurationEntryDbSet.First();
         var configuration = new ConfigurationBuilder()
@@ -171,12 +155,9 @@ public class EfCoreDictionaryConfigurationRepositoryTests
         Assert.That(configuration["ConnectionString"], Is.EqualTo(savedEntry.Value));
     }
 
-    private static DbContextOptions<ConfigurationRepositoryDbContext> GetDbContextOptions(string databaseName)
-    {
-        var options = new DbContextOptionsBuilder<ConfigurationRepositoryDbContext>();
-        options
-            .UseInMemoryDatabase(databaseName)
-            .UseTable(tableName: "testConfiguration");
-        return options.Options;
-    }
+    private static DbContextOptions<ConfigurationRepositoryDbContext> GetDbContextOptions(string databaseName) =>
+        ConfigurationDbContextOptionsFactory.Create(
+            options => options
+                .UseInMemoryDatabase(databaseName)
+                .UseTable(tableName: "testConfiguration"));
 }

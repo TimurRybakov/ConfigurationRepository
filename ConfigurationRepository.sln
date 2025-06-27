@@ -42,6 +42,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReloadableConfiguration", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReloadableRepository.ParsableInMemory", "samples\ReloadableRepository.ParsableInMemory\ReloadableRepository.ParsableInMemory.csproj", "{5F232E1C-4124-4BA0-934C-33ABF1131786}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationRepository.EfCore", "samples\ConfigurationRepository.EfCore\ConfigurationRepository.EfCore.csproj", "{3D1D28BE-F4D2-4EEA-8C56-26C8465A3B8A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,6 +94,10 @@ Global
 		{5F232E1C-4124-4BA0-934C-33ABF1131786}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5F232E1C-4124-4BA0-934C-33ABF1131786}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F232E1C-4124-4BA0-934C-33ABF1131786}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D1D28BE-F4D2-4EEA-8C56-26C8465A3B8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D1D28BE-F4D2-4EEA-8C56-26C8465A3B8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D1D28BE-F4D2-4EEA-8C56-26C8465A3B8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D1D28BE-F4D2-4EEA-8C56-26C8465A3B8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -109,5 +115,6 @@ Global
 		{D7CF1A0B-80B0-4B88-A701-CCA36D44D178} = {333E19FB-6395-431F-8EC7-E84A8F076203}
 		{7A9E8FD5-2665-4A86-B376-AAAF5CCA1408} = {DB72A8EF-D948-425B-965B-991DDB645809}
 		{5F232E1C-4124-4BA0-934C-33ABF1131786} = {333E19FB-6395-431F-8EC7-E84A8F076203}
+		{3D1D28BE-F4D2-4EEA-8C56-26C8465A3B8A} = {333E19FB-6395-431F-8EC7-E84A8F076203}
 	EndGlobalSection
 EndGlobal

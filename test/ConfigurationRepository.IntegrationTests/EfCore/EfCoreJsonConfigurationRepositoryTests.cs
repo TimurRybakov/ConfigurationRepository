@@ -18,8 +18,8 @@ public class EfCoreJsonConfigurationRepositoryTests
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Json_Repository_Should_Return_Same_Value_As_Saved));
         await using var context = new ConfigurationRepositoryDbContext(options);
-        var repository = new EntryRepository(context);
-        var entry = new ConfigurationEntry { Key = Key, Value = """{"Host":"127.0.0.1"}""" };
+        var repository = new ConfigurationEntryRepository(context);
+        var entry = new ConfigurationEntry(Key, """{"Host":"127.0.0.1"}""");
 
         // Act
         await repository.AddAsync(entry);
@@ -37,12 +37,8 @@ public class EfCoreJsonConfigurationRepositoryTests
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Parametrized_Json_Repository_Should_Return_Same_Value_As_Saved));
         await using var context = new ConfigurationRepositoryDbContext(options);
-        var repository = new EntryRepository(context);
-        var entry = new ConfigurationEntry
-        {
-            Key = Key,
-            Value = """{ "localhost" : "127.0.0.1", "host" : "%localhost%" }"""
-        };
+        var repository = new ConfigurationEntryRepository(context);
+        var entry = new ConfigurationEntry(Key, """{ "localhost" : "127.0.0.1", "host" : "%localhost%" }""");
 
         // Act
         await repository.AddAsync(entry);
@@ -61,8 +57,8 @@ public class EfCoreJsonConfigurationRepositoryTests
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Json_Repository_With_Reloader_Should_Periodically_Reload));
         await using var context = new ConfigurationRepositoryDbContext(options);
-        var repository = new EntryRepository(context);
-        var entry = new ConfigurationEntry { Key = Key, Value = """{"Host":"127.0.0.1"}""" };
+        var repository = new ConfigurationEntryRepository(context);
+        var entry = new ConfigurationEntry(Key, """{"Host":"127.0.0.1"}""");
 
         // Act
         await repository.AddAsync(entry);
@@ -107,12 +103,8 @@ public class EfCoreJsonConfigurationRepositoryTests
         // Arrange
         var options = GetDbContextOptions(nameof(EfCore_Parametrized_Json_Repository_With_Reloader_Should_Periodically_Reload));
         await using var context = new ConfigurationRepositoryDbContext(options);
-        var repository = new EntryRepository(context);
-        var entry = new ConfigurationEntry
-        {
-            Key = Key,
-            Value = """{ "localhost" : "127.0.0.1", "host" : "%localhost%" }"""
-        };
+        var repository = new ConfigurationEntryRepository(context);
+        var entry = new ConfigurationEntry(Key, """{ "localhost" : "127.0.0.1", "host" : "%localhost%" }""");
 
         // Act
         await repository.AddAsync(entry);
@@ -152,12 +144,9 @@ public class EfCoreJsonConfigurationRepositoryTests
         Assert.That(configuration["Host"], Is.EqualTo("192.168.0.1"));
     }
 
-    private static DbContextOptions<ConfigurationRepositoryDbContext> GetDbContextOptions(string databaseName)
-    {
-        var options = new DbContextOptionsBuilder<ConfigurationRepositoryDbContext>();
-        options
-            .UseInMemoryDatabase(databaseName)
-            .UseTable(tableName: "testConfiguration");
-        return options.Options;
-    }
+    private static DbContextOptions<ConfigurationRepositoryDbContext> GetDbContextOptions(string databaseName) =>
+        ConfigurationDbContextOptionsFactory.Create(
+            options => options
+                .UseInMemoryDatabase(databaseName)
+                .UseTable(tableName: "testConfiguration"));
 }

@@ -12,7 +12,7 @@ public interface IConfigurationEntry
     /// Configuration Key delimited by <see cref="ConfigurationPath.KeyDelimiter"/>.
     /// </summary>
     [DisallowNull]
-    string Key { get; }
+    string Key { get; init; }
 
     /// <summary>
     /// Nullable string represeting configuration Value.

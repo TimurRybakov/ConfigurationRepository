@@ -247,11 +247,9 @@ static async Task<List<ConfigurationEntry>> GetConfiguration(string connectionSt
     List<ConfigurationEntry> list = [];
     while (await reader.ReadAsync())
     {
-        list.Add(new ConfigurationEntry()
-        {
-            Key = reader.GetString(reader.GetOrdinal("Key")),
-            Value = reader.GetString(reader.GetOrdinal("Value"))
-        });
+        list.Add(new ConfigurationEntry(
+            reader.GetString(reader.GetOrdinal("Key")),
+            reader.GetString(reader.GetOrdinal("Value"))));
     }
 
     return list;

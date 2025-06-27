@@ -1,5 +1,5 @@
 # ReloadableConfiguration
-An ASP .NET Core class library for using databases as configuration repositories.
+An ASP .NET Core class library for defining reloadable configuration repositories that periodically reload their contents to reflect data changes made by others.
 
 [![NuGet](https://img.shields.io/nuget/dt/ReloadableConfiguration.svg)](https://www.nuget.org/packages/ReloadableConfiguration)
 [![NuGet](https://img.shields.io/nuget/vpre/ReloadableConfiguration.svg)](https://www.nuget.org/packages/ReloadableConfiguration)
