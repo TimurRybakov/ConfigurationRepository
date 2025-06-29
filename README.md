@@ -1,5 +1,5 @@
 # ConfigurationRepository
-An ASP .NET Core class library for using databases as configuration repositories.
+An ASP .NET Core class library that provides access to application\`s configuration stored in a database or any other repository.
 
 [![NuGet](https://img.shields.io/nuget/dt/ConfigurationRepository.svg)](https://www.nuget.org/packages/ConfigurationRepository)
 [![NuGet](https://img.shields.io/nuget/vpre/ConfigurationRepository.svg)](https://www.nuget.org/packages/ConfigurationRepository)
@@ -16,113 +16,101 @@ Install-Package ConfigurationRepository
 dotnet add package ConfigurationRepository
 ```
 
-# [Dapper configuration repository](/src/ConfigurationRepository.Dapper/README.md)
+### Usage:
 
-# [EntityFramework configuration repository](/src/ConfigurationRepository.EntityFramework/README.md)
+The configuration can be stored in two different structured forms, we have to choose one:
++ A single configuration with it\`s keys and values, like in a dictionary, this one called `DictionaryRepository`.
++ Multiple configurations, one of which is extracted using the `Key` and a `Value` that contains parsable hierarchical structure of the configuration by that `Key`. This one called `ParsableRepository`.
+> [!NOTE]
+> Currently, the only format supported for `ParsableRepository` is in `JSON` format. This can be easily extended implementing `IConfigurationParser` interface for any format needed.
 
-# [SqlClient configuration repository](/src/ConfigurationRepository.SqlClient/README.md)
-# Ms Sql Server + Dapper:
+A dictionary repository provider is registered by calling `AddDictionaryRepository()` extension method on configuration builder.
 
-Let's assume that we have a database that stores a configuration table as key-value pairs:
-> ```tsql
-> create table Configuration
-> (
->     [Key]   varchar(800)  not null primary key clustered,
->     [Value] nvarchar(max)     null
-> );
-> 
-> insert Configuration ([Key], [Value])
-> values ('Logging:LogLevel:Default', N'Information'),
->        ('Logging:LogLevel:Microsoft.AspNetCore', N'Warning');
-> ```
-> This script defines a table with non-nullable Key column used as primary key and nullable Value column. The hierarchy of keys is linearized by colon [:] separators. The names of the table, columns and keys/indexes on them can be any.
+A parsable repository provider is registered by calling `AddParsableRepository()` extension method on configuration builder.
 
-So then in our application Program.cs file we may add a configuration provider like this:
-> ```csharp
-> var builder = WebApplication.CreateBuilder(args);
-> 
-> var connectionString = builder.Configuration.GetConnectionString("Dapper");
-> 
-> builder.Configuration.AddDapperRepository(
->     repository => repository
->         .UseDbConnectionFactory(() => new SqlConnection(connectionString))
->         .WithSelectConfigurationQuery("select \"Key\", \"Value\" from Configuration"));
-> 
-> var app = builder.Build();
-> 
-> app.Run();
-> ```
-> Here we:
-> - extract connection string named "Dapper" from existing configuration providers (i.e. `appsettings.json`);
-> - add database repository using Dapper with `AddDapperRepository()` extension method;
-> - define database connection factory that will create database connection for our provider using `UseDbConnectionFactory()` extension method and our connection string;
-> - define the select configuration query with `WithSelectConfigurationQuery()` extension method.
+### See also:
 
-If our database source can change at any time in any way we may also add configuration reloader that with periodically reload our configuration from database:
-> ```csharp
-> var builder = WebApplication.CreateBuilder(args);
-> 
-> var connectionString = builder.Configuration.GetConnectionString("Dapper");
-> 
-> builder.Configuration.AddDapperRepository(
->     repository => repository
->         .UseDbConnectionFactory(() => new SqlConnection(connectionString))
->         .WithSelectConfigurationQuery("select \"Key\", \"Value\" from Configuration"),
->     source => source.WithPeriodicalReload());
-> 
-> builder.Services.AddConfigurationReloader();
-> 
-> var app = builder.Build();
-> 
-> app.Run();
-> ```
-> Here we additionaly:
-> - define that our configuration provider source will use `PeriodicalReload` background service;
-> - register `PeriodicalReload` background service in our service collection.
->
-> We can define reload period as a time span passed as a parameter to `WithPeriodicalReload()` exstension method.
+The main purpose of `ConfigurationRepository` is to store the configuration in a database. The following libraries provide this:
 
-What if our config in database is too heavy to reload it frequently and we want to minimize our network traffic? Let`s just version our configurations adding a rowversion column to the configuration table:
-> ```tsql
-> create table Configuration
-> (
->     [Key]     varchar(800)  not null primary key clustered,
->     [Value]   nvarchar(max)     null,
->     [Version] rowversion    not null unique
-> );
-> 
-> insert Configuration ([Key], [Value])
-> values ('Logging:LogLevel:Default', N'Information'),
->        ('Logging:LogLevel:Microsoft.AspNetCore', N'Warning');
-> ```
-> Here we additionaly:
-> - add a Version column of type rowversion to Configuration table;
-> - mark Version column with uniqe constraint to get an indexed column.
+## [Dapper configuration repository](/src/ConfigurationRepository.Dapper/README.md) - for accessing a database configuration using Dapper ORM.
 
-Then we make our configuration versioned by adding SelectCurrentVersionQuery to our repository:
-> ```csharp
-> var builder = WebApplication.CreateBuilder(args);
-> 
-> var connectionString = builder.Configuration.GetConnectionString("Dapper");
-> 
-> builder.Configuration.AddDapperRepository(
->     repository => repository
->         .UseDbConnectionFactory(() => new SqlConnection(connectionString))
->         .WithSelectConfigurationQuery("select \"Key\", \"Value\" from Configuration")
->         .WithSelectCurrentVersionQuery("select max(\"Version\") from Configuration"),
->     source => source.WithPeriodicalReload());
-> 
-> builder.Services.AddConfigurationReloader();
-> 
-> var app = builder.Build();
-> 
-> app.Run();
-> ```
-> Here we additionaly add `WithSelectCurrentVersionQuery()` extension method passing query that selects current configuration version.
+```csharp
+using ConfigurationRepository;
+using ConfigurationRepository.Dapper;
 
-# ParametrizedConfiguration
-ParametrizedConfiguration library presents a configuration provider that uses it\`s own configuration data via other providers to parametrize parameter placeholders with values, accessed by parameter keys. By default placeholders defined between two `%` symbols like `%param name%`, where `param name` should be the key of the same configuration, the value of which will be substituted into `%param name%`. for example:
-This configuration:
+var builder = WebApplication.CreateBuilder(args);
+
+var connectionString = builder.Configuration.GetConnectionString("Postgres");
+
+builder.Configuration.AddDapperRepository(
+    repository => repository
+        .UseDbConnectionFactory(() => new NpgsqlConnection(connectionString))
+        .WithSelectConfigurationQuery("select \"Key\", \"Value\" from Configuration"));
+
+var app = builder.Build();
+
+app.Run();
+```
+
+## [EntityFramework configuration repository](/src/ConfigurationRepository.EntityFramework/README.md) - for accessing a database configuration using Entity Frameworks ORM.
+
+```csharp
+using ConfigurationRepository.EntityFramework;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
+var config = new ConfigurationBuilder()
+    .AddEfCoreRepository(options => options
+        .UseInMemoryDatabase("ConfigurationDatabase")
+        .UseTable("ConfigurationTable"))
+    .Build();
+```
+
+## [SqlClient configuration repository](/src/ConfigurationRepository.SqlClient/README.md) - for accessing MS SQL Server database configuration using SqlClient library.
+
+```csharp
+using ConfigurationRepository;
+using ConfigurationRepository.SqlClient;
+
+var builder = WebApplication.CreateBuilder(args);
+
+var connectionString = builder.Configuration.GetConnectionString("MsSql");
+
+builder.Configuration.AddSqlClientRepository(
+    repository => repository
+        .UseConnectionString(connectionString)
+        .WithConfigurationTableName("Configuration"));
+
+var app = builder.Build();
+
+app.Run();
+```
+
+## Dapper, EntityFramework and SqlClient repositories are all reloadable. Use [Reloadable configuration repositories](/src/ReloadableConfiguration/README.md) for building configurations that periodically updates from their source providers.
+```csharp
+using ConfigurationRepository;
+using ConfigurationRepository.Dapper;
+
+var builder = WebApplication.CreateBuilder(args);
+
+var connectionString = builder.Configuration.GetConnectionString("Postgres");
+
+builder.Configuration.AddDapperRepository(
+    repository => repository
+        .UseDbConnectionFactory(() => new NpgsqlConnection(connectionString))
+        .WithSelectConfigurationQuery("select \"Key\", \"Value\" from Configuration")
+        .WithSelectCurrentVersionQuery("select max(\"Version\") from Configuration"),
+    source => source.WithPeriodicalReload());
+
+builder.Services.AddConfigurationReloader();
+
+var app = builder.Build();
+
+app.Run();
+```
+
+## [Parametrized configuration](/src/ParametrizedConfiguration/README.md) - for parametrizing configuration values
+For example, this configuration described as a json:
 ```
 {
   { "param1", "1+%param2%" },
@@ -138,32 +126,9 @@ will be parametrized into this:
   { "param3", "3" }
 };
 ```
-This can be used to hide sensitive data from publicly stored configurations or to reuse same configuration values in several places. The code below demonstrates this:
-> ```csharp
-> using ParametrizedConfiguration;
-> using Microsoft.Extensions.Configuration;
-> 
-> // Assume secrets are set via environment variables somewere outside this code,
-> // we set them here just for clarity:
-> Environment.SetEnvironmentVariable("DatabaseName", "MyDatabase");
-> Environment.SetEnvironmentVariable("UserName", "Bob");
-> Environment.SetEnvironmentVariable("Password", "strongPassword");
-> 
-> // Define configuration that will be parametrized with it`s own values:
-> var configuration = new ConfigurationBuilder()
->     .AddEnvironmentVariables()
->     .WithParametrization()
->     .Build();
-> 
-> // Let`s define our configuration key with parameters. It also won't be here
-> // in our production code, but will be loaded from configuration providers
-> // such as json-files or any other defined in ConfigurationBuilder.
-> configuration["ConnectionStrings:Mssql"] =
->     "Server=mssql-server;Database=%DatabaseName%;User Id=%UserName%;Password=%Password%;TrustServerCertificate=True";
-> 
-> // Ok, now let`s get the connection string from configuration:
-> Console.WriteLine(configuration.GetConnectionString("mssql"));
-> 
-> // Output will be parametrized with values from same configuration:
-> // Server=mssql-server;Database=MyDatabase;User Id=Bob;Password=strongPassword;TrustServerCertificate=True
-> ```
+```csharp
+var configuration = new ConfigurationBuilder()
+    // ...Here will be listed all configuration providers (at least one)...
+    .WithParametrization() // Parametrized provider registered here as last one
+    .Build();
+```

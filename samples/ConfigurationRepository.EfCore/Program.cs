@@ -10,15 +10,21 @@ var options = ConfigurationDbContextOptionsFactory.Create(
 // Create configuration context using these options.
 await using var configurationContext = new ConfigurationRepositoryDbContext(options);
 
-// Add a key-value pair to configuration table.
-configurationContext.ConfigurationEntryDbSet.Add(new ConfigurationEntry("Key", "value"));
+// Add a configuration to configurations table with the Key = "DatabaseConfig".
+configurationContext.ConfigurationEntryDbSet.Add(new ConfigurationEntry("DatabaseConfig", """
+    {
+      "ConnectionStrings": {
+        "Host": "A connection string to a host"
+      }
+    }
+    """));
 await configurationContext.SaveChangesAsync();
 
-// Create configuration using Entity Framework repository with created database context options.
+// Create configuration using Entity Framework json repository with created database context options.
 var config = new ConfigurationBuilder()
-    .AddEfCoreRepository(options)
+    .AddEfCoreJsonRepository("DatabaseConfig", options)
     .Build();
 
-// Get a value from the configuration.
-Console.WriteLine(config["key"]);
+// Get the Value = "A connection string to a host" from the configuration.
+Console.WriteLine(config.GetConnectionString("Host"));
 

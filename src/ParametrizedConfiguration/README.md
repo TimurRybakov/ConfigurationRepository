@@ -35,6 +35,23 @@ Install-Package ParametrizedConfiguration
 dotnet add package ParametrizedConfiguration
 ```
 
+### Usage:
+
+Parametrization will be made on any configuration that registered `ParametrizedConfigurationProvider`.
+The registration is made by calling `WithParametrization()` extension method on configuration builder.
+
+> [!NOTE]
+> Call `WithParametrization()` method last before you build your configuration as it uses all providers registered before itself.
+
+```csharp
+var configuration = new ConfigurationBuilder()
+    // ...Here will be listed all configuration providers (at least one)...
+    .WithParametrization() // Parametrized provider registered here as last one
+    .Build();
+```
+
+### Examples:
+
 Here is a simple example to demonstrate configuration parametrization:
 ```csharp
 using ParametrizedConfiguration;

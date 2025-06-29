@@ -15,6 +15,15 @@ Install-Package ReloadableConfiguration
 ```
 dotnet add package ReloadableConfiguration
 ```
+
+### Usage:
+
+- The source of reloadable configuration repository provider should have `PeriodicalReload` property set to `true`.
+This may be done by calling `WithPeriodicalReload()` extension method on source configurator.
+- A `ConfigurationReloader` hosted service should be registered in service collection using `AddConfigurationReloader()` extension method.
+
+### Examples:
+
 The following sample explains how to define a configuration repository that is periodically reloaded to update it\`s configuration if provider data changes. A working example you may find in [ReloadableRepository.ParsableInMemory sample project on github](../../samples/ReloadableRepository.ParsableInMemory).
 ```csharp
 using ConfigurationRepository;
@@ -65,3 +74,4 @@ class InMemoryJsonRepository(string jsonConfig)
     }
 }
 ```
+The complete example you may find in [ReloadableRepository.ParsableInMemory project on github](../../samples/ReloadableRepository.ParsableInMemory).

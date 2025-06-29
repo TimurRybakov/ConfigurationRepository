@@ -10,10 +10,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-public sealed class ReloadableVaultConfiguration
+public sealed class ReloadableBaseConfiguration
 { }
 
-public sealed class ReloadableDatabaseConfiguration
+public sealed class ReloadableConfiguration
 { }
 
 /// <summary>
@@ -32,7 +32,7 @@ public class ValutConfigurationReloader : BackgroundService
     /// <param name="configuration">Instance of IConfiguration</param>
     /// <param name="logger">Optional logger provider</param>
     public ValutConfigurationReloader(
-        IReloadableConfigurationService<ReloadableVaultConfiguration> configurationService,
+        IReloadableConfigurationService<ReloadableBaseConfiguration> configurationService,
         ILogger? logger = null)
     {
         var configurationRoot = (IConfigurationRoot)configurationService.Configuration;

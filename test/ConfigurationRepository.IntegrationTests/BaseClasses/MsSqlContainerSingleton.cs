@@ -111,14 +111,14 @@ public partial class MsSqlContainerSingleton : IDisposable
             if object_id('appcfg.JsonConfiguration', 'U') is null
               create table appcfg.JsonConfiguration
               (
-                [Key]       varchar(255) collate Cyrillic_General_BIN not null primary key clustered,
+                [Key]       varchar(255) collate Latin1_General_100_BIN2 not null primary key clustered,
                 [JsonValue] nvarchar(max) null,
                 [Version]   rowversion not null
               );
             """;
 
         const string triggerCommandText = $"""
-            create or alter trigger appcfg.tr_Configuration_i_u_d on appcfg.Configuration for insert, update, delete
+            create or alter trigger appcfg.tr_Configuration_Change on appcfg.Configuration for insert, update, delete
             as
               set nocount on;
 

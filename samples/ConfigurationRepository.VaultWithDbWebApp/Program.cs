@@ -30,7 +30,7 @@ var baseConfiguration = new ConfigurationBuilder()
             "root"),
         basePath: "configuration_sample_web_api",
         mountPoint: "secret")
-    .WithParametrization<ReloadableVaultConfiguration>(builder.Services)
+    .WithParametrization<ReloadableBaseConfiguration>(builder.Services)
     .Build();
 
 // Get database connection string using parametrized configuration.
@@ -51,7 +51,7 @@ var configuration = new ConfigurationBuilder()
             .UseDbConnectionFactory(() => new SqlConnection(finalConnectionString))
             .WithSelectConfigurationQuery("select \"Key\", \"Value\" from Configuration"),
         source => source.WithPeriodicalReload())
-    .WithParametrization<ReloadableDatabaseConfiguration>(builder.Services)
+    .WithParametrization<ReloadableConfiguration>(builder.Services)
     .Build();
 
 // Add final configuration as source for application`s configuration.
