@@ -9,16 +9,10 @@ namespace ConfigurationRepository;
 internal sealed class ReloadableConfigurationService<TService>(
     IConfiguration configuration) : IReloadableConfigurationService<TService>
 {
-
     /// <summary>
     /// Configuration to be reloaded.
     /// </summary>
     public IConfiguration Configuration { get; } = configuration;
-
-    /// <summary>
-    /// A type of marker class. Markers may be used by different reloaders.
-    /// </summary>
-    public Type ServiceType => typeof(TService);
 }
 
 /// <summary>

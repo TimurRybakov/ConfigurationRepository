@@ -11,11 +11,6 @@ public interface IReloadableConfigurationService
     /// Configuration to be reloaded.
     /// </summary>
     IConfiguration Configuration { get; }
-
-    /// <summary>
-    /// A type of marker class. Markers may be used by different reloaders.
-    /// </summary>
-    Type ServiceType { get; }
 }
 
 /// <summary>

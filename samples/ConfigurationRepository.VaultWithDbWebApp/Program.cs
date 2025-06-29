@@ -25,9 +25,7 @@ var baseConfiguration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddVaultConfiguration(
-        () => new VaultOptions(
-            vaultUri,
-            "root"),
+        () => new VaultOptions(vaultUri, "root"),
         basePath: "configuration_sample_web_api",
         mountPoint: "secret")
     .WithParametrization<ReloadableBaseConfiguration>(builder.Services)
