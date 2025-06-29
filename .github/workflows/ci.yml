@@ -33,7 +33,10 @@ jobs:
       run: dotnet test -c Release --no-build -l trx --verbosity=normal ./test/ConfigurationRepository.UnitTests/ConfigurationRepository.UnitTests.csproj
 
     - name: Pack
-      run: dotnet pack -c Release -o artifacts --no-build
+      run: |
+        while IFS= read -r proj; do
+          dotnet pack "$proj" -c Release -o artifacts --no-build
+        done < <(find src -name '*.csproj')
 
     - name: Artifacts
       uses: actions/upload-artifact@v4
