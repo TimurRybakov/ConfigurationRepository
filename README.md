@@ -32,7 +32,7 @@ A parsable repository provider is registered by calling `AddParsableRepository()
 
 The main purpose of `ConfigurationRepository` is to store the configuration in a database. The following libraries provide this:
 
-## [Dapper configuration repository](/src/ConfigurationRepository.Dapper/README.md) - for accessing a database configuration using Dapper ORM.
+## [Dapper configuration repository](/src/ConfigurationRepository.Dapper) - for accessing a database configuration using Dapper ORM.
 
 ```csharp
 using ConfigurationRepository;
@@ -52,7 +52,7 @@ var app = builder.Build();
 app.Run();
 ```
 
-## [EntityFramework configuration repository](/src/ConfigurationRepository.EntityFramework/README.md) - for accessing a database configuration using Entity Frameworks ORM.
+## [EntityFramework configuration repository](/src/ConfigurationRepository.EntityFramework) - for accessing a database configuration using Entity Frameworks ORM.
 
 ```csharp
 using ConfigurationRepository.EntityFramework;
@@ -66,7 +66,7 @@ var config = new ConfigurationBuilder()
     .Build();
 ```
 
-## [SqlClient configuration repository](/src/ConfigurationRepository.SqlClient/README.md) - for accessing MS SQL Server database configuration using SqlClient library.
+## [SqlClient configuration repository](/src/ConfigurationRepository.SqlClient) - for accessing MS SQL Server database configuration using SqlClient library.
 
 ```csharp
 using ConfigurationRepository;
@@ -86,7 +86,7 @@ var app = builder.Build();
 app.Run();
 ```
 
-## Dapper, EntityFramework and SqlClient repositories are all reloadable. Use [Reloadable configuration repositories](/src/ReloadableConfiguration/README.md) for building configurations that periodically updates from their source providers.
+## Dapper, EntityFramework and SqlClient repositories are all reloadable. Use [Reloadable configuration repositories](/src/ReloadableConfiguration) for building configurations that periodically updates from their source providers.
 ```csharp
 using ConfigurationRepository;
 using ConfigurationRepository.Dapper;
@@ -109,7 +109,7 @@ var app = builder.Build();
 app.Run();
 ```
 
-## [Parametrized configuration](/src/ParametrizedConfiguration/README.md) - for parametrizing configuration values
+## [Parametrized configuration](/src/ParametrizedConfiguration) - for parametrizing configuration values
 For example, this configuration described as a json:
 ```
 {

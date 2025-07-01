@@ -19,8 +19,11 @@ dotnet add package ConfigurationRepository.Dapper
 ### Usage:
 
 The configuration can be stored in two different structured forms, we have to choose one:
-+ A single configuration with it\`s keys and values, like in a dictionary, this one called `DapperDictionaryConfigurationRepository`.
-+ Multiple configurations, one of which is extracted using the `Key` and a `Value` that contains parsable hierarchical structure of the configuration by that `Key`. This one called `DapperParsableConfigurationRepository`.
++ A single configuration with it\`s keys and values, like in a dictionary.
+Access to configuration storage is provided by `DapperDictionaryConfigurationRepository` class.
++ Multiple configurations, one of which is extracted using the `Key` and a `Value` that contains parsable hierarchical structure of the configuration by that `Key`.
+Access to configuration storage is provided by `DapperParsableConfigurationRepository` class.
+
 > [!NOTE]
 > Currently, the only format supported for `DapperParsableConfigurationRepository` is in `JSON` format. This can be easily extended implementing `IConfigurationParser` interface for any format needed.
 
@@ -234,7 +237,7 @@ insert into Configuration ("Key", "JsonValue")
 values ('MyAppConfig', '{"ConfigurationKey1":"Value1","ConfigurationKey2":"Value2"}');
 ```
 
-Finally in our application we can set things up:
+Finally in our application we can wire all up:
 > ```csharp
 > using ConfigurationRepository;
 > using ConfigurationRepository.Dapper;
@@ -412,7 +415,7 @@ First, we define configuration table:
 > + The `Version` column is a `rowversion` that is automatically updated by MS SQL Server when rows are inserted or updated.
 > + Inserted one row into `JsonConfiguration` table with `Key` = "MyAppConfig" and `JsonValue` with our JSON configuration.
 
-Finally in our application we can set things up:
+Finally in our application we can wire all up:
 > ```csharp
 > using ConfigurationRepository;
 > using ConfigurationRepository.Dapper;

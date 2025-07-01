@@ -19,9 +19,11 @@ dotnet add package ConfigurationRepository.SqlClient
 ### Usage:
 
 The configuration can be stored in two different structured forms, we have to choose one:
-+ A single configuration with it\`s keys and values, like in a dictionary, this one called `SqlClientDictionaryConfigurationRepository`.
++ A single configuration with it\`s keys and values, like in a dictionary.
+Access to configuration storage is provided by `SqlClientDictionaryConfigurationRepository` class.
 + Multiple configurations, one of which is extracted using the `Key` and a `Value` that contains parsable hierarchical structure of the configuration by that `Key`.
-This one called `SqlClientParsableConfigurationRepository`.
+Access to configuration storage is provided by `SqlClientParsableConfigurationRepository` class.
+
 > [!NOTE]
 > Currently, the only format supported for `SqlClientParsableConfigurationRepository` is in `JSON` format.
 > This can be easily extended implementing `IConfigurationParser` interface for any format needed.
@@ -46,7 +48,9 @@ Let's assume that we have a database that stores a configuration table as key-va
 > values ('Logging:LogLevel:Default', N'Information'),
 >        ('Logging:LogLevel:Microsoft.AspNetCore', N'Warning');
 > ```
-> This script defines a table with non-nullable Key column used as primary key and nullable Value column. The hierarchy of keys is linearized by colon [:] separators. The names of the table, columns and keys/indexes on them can be any.
+> This script defines a table with non-nullable Key column used as primary key and nullable Value column.
+> The hierarchy of keys is linearized by colon [:] separators.
+> The names of the table, columns and keys/indexes on them can be any.
 
 So then in our application Program.cs file we may add a configuration provider like this:
 > ```csharp

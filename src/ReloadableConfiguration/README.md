@@ -24,7 +24,7 @@ This may be done by calling `WithPeriodicalReload()` extension method on source 
 
 ### Examples:
 
-The following sample explains how to define a configuration repository that is periodically reloaded to update it\`s configuration if provider data changes. A working example you may find in [ReloadableRepository.ParsableInMemory sample project on github](../../samples/ReloadableRepository.ParsableInMemory).
+The following sample explains how to define a configuration repository that is periodically reloaded to update it\`s configuration if provider data changes.
 ```csharp
 using ConfigurationRepository;
 using Microsoft.AspNetCore.Builder;
@@ -74,4 +74,4 @@ class InMemoryJsonRepository(string jsonConfig)
     }
 }
 ```
-The complete example you may find in [ReloadableRepository.ParsableInMemory project on github](../../samples/ReloadableRepository.ParsableInMemory).
+The complete example you may find in [ReloadableRepository.ParsableInMemory project on github](https://github.com/TimurRybakov/ConfigurationRepository/tree/master/samples/ReloadableRepository.ParsableInMemory).

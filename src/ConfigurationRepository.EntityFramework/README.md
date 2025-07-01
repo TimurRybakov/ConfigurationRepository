@@ -19,8 +19,11 @@ dotnet add package ConfigurationRepository.EntityFramework
 ### Usage:
 
 The configuration can be stored in two different structured forms, we have to choose one:
-+ A table of single configuration with it\`s keys and values, like in a dictionary, this one uses `EfDictionaryConfigurationRepository`.
-+ A table of multiple configurations, one of which is extracted using the `Key` and a `Value` that contains parsable hierarchical structure of the configuration by that `Key`. This one uses `EfParsableConfigurationRepository`.
++ A table of single configuration with it\`s keys and values, like in a dictionary.
+Access to configuration storage is provided by `EfDictionaryConfigurationRepository` class.
++ A table of multiple configurations, one of which is extracted using the `Key` and a `Value` that contains parsable hierarchical structure of the configuration by that `Key`.
+Access to configuration storage is provided by `EfParsableConfigurationRepository` class.
+
 > [!NOTE]
 > Currently, the only format supported for `EfParsableConfigurationRepository` is in `JSON` format. This can be easily extended implementing `IConfigurationParser` interface for any format needed.
 
@@ -41,7 +44,7 @@ Registration of EfCore configuration provider with `EfDictionaryConfigurationRep
 > + Register EfCore dictionary repository `EfDictionaryConfigurationRepository` for this builder as configuration provider using `AddEfCoreRepository()` extension method;
 > + Configure database context options:
 >   + For simplicity we are using in-memory database with `UseInMemoryDatabase()` extension method. This can be replaced by any database supported by Entity Framework.
->   + Using `UseTable()` extension method we set the name for our configuration table.
+>   + With `UseTable()` extension method we set the name for our configuration table.
 > + Build configuration.
 
 Registration of EfCore configuration provider with `EfParsableConfigurationRepository` (JSON) for `ConfigurationBuilder`:

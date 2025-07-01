@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Configuration repository provider. A repository may be any storage, i.e. a database.</Description>
-    <PackageTags>configuration-repository-provider;configuration-storage;configuration-repository;configuration;repository;storage</PackageTags>
+    <Description>Configuration repository provider for building .NET Core application`s configuration stored in databases or other storages.</Description>
+    <PackageTags>database-configuration;configuration-repository-provider;configuration-storage;stored-configuration;configuration-repository;configuration;repository;storage</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

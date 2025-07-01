@@ -19,14 +19,16 @@ dotnet add package ConfigurationRepository
 ### Usage:
 
 The configuration can be stored in two different structured forms, we have to choose one:
-+ A single configuration with it\`s keys and values, like in a dictionary, this one called `DictionaryRepository`.
-+ Multiple configurations, one of which is extracted using the `Key` and a `Value` that contains parsable hierarchical structure of the configuration by that `Key`. This one called `ParsableRepository`.
++ A single configuration with it\`s keys and values, like in a dictionary.
+This type of configuration repository is called `Dictionary repository`.
++ Multiple configurations, one of which is extracted using the `Key` and a `Value` that contains parsable hierarchical structure of the configuration by that `Key`.
+This type of configuration repository is called `Parsable repository`.
 > [!NOTE]
-> Currently, the only format supported for `ParsableRepository` is in `JSON` format. This can be easily extended implementing `IConfigurationParser` interface for any format needed.
+> Currently, the only format supported for `Parsable repository` is in `JSON` format. This can be easily extended implementing `IConfigurationParser` interface for any format needed.
 
-A dictionary repository provider is registered by calling `AddDictionaryRepository()` extension method on configuration builder.
+A dictionary repository provider is registered by `AddDictionaryRepository()` extension method called on configuration builder.
 
-A parsable repository provider is registered by calling `AddParsableRepository()` extension method on configuration builder.
+A parsable repository provider is registered by `AddParsableRepository()` extension method called on configuration builder.
 
 ### Examples:
 
@@ -76,14 +78,17 @@ class InMemoryJsonRepository(string jsonConfig)
     }
 }
 ```
-More complex example with database-stored configuration repository that stores secrets separatley in `Vault` and parametrizes this configuration with these secret values you may find in [ConfigurationRepository.VaultWithDbWebApp sample project on github](../../samples/ConfigurationRepository.VaultWithDbWebApp).
-Note that It uses `docker` and `docker-compose` to set things up.
+More complex example with database-stored configuration repository that stores secrets separatley in `Vault` and parametrizes this configuration with these secret values you may find in [ConfigurationRepository.VaultWithDbWebApp sample project on github](https://github.com/TimurRybakov/ConfigurationRepository/tree/master/samples/ConfigurationRepository.VaultWithDbWebApp).
+Note that It uses `docker` and `docker-compose` to set all environment up.
 
 ### See also:
 
 The main purpose of `ConfigurationRepository` is to store the configuration in a database. The following libraries provide this:
-## [Dapper configuration repository](/src/ConfigurationRepository.Dapper/README.md) - for accessing a database configuration using Dapper ORM
+## [ConfigurationRepository.Dapper](https://github.com/TimurRybakov/ConfigurationRepository/tree/master/src/ConfigurationRepository.Dapper) - for accessing database configurations using Dapper ORM.
 
-## [EntityFramework configuration repository](/src/ConfigurationRepository.EntityFramework/README.md) - for accessing a database configuration using Entity Frameworks ORM
+## [ConfigurationRepository.EntityFramework](https://github.com/TimurRybakov/ConfigurationRepository/tree/master/src/ConfigurationRepository.EntityFramework) - for accessing database configurations using Entity Frameworks ORM.
 
-## [SqlClient configuration repository](/src/ConfigurationRepository.SqlClient/README.md) - for accessing MS SQL Server database configuration using SqlClient library
+## [ConfigurationRepository.SqlClient](https://github.com/TimurRybakov/ConfigurationRepository/tree/master/src/ConfigurationRepository.SqlClient) - for accessing MS SQL Server database configurations using MS SqlClient library.
+
+Any of these configurations may also be parametrizable:
+## [ParametrizedConfiguration](https://github.com/TimurRybakov/ConfigurationRepository/tree/master/src/ParametrizedConfiguration) - for parametrizing configuration provided by other configuration providers.

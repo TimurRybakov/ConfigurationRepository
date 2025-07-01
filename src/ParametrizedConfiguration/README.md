@@ -81,4 +81,4 @@ Console.WriteLine(configuration.GetConnectionString("mssql"));
 // Output will be parametrized with values from same configuration:
 // Server=mssql-server;Database=MyDatabase;User Id=Bob;Password=strongPassword;TrustServerCertificate=True
 ```
-This example you may also find in [ParametrizedConfiguration.EnvSecrets sample project on github](../../samples/ParametrizedConfiguration.EnvSecrets).
+This example you may also find in [ParametrizedConfiguration.EnvSecrets sample project on github](https://github.com/TimurRybakov/ConfigurationRepository/tree/master/samples/ParametrizedConfiguration.EnvSecrets).
