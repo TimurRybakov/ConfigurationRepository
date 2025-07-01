@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Reloadable configuration marker class with reloading background service. Used for configuration provaiders that needs external service for periodical reload.</Description>
+    <Description>A configuration provider with reloading background service. Used for configuration providers that needs external service for periodical reload.</Description>
     <PackageTags>reloadable-configuration;reload-configuration-provider;configuration;configuration-reloader;configuration-updater;</PackageTags>
   </PropertyGroup>
 
