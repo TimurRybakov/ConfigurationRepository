@@ -52,7 +52,7 @@ var app = builder.Build();
 app.Run();
 ```
 
-## [EntityFramework configuration repository](/src/ConfigurationRepository.EntityFramework) - for accessing a database configuration using Entity Frameworks ORM.
+## [EntityFramework configuration repository](/src/ConfigurationRepository.EntityFramework) - for accessing a database configuration using Entity Framework ORM.
 
 ```csharp
 using ConfigurationRepository.EntityFramework;

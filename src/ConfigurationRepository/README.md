@@ -86,7 +86,7 @@ Note that It uses `docker` and `docker-compose` to set all environment up.
 The main purpose of `ConfigurationRepository` is to store the configuration in a database. The following libraries provide this:
 ## [ConfigurationRepository.Dapper](https://github.com/TimurRybakov/ConfigurationRepository/tree/master/src/ConfigurationRepository.Dapper) - for accessing database configurations using Dapper ORM.
 
-## [ConfigurationRepository.EntityFramework](https://github.com/TimurRybakov/ConfigurationRepository/tree/master/src/ConfigurationRepository.EntityFramework) - for accessing database configurations using Entity Frameworks ORM.
+## [ConfigurationRepository.EntityFramework](https://github.com/TimurRybakov/ConfigurationRepository/tree/master/src/ConfigurationRepository.EntityFramework) - for accessing database configurations using Entity Framework ORM.
 
 ## [ConfigurationRepository.SqlClient](https://github.com/TimurRybakov/ConfigurationRepository/tree/master/src/ConfigurationRepository.SqlClient) - for accessing MS SQL Server database configurations using MS SqlClient library.
 
