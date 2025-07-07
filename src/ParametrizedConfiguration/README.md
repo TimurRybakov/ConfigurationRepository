@@ -3,20 +3,20 @@ An ASP .NET Core class library presents a configuration provider that uses it\`s
 By default placeholders defined between two `%` symbols like `%param name%`, where `param name` should be the key of the same configuration, the value of which will be substituted into `%param name%`.
 
 For example, this configuration described as a json:
-```
+```json
 {
-  { "param1", "1+%param2%" },
-  { "param2", "2+%param3%" },
-  { "param3", "3" }
-};
+  "param1": "1+%param2%",
+  "param2": "2+%param3%",
+  "param3": "3"
+}
 ```
 will be parametrized into this:
-```
+```json
 {
-  { "param1", "1+2+3" },
-  { "param2", "2+3" },
-  { "param3", "3" }
-};
+  "param1": "1+2+3",
+  "param2": "2+3",
+  "param3": "3"
+}
 ```
 This can be used to hide sensitive data from publicly stored configurations or to reuse the same values in different parts of the configuration.
 
