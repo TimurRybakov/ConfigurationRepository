@@ -111,20 +111,20 @@ app.Run();
 
 ## [Parametrized configuration](/src/ParametrizedConfiguration) - for parametrizing configuration values
 For example, this configuration described as a json:
-```
+```json
 {
-  { "param1", "1+%param2%" },
-  { "param2", "2+%param3%" },
-  { "param3", "3" }
-};
+  "param1": "1+%param2%",
+  "param2": "2+%param3%",
+  "param3": "3"
+}
 ```
 will be parametrized into this:
-```
+```json
 {
-  { "param1", "1+2+3" },
-  { "param2", "2+3" },
-  { "param3", "3" }
-};
+  "param1": "1+2+3",
+  "param2": "2+3",
+  "param3": "3"
+}
 ```
 ```csharp
 var configuration = new ConfigurationBuilder()
