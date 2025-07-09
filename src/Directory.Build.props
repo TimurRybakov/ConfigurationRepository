@@ -2,11 +2,11 @@
   <PropertyGroup>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <PackageReadmeFile>README.md</PackageReadmeFile>
         
-    <Version>1.1.1</Version>
+    <Version>1.1.2</Version>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
     <Authors>Timur Rybakov</Authors>
